@@ -1,0 +1,35 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "成语故事",
+      "hasCanvas": false,
+      "bodyTextLen": 799,
+      "bodyTextHash": "db039b830f246684de30880fe0b65cb4f1238b7a300ecec7082ac829e155c587",
+      "bodyTextPrefix": "给小朋友的免费有声绘本 成语故事 不用登录，打开就能听 轻轻点开一本 听故事 · 看图画 · 懂道理 · 共 24 本 书架 守",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "成语故事",
+      "hasCanvas": false,
+      "bodyTextLen": 799,
+      "bodyTextHash": "db039b830f246684de30880fe0b65cb4f1238b7a300ecec7082ac829e155c587",
+      "bodyTextPrefix": "给小朋友的免费有声绘本 成语故事 不用登录，打开就能听 轻轻点开一本 听故事 · 看图画 · 懂道理 · 共 24 本 书架 守",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}

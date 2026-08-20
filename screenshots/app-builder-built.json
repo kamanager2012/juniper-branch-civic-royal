@@ -1,0 +1,37 @@
+{
+  "url": "http://127.0.0.1:8081/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "成语故事",
+      "hasCanvas": false,
+      "bodyTextLen": 218,
+      "bodyTextHash": "fc0bb28409c0fa10c4d76fac1b90da818fb6a5e6c165113c0e36e6414111d303",
+      "bodyTextPrefix": "给小朋友的有声绘本 成语故事 轻轻点开一本 听故事 · 看图画 · 懂道理 书架 守株待兔 shǒu zhū dài tù 好运",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "成语故事",
+      "hasCanvas": false,
+      "bodyTextLen": 218,
+      "bodyTextHash": "fc0bb28409c0fa10c4d76fac1b90da818fb6a5e6c165113c0e36e6414111d303",
+      "bodyTextPrefix": "给小朋友的有声绘本 成语故事 轻轻点开一本 听故事 · 看图画 · 懂道理 书架 守株待兔 shǒu zhū dài tù 好运",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-built.json",
+  "divergesFromBaseline": false,
+  "baselineReasons": []
+}
