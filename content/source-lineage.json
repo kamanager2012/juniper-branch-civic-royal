@@ -1,5 +1,3939 @@
 {
   "schemaVersion": 1,
   "originCommit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
-  "entries": {}
+  "entries": {
+    "artwork:public/favicon.svg": {
+      "fingerprintSha256": "953d7ff2f785bc5208edb76dafca96aafdc30cd0ec0119f442fe4f20e526efb1",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/favicon.svg",
+        "method": "git-blob-identity",
+        "gitBlob": "503fe3923baa81025041297312e5c3394a549dcb"
+      }
+    },
+    "artwork:public/icon-180.png": {
+      "fingerprintSha256": "3cf5d17d294b51c6cca6c86070309b88554b7ad702b0412e8e2709a01990bc8a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": ".vercel/output/static/__grok/icon-180.png",
+        "method": "git-blob-identity",
+        "gitBlob": "e9d2ac1c646a76979136bb2f8b2c483d81a33f54"
+      }
+    },
+    "artwork:public/og.jpg": {
+      "fingerprintSha256": "2c2c54e73e543e1604017e87265c202cf6b759ec0fdf339a0abc0967d640326d",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/og.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "782567bdb9396a614a556a3e61b8b6d6b1d286c1"
+      }
+    },
+    "artwork:public/ui/bookshelf-paper.jpg": {
+      "fingerprintSha256": "5ee882681636e4a25f7d225c91c0111eb0190683b963dd6228bfabd57dfda750",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": ".vercel/output/static/stories/bookshelf-hero.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "ec58e3ddf4acfa040e9fb05e44eef97196438464"
+      }
+    },
+    "audio:public/audio/ba-miao/moral.mp3": {
+      "fingerprintSha256": "a45ecc7c895c92c7f8ae3773c5526c027a4593b7c7e2b17f91e71fef72eb9f1a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ba-miao/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "845e6af9b14867fef5d7956387e482dbe1d5efe7"
+      }
+    },
+    "audio:public/audio/ba-miao/p0.mp3": {
+      "fingerprintSha256": "a01f8187fdfe605060fc4597f18142312a838d68ca5ab942f36e7f0a4c547aed",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ba-miao/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "99495bc43421e96a56e1ce5bb6bd720e494b4c63"
+      }
+    },
+    "audio:public/audio/ba-miao/p1.mp3": {
+      "fingerprintSha256": "f03ac2ff7f3051d464351983366d0abc6a8b15c863abb9efc0b64b4ce3cf36f2",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ba-miao/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "b20e2bf7c12a51b5d583e2ae814177f6235c38fa"
+      }
+    },
+    "audio:public/audio/ba-miao/p2.mp3": {
+      "fingerprintSha256": "81a09f84dc1c9dd2397e46b8398fc821621dfa010f1917bf6db820d4c6176061",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ba-miao/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "88ff105a686ea3c57276b2318be02561638e66d9"
+      }
+    },
+    "audio:public/audio/ba-miao/p3.mp3": {
+      "fingerprintSha256": "a6e7495a52715585ae8e6b4388ba4bc0a6173fdbe3fc7c456abe85a2028c76c9",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ba-miao/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "d123afc62a04c197712423fd6178cf414b96593c"
+      }
+    },
+    "audio:public/audio/ba-miao/p4.mp3": {
+      "fingerprintSha256": "52a329e19fc55c937a2ea4b803ec33590ab86b8271cfcb39cf3da821a0b22b70",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ba-miao/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "652aac10075b3c15c5ed6d94f77f3d1d99c8c53e"
+      }
+    },
+    "audio:public/audio/ba-miao/p5.mp3": {
+      "fingerprintSha256": "cdd699ad1c6ccf7899bfc7a8c19f0aef7583011876fdbc62b30ab2cc878f9900",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ba-miao/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "7d908fb1e7e7028fa817375343605e7ea0e736ab"
+      }
+    },
+    "audio:public/audio/ba-miao/p6.mp3": {
+      "fingerprintSha256": "e4b363e5406fff7ebef2aa1b52b57e531dc9fb619917d609e76d8eb5753d38e6",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ba-miao/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "b12ee9303bcf5a8da8f70b4658d1253ac174aca5"
+      }
+    },
+    "audio:public/audio/ba-miao/p7.mp3": {
+      "fingerprintSha256": "96d4c90135be7b245b18c825861da58f9a54e677f49511289fc6c0baca930250",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ba-miao/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "9d6abb1a71056d7343f2fe54b873476c1c588d11"
+      }
+    },
+    "audio:public/audio/dui-niu/moral.mp3": {
+      "fingerprintSha256": "bf086153d63c80df1ec7ac3219230b636d963dbf839f4bf289cd883f30ee0aaa",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/dui-niu/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "4ae239eab139351fd5856b3fc6a39ad9ee49dff2"
+      }
+    },
+    "audio:public/audio/dui-niu/p0.mp3": {
+      "fingerprintSha256": "4501b91f6509f371d15e96f13d02f7603086ae0d530cf6abf2d1b7df8569aeae",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/dui-niu/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "6b3a372bb2f6bceb9afc70c0bc30855c24dc3307"
+      }
+    },
+    "audio:public/audio/dui-niu/p1.mp3": {
+      "fingerprintSha256": "c66aed30227a43a437febe3e751ace56722ea43d094e5cab56e986ffbccd3b21",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/dui-niu/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "4085b54053dbc96df76ed96f1b9841f9a0e54db5"
+      }
+    },
+    "audio:public/audio/dui-niu/p2.mp3": {
+      "fingerprintSha256": "3c063b7e07f07132317cef1465ee90dd05b06461659c3db39ce561e551b27d8a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/dui-niu/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "5f3cb2672ac7822602360dc164749e75bda48025"
+      }
+    },
+    "audio:public/audio/dui-niu/p3.mp3": {
+      "fingerprintSha256": "4752b9ff366d343c25532d8d7e04288eb841a4e764768cedd5365c8647ad8f9a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/dui-niu/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "dd318c89c8c3f20e7302412be6a00ab44e273b78"
+      }
+    },
+    "audio:public/audio/dui-niu/p4.mp3": {
+      "fingerprintSha256": "eb10554d58144fe827897e1aed6e4f53f2418b90e4c46013820134350374db14",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/dui-niu/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "4752f561b915cc621dec8ae740565f566970bb43"
+      }
+    },
+    "audio:public/audio/dui-niu/p5.mp3": {
+      "fingerprintSha256": "b5ac4eca6b909c4c67d842b35d41117afdb86284e91d52648a85763a470a5a11",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/dui-niu/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "f291eb970d43a19fd7bb81332fc7fb1ab42c9b5a"
+      }
+    },
+    "audio:public/audio/dui-niu/p6.mp3": {
+      "fingerprintSha256": "d5a1abc223444a1b7e06098de16098b69be14f1b7a2ddc078962a7d3aa52fbc1",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/dui-niu/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "b1cb0c63affa201cdae1fce0b5658be38734ffe5"
+      }
+    },
+    "audio:public/audio/dui-niu/p7.mp3": {
+      "fingerprintSha256": "9415a5c6adf5eefbe381231eab7b151fbde88975c691b7d099fd3572cb46dc14",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/dui-niu/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "e3f50d4cf2e75ecf1c20f17bde7688a362ab26c1"
+      }
+    },
+    "audio:public/audio/hu-jia/moral.mp3": {
+      "fingerprintSha256": "ad643b184873ecc68f03cffde3ee843db362fc7cc4f59bb80dc943ff8f33268f",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hu-jia/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "35af2bddca0f94e6dc5eab933f772981f22b40a6"
+      }
+    },
+    "audio:public/audio/hu-jia/p0.mp3": {
+      "fingerprintSha256": "e0b63e914a7bc6c8d7a1f31721047c71990bb3df67fcb6baca7d4a5b38a5ca76",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hu-jia/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "6186a84881a78d8bb73815d6d5e32538163c4e03"
+      }
+    },
+    "audio:public/audio/hu-jia/p1.mp3": {
+      "fingerprintSha256": "003aae5d55c46f13ba39589b3c081576e16083bfdbb7f8c417a2ea9551084292",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hu-jia/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "439d8ad161212882ba195cec08c0d0c79ba5ef3a"
+      }
+    },
+    "audio:public/audio/hu-jia/p2.mp3": {
+      "fingerprintSha256": "fe4aa6644a0c61f4b2d722b51a453df5f609e3f0340df36d8fe6d17f3417a126",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hu-jia/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "58fc2a3e4319056aa850fc56de02f306134b1856"
+      }
+    },
+    "audio:public/audio/hu-jia/p3.mp3": {
+      "fingerprintSha256": "8f8202adb4da969871c04623ced5c1fbba9f39df46a0222066fbe6930978d97c",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hu-jia/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "c7c08028096434c489a47d7b0d42b548ceb4a51b"
+      }
+    },
+    "audio:public/audio/hu-jia/p4.mp3": {
+      "fingerprintSha256": "00bf87317f1831a9211e6069279bc28a5eb0683d745602062f766f7465d0c10b",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hu-jia/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "091982cbbd8fe6c8ba7a451440eda3fd11553af2"
+      }
+    },
+    "audio:public/audio/hu-jia/p5.mp3": {
+      "fingerprintSha256": "d71fa88f8c25de9821b2b0ff6ffdb1f06cf4604a87093b81de279ce54a88a9f3",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hu-jia/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "96aec3ebc08fa20f245fe7f9739194dc18f757aa"
+      }
+    },
+    "audio:public/audio/hu-jia/p6.mp3": {
+      "fingerprintSha256": "eac5fc3675868de2f866c455d0023f91c7d0c3224ccdad47cf90a24a1f87d2f7",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hu-jia/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "7c742a812fc4cceae263c2d463a6cf88fbd7e580"
+      }
+    },
+    "audio:public/audio/hu-jia/p7.mp3": {
+      "fingerprintSha256": "11f153a3fcf014379d8a6583174208e68d55b7a072bf84e4ff91d6b49a4c92ae",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hu-jia/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "224a08a5ee06e9e8ef2151e40c90a71f00c943c8"
+      }
+    },
+    "audio:public/audio/hua-long/moral.mp3": {
+      "fingerprintSha256": "c4bd1af0404d5f87f4701acc12e871f21c1edfd8807f06b9acb425dabaa12429",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hua-long/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "bc60c8d1b022582684a2824930c1926bdca2ef37"
+      }
+    },
+    "audio:public/audio/hua-long/p0.mp3": {
+      "fingerprintSha256": "04f956acf41b07e63bdcc76023a3c300425f14a13a6917877272de679e75d25d",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hua-long/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "413ff500f7b433747643d6c97d3d9723ff446675"
+      }
+    },
+    "audio:public/audio/hua-long/p1.mp3": {
+      "fingerprintSha256": "88cea9ace56d7f48e4b8b2cf53e79779b90e7d0a11480462a37444454a8cb376",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hua-long/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "e78f102d29c75e18f50439e277adeccc46042bb6"
+      }
+    },
+    "audio:public/audio/hua-long/p2.mp3": {
+      "fingerprintSha256": "919d54800204d68fbc287a8a3e869722a94141dea345ce83bc94f5bd14433f0d",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hua-long/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "56990ba87706c30449e370f7c0ee1e6948a913cc"
+      }
+    },
+    "audio:public/audio/hua-long/p3.mp3": {
+      "fingerprintSha256": "a71467a9089900056265d01aa6e9976ce02f1223f9b0cf7be0971a7a252d46d7",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hua-long/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "4d582de8d620b2d0d4f3633c75a254cc1e265af7"
+      }
+    },
+    "audio:public/audio/hua-long/p4.mp3": {
+      "fingerprintSha256": "685abcdea8343da79e5e503a3ebb62edd44db9ef3792c3a27503915efbb2d82a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hua-long/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "dcecece4a34d7892de6b3bd55706e6a3026308c8"
+      }
+    },
+    "audio:public/audio/hua-long/p5.mp3": {
+      "fingerprintSha256": "638e2e0e78cfe08518d1dd4e1ba5e9275635bc91dd3ccb581032ccdac2bc6b88",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hua-long/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "829f4f269ec751a899cb218ae400164078d0ff2d"
+      }
+    },
+    "audio:public/audio/hua-long/p6.mp3": {
+      "fingerprintSha256": "05997a03bcf3fd3bf629fa150f5fa5f9df78d47a4c26f99060a632a6746ace92",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hua-long/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "bc306896b7254b88c8776052462237e10e4c69d7"
+      }
+    },
+    "audio:public/audio/hua-long/p7.mp3": {
+      "fingerprintSha256": "e3519a332d108e35d3776302577c830eb2e88eb0f4601d3c81fee0b59cd5b416",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hua-long/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "c7e2387f1ae5db927d7428c5ccfaaa07fcac9fba"
+      }
+    },
+    "audio:public/audio/hua-she/moral.mp3": {
+      "fingerprintSha256": "cc632369fe7c03dce13fdc79547190fccde915292b2a7588452d82413ba2e257",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hua-she/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "1fdfda976a7f264b000ddbad906ec09c1fb5c7a8"
+      }
+    },
+    "audio:public/audio/hua-she/p0.mp3": {
+      "fingerprintSha256": "578e6c89688a80ae5806111bdaea1da2f78ba4d18d995ec5c3778e2bdde9cdf8",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hua-she/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "1f09e4024800016cd45a1669579a2f351e858049"
+      }
+    },
+    "audio:public/audio/hua-she/p1.mp3": {
+      "fingerprintSha256": "12a9493e533e2ffc943958a3259d5dcb0664d3542790fcefbe0e67f1b6e33b73",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hua-she/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "fd2c8d62f1df76e34a043b226c08c717886e0478"
+      }
+    },
+    "audio:public/audio/hua-she/p2.mp3": {
+      "fingerprintSha256": "4343eec55e95286eeb58326f947890efe6a806c266fe6e049fe3314c651caf78",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hua-she/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "def7fee494cec8f8c4473ce2fe48e546c96293ca"
+      }
+    },
+    "audio:public/audio/hua-she/p3.mp3": {
+      "fingerprintSha256": "7e3dd27050d9e12a3bad5da57427d181d3d2db1e05d4131054c84005aa6dfc16",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hua-she/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "9a2bd502bedf50ee48d2691d6f005ad0523e08a2"
+      }
+    },
+    "audio:public/audio/hua-she/p4.mp3": {
+      "fingerprintSha256": "267b2509ae8834c81c55852bdebf82791bbbd65a6aed129b2fb7600b4e95d4d2",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hua-she/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "c222043943071abd59dbc63b850b1314852f3183"
+      }
+    },
+    "audio:public/audio/hua-she/p5.mp3": {
+      "fingerprintSha256": "c9f77a7c10eaa249fc8d3951ee116d3243e80871b2ef75355b5afde226c45d60",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hua-she/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "34992f1b1b2d5ba3bd26546fad5b757cfe76110f"
+      }
+    },
+    "audio:public/audio/hua-she/p6.mp3": {
+      "fingerprintSha256": "915cf53e3823acad888f88596c8489af22cc701d8eb3aba15b35142abbe95d67",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hua-she/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "a71b93613ed8311f075d8397206443902a664f77"
+      }
+    },
+    "audio:public/audio/hua-she/p7.mp3": {
+      "fingerprintSha256": "37fe41c4512ce7582019f65e6c842f9d6e78812d91a181c033c840b8dbee4230",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/hua-she/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "b12cee6a9baf8ad008b0aefd3708a6b323bb113f"
+      }
+    },
+    "audio:public/audio/jing-di/moral.mp3": {
+      "fingerprintSha256": "49b009a321304381c7677a77b07a43658f12d23736e6f35bde2c650ad7314453",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/jing-di/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "04e01ec07865514ff94d47b74665e740d2a3fd1c"
+      }
+    },
+    "audio:public/audio/jing-di/p0.mp3": {
+      "fingerprintSha256": "d1f96d4bb3fe0e3a7242bc4b9d91beaedda0dc064959bd50ffc60a55616876e6",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/jing-di/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "b807de7ae085dcf007d356bdfe54d92d989d1672"
+      }
+    },
+    "audio:public/audio/jing-di/p1.mp3": {
+      "fingerprintSha256": "994327eb7cc2156126a4c70885aeb7b6f099ec8477c4248883a0af03190a9894",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/jing-di/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "3784e14453eb54a307ede5b89c48cb11607f879a"
+      }
+    },
+    "audio:public/audio/jing-di/p2.mp3": {
+      "fingerprintSha256": "b9b68a6e8aa78835d9ac7e0c54cabbc59ef0cc1461796e0a6b28e4aaddf73c5a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/jing-di/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "ce0928b95d520e7236fcaa7e2265611c9f691170"
+      }
+    },
+    "audio:public/audio/jing-di/p3.mp3": {
+      "fingerprintSha256": "da317de540e9eee01c6ddba5c0921e7da6be8d4e958a9fa38e79569e885fe7cc",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/jing-di/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "5971be9b4929673d2c0ec5d696b4ae5547961595"
+      }
+    },
+    "audio:public/audio/jing-di/p4.mp3": {
+      "fingerprintSha256": "0fe4dfd81c2421647d17cb5a628d47cf59ffd0406f560abb1308a729827fc478",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/jing-di/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "940599a3afce08e50212cc5be2bc2bf5a567ca3c"
+      }
+    },
+    "audio:public/audio/jing-di/p5.mp3": {
+      "fingerprintSha256": "655cc97fc78ca224c3c73fcf225c09b32e3e9990ed9159b9f6f4f83ff84369e3",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/jing-di/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "a32fa2065e22bd0d59c9e4aba30ada973fc508d5"
+      }
+    },
+    "audio:public/audio/jing-di/p6.mp3": {
+      "fingerprintSha256": "79f72d636663abfcdc5d89b45c7b4a0103e0adfe2d06f91435254560f00203ed",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/jing-di/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "652feb8e988977714a320780ae60b4b43d4bc720"
+      }
+    },
+    "audio:public/audio/jing-di/p7.mp3": {
+      "fingerprintSha256": "9553aee8f2d5ab8db556fc07c3f7bccf5db507351c85ce706cac2cfe63af230c",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/jing-di/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "e8e4c1d9021964bf30c69fa172fd44d93bbbb2ab"
+      }
+    },
+    "audio:public/audio/jing-wei/moral.mp3": {
+      "fingerprintSha256": "75875f5db1f571cf5031f6639c90d67d5a5af2d4870db5cc3c66b498c90860b7",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/jing-wei/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "bbaae196c870ee444d66aff0f1ade1a7bcc67443"
+      }
+    },
+    "audio:public/audio/jing-wei/p0.mp3": {
+      "fingerprintSha256": "e24bfc9aabcfd175a2e37a31cc2cddcf143721f1841a50cbf165809b26042fd9",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/jing-wei/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "e241b38769038e6c5ba6a8ea0c4bd2ea69f25467"
+      }
+    },
+    "audio:public/audio/jing-wei/p1.mp3": {
+      "fingerprintSha256": "91519acf3468b31dec302fa4471dbffadcd132eb94a86d65fd6530e27df64f6d",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/jing-wei/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "7ce1e88c00ebb946a5e8b7e93206a1dacad6af2d"
+      }
+    },
+    "audio:public/audio/jing-wei/p2.mp3": {
+      "fingerprintSha256": "a7688786b358386f2f3c8ea20276ab3fe63ecd555948ad955b6ef4510960610f",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/jing-wei/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "40646e131a84a199d84992666a4e07af5bbd591b"
+      }
+    },
+    "audio:public/audio/jing-wei/p3.mp3": {
+      "fingerprintSha256": "42e5cb40adeacdea075144fc11104ba05705b064eb0ee8729d2ef716c85ba846",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/jing-wei/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "c70e396bc7fe0f3f0a46a8f7d0d241cbc3c8e7d1"
+      }
+    },
+    "audio:public/audio/jing-wei/p4.mp3": {
+      "fingerprintSha256": "26f18998bf00a46a287506334f83657830d88dc7a1156b373e3c5be94d74557e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/jing-wei/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "750e48443dc109c786b09631e18e71c7a0c305d9"
+      }
+    },
+    "audio:public/audio/jing-wei/p5.mp3": {
+      "fingerprintSha256": "11520b1e28bb1c2749c83485f2e5c39fb384777ddbf9838e80705e2607b563ce",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/jing-wei/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "0eec9cf36d1b71bfd67b6c9854c205b6b79ef633"
+      }
+    },
+    "audio:public/audio/jing-wei/p6.mp3": {
+      "fingerprintSha256": "78e831897280586445002a66ea82f6d38e9e41924a666263a98dfe12016673a5",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/jing-wei/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "6321f8e2885672e3cca29351a3cb40aa990730ec"
+      }
+    },
+    "audio:public/audio/jing-wei/p7.mp3": {
+      "fingerprintSha256": "56974f9092110ccbaa4214807db0a1fa12fa24d625df6e808d9706149ab2a0e1",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/jing-wei/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "d1ee74d46764f5e83d5f93a80a31bb3bb9c5d138"
+      }
+    },
+    "audio:public/audio/ke-zhou/moral.mp3": {
+      "fingerprintSha256": "0803597020665cec4a2716f4f20d8e42049a8785b41bfb20ad80b3576d1f4bc0",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ke-zhou/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "e20ec973e65ad9e8315767cf07559d0b7e90d50d"
+      }
+    },
+    "audio:public/audio/ke-zhou/p0.mp3": {
+      "fingerprintSha256": "8de44e587f254f5669186c69a61ec2e36362c30c3be69fd32953527a975c4253",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ke-zhou/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "e341006aba9836cc4aee5a1868e87c5b0978ecee"
+      }
+    },
+    "audio:public/audio/ke-zhou/p1.mp3": {
+      "fingerprintSha256": "453d91c0313f6994161e9edb4aaaf33978601bc82338726ff749820214c768cc",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ke-zhou/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "a30b762e56244c3d31619921d20bb74be3a28f0d"
+      }
+    },
+    "audio:public/audio/ke-zhou/p2.mp3": {
+      "fingerprintSha256": "58f5895edbb5e6a53abede73be28f66cc089ad7df4bee52ba369ebd2d3b82fea",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ke-zhou/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "efad4d87acf38d255448a13ddaf701224d224c30"
+      }
+    },
+    "audio:public/audio/ke-zhou/p3.mp3": {
+      "fingerprintSha256": "c912d348a6b1c191d914fa4eaa59f9ded83212dc32914222ca7d9bcd5f7b0558",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ke-zhou/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "1b36c93981345f1dfc2afe0271386900a2e56cc0"
+      }
+    },
+    "audio:public/audio/ke-zhou/p4.mp3": {
+      "fingerprintSha256": "b929c55758ee13c5bc8398860d93cde0e35639fbc10ad76cb06d4b3ab554010e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ke-zhou/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "c29888cd2b31d74b2980107957a12fe64de1d56d"
+      }
+    },
+    "audio:public/audio/ke-zhou/p5.mp3": {
+      "fingerprintSha256": "1236f0f9629ac717286445d57a46a38fd2c1d5ae61274ced2b8ae214096f482e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ke-zhou/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "1f932e0f15482cb7ab8eeeaeeea4571f92790ebf"
+      }
+    },
+    "audio:public/audio/ke-zhou/p6.mp3": {
+      "fingerprintSha256": "cc544297f3421aca3b00ae64504120c61979e231f36876e1560554cd35315573",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ke-zhou/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "6bc90436742132d02d4f34d360cc0265ea4c8090"
+      }
+    },
+    "audio:public/audio/ke-zhou/p7.mp3": {
+      "fingerprintSha256": "3b53ba6468f91acf16247d55ef35567d1eed5e7fff5dbb8bd2e03eb4e3cf353d",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ke-zhou/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "1d0a4630a200154f8d26de1c88395f1a8f782194"
+      }
+    },
+    "audio:public/audio/lan-yu/moral.mp3": {
+      "fingerprintSha256": "ed75ed6eebf8b36b24242f95357a903cc106875d75008f413ffab520754bdc42",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/lan-yu/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "92f31699369bc1974ba4d9e6bb0454bdd88b8bca"
+      }
+    },
+    "audio:public/audio/lan-yu/p0.mp3": {
+      "fingerprintSha256": "11cb3ff0358060c0e5b4d91c1811a662788bcf5238da372781be9c6dfa129e54",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/lan-yu/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "c2155a6c8f7d80d54eb3ed99dce5d0924f646f14"
+      }
+    },
+    "audio:public/audio/lan-yu/p1.mp3": {
+      "fingerprintSha256": "f66ac32137945ac440790420f2c85b89f4ff8b1cd39f5a9c5fc90ed9a371a6c8",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/lan-yu/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "516e0d31a77934d0677212fcbae74191d9d9d88e"
+      }
+    },
+    "audio:public/audio/lan-yu/p2.mp3": {
+      "fingerprintSha256": "8dfa44fe8a74928c79d9433fdd6fcd6a1c7a504bdffc3759b4d92eaf89b453c5",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/lan-yu/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "81ebb1d12958590576806a56b1f7f79f02310266"
+      }
+    },
+    "audio:public/audio/lan-yu/p3.mp3": {
+      "fingerprintSha256": "9620c2bec797fc2c54989ddec98e9017133c2a55bc2357685cce1ade3297ced4",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/lan-yu/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "d10872f5534977ef42fb22c02a65e4522de4a044"
+      }
+    },
+    "audio:public/audio/lan-yu/p4.mp3": {
+      "fingerprintSha256": "495f4b88dc0897e7c9f89041702a2d984f7cbb4661965834667a2704f3bf5cc2",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/lan-yu/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "39b189b32b2020d7c851fc3464cc2a342ac64495"
+      }
+    },
+    "audio:public/audio/lan-yu/p5.mp3": {
+      "fingerprintSha256": "a85f5ed21d6cdaa288e251aabd02eb528d1ba4eba8e41eee7f246dd581287359",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/lan-yu/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "8f82004688012d601a4962690d6bcec184e38680"
+      }
+    },
+    "audio:public/audio/lan-yu/p6.mp3": {
+      "fingerprintSha256": "738bdced927001096ed0dbfb2201b4432e455cc43b7d1e35ab05d37398717e6e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/lan-yu/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "626cf74e57365a6ea159b1129457d2ba8a46774c"
+      }
+    },
+    "audio:public/audio/lan-yu/p7.mp3": {
+      "fingerprintSha256": "fafe67e81232ef9444572899e235b679a1de11586d3caae70fee85edb97666fd",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/lan-yu/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "bc78a1ab1ee97d94dc48cd1813828cad17707d41"
+      }
+    },
+    "audio:public/audio/mai-du/moral.mp3": {
+      "fingerprintSha256": "20991f9f8b89a28f73a3ea784e96c56af39c3cf53ab7255204a7d2f210334571",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/mai-du/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "71695dfe8a74158ddb6414990352b92b29e472ae"
+      }
+    },
+    "audio:public/audio/mai-du/p0.mp3": {
+      "fingerprintSha256": "bae9b5dfdbe49ab762679642413f51bf9fe743d9b4af361f25a3e2e8a9bdaa0e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/mai-du/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "b1474a6ae9857814972fcbaeba3c2f9b8de440fe"
+      }
+    },
+    "audio:public/audio/mai-du/p1.mp3": {
+      "fingerprintSha256": "689f28230151149e332bbc1b551ff87c0cf86146ba2d14f6ccf48ebd67294ffe",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/mai-du/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "7f7f7fe6b02ee8394bd04491108fc6e9466845bd"
+      }
+    },
+    "audio:public/audio/mai-du/p2.mp3": {
+      "fingerprintSha256": "9b649b925bc2b1b26be2ca58223bd3266a4c7442e4be6408889f2944ade36cfe",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/mai-du/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "d693fac0598d2aa26fd6bd908ae0d5c23074ab53"
+      }
+    },
+    "audio:public/audio/mai-du/p3.mp3": {
+      "fingerprintSha256": "5f83177a455dcb62e36fef731913bab149c9c923ea9e284eab946a7071fcb70e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/mai-du/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "9e1614f22f3e82a1e722ca1b5cb0aeab4f48a546"
+      }
+    },
+    "audio:public/audio/mai-du/p4.mp3": {
+      "fingerprintSha256": "93dc4fb7ad8e780bc7e5bc249a4d12ea31a7677fc3f9efcc73ff2167f538e648",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/mai-du/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "4471156eff4a6f26fbc974a99cfe89c6bd884ef6"
+      }
+    },
+    "audio:public/audio/mai-du/p5.mp3": {
+      "fingerprintSha256": "81a160545a83e339ae77de0d3d9231766ee35de0bcf126e52268a06dba056f42",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/mai-du/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "2043ba6adaa3c2a21b24386fd22b7f5a90e8290e"
+      }
+    },
+    "audio:public/audio/mai-du/p6.mp3": {
+      "fingerprintSha256": "2571d14262a8c68444af888c04889d6a282476b8a6367455dc0a56a80f2fecae",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/mai-du/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "684cf41c5320d7760caef212b50b0926f663c9df"
+      }
+    },
+    "audio:public/audio/mai-du/p7.mp3": {
+      "fingerprintSha256": "8e81eda39061e73359cd7e18f6cc8dcbd24646a14fdfa94ebb4f1fa30245bbda",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/mai-du/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "7c3954ab6ddf82301f15c69d449090123f065355"
+      }
+    },
+    "audio:public/audio/mang-ren/moral.mp3": {
+      "fingerprintSha256": "c2ce3b500ba81ecb2b1ad9d3a20bc94113c8656a86d5212fdd5b6212c6c6cb34",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/mang-ren/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "ff6954c3a02552401348fa0911b8a0df5c6d61f6"
+      }
+    },
+    "audio:public/audio/mang-ren/p0.mp3": {
+      "fingerprintSha256": "5e103be9a56ee615475677a524ed9b13cdf80f13703497d2eddc801855d64a27",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/mang-ren/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "2e2de435db71eedaaffd0f231620627b36a58e00"
+      }
+    },
+    "audio:public/audio/mang-ren/p1.mp3": {
+      "fingerprintSha256": "d650ce45d43bc9657b3c54de8888e923d7c9c25edcde4cf43153a0d57cb60f08",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/mang-ren/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "e01f881c59f3d1b22e38e0b1865f95c2d72299c2"
+      }
+    },
+    "audio:public/audio/mang-ren/p2.mp3": {
+      "fingerprintSha256": "261b0371bf96cac2b5069c02f24f41fa40895e605af0c0bf66870bf6e14f3bdb",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/mang-ren/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "f4907e67fc245e0e89bb32005da14d3a9e75c1be"
+      }
+    },
+    "audio:public/audio/mang-ren/p3.mp3": {
+      "fingerprintSha256": "4661d5ee157c6d21e583a1bd9cb95b26facc024a51fb2d60359b7bf48600e122",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/mang-ren/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "74723774c90e37b7dda984018fee306f841af8cf"
+      }
+    },
+    "audio:public/audio/mang-ren/p4.mp3": {
+      "fingerprintSha256": "1bc5758418a9ceadce06286071e219da640351db9da89bf696522a0376edca2b",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/mang-ren/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "47badbc5216a0cffd19f3dd61113d58cfa60eaef"
+      }
+    },
+    "audio:public/audio/mang-ren/p5.mp3": {
+      "fingerprintSha256": "3101e3dc682089eebce1e771eee0967db23b3e764f44431972de98d5fecc971f",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/mang-ren/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "39f45ecf6b15b31127ed4202ca399dd5837b8278"
+      }
+    },
+    "audio:public/audio/mang-ren/p6.mp3": {
+      "fingerprintSha256": "392ff62435ac5e8a2bf5d0968ac3e88d6e950be5895bab28f16f1fc06159e342",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/mang-ren/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "3928687b9f6bbcb55c9ffc6130afe34f06cc70b4"
+      }
+    },
+    "audio:public/audio/mang-ren/p7.mp3": {
+      "fingerprintSha256": "e7fd3717556cf601e8778274fa108a689043a4dadf912019f895de1d18011aff",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/mang-ren/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "a0f02da9436b7697921a6a0015dfd91d09070d40"
+      }
+    },
+    "audio:public/audio/nan-yuan/moral.mp3": {
+      "fingerprintSha256": "943c5e5c04f53b2131a3680a876df5fd6140386b20b68650a4e444a061f59bd7",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/nan-yuan/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "8ad61d79c4203b9e1ac9e30d67cc16a9eab32045"
+      }
+    },
+    "audio:public/audio/nan-yuan/p0.mp3": {
+      "fingerprintSha256": "adf4f5b0d9a1b6ba7e354f68dcafd3bed28be26d8a9f60ced66fe6985699852c",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/nan-yuan/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "18d6f8fac40070c264faa0b24fc995da15e3c010"
+      }
+    },
+    "audio:public/audio/nan-yuan/p1.mp3": {
+      "fingerprintSha256": "9a57145835567534bfc43817b1f37f5b849006a6a265d81bf9a9bb08a70e163f",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/nan-yuan/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "24427e053d671ae4508ee6f88e97c8282731793c"
+      }
+    },
+    "audio:public/audio/nan-yuan/p2.mp3": {
+      "fingerprintSha256": "dc4d38fd9cadbeb0a28b0aeac5a9d9d8d325ba4de9b3e403aac7499d1d6aca4d",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/nan-yuan/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "54738527442068bd3252d27d368954b4e1b53bc9"
+      }
+    },
+    "audio:public/audio/nan-yuan/p3.mp3": {
+      "fingerprintSha256": "7527ebe043e569aec15c5aab9be0705a9f38e574317404b00a93da494039c6cc",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/nan-yuan/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "aa67961ecea9d800fa7d3e80c2a6b21c99b82b10"
+      }
+    },
+    "audio:public/audio/nan-yuan/p4.mp3": {
+      "fingerprintSha256": "46cbd335470917b9e656c78cfcb5b32632203abe545b9ec9a3dcdc9484172c9f",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/nan-yuan/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "0278931a34e06f2a95e0f6aad8643746fc7a5704"
+      }
+    },
+    "audio:public/audio/nan-yuan/p5.mp3": {
+      "fingerprintSha256": "20d55d8d26c0ffcc4edaef012ac9be9ddd52d240c3fa9bf263b51615cc2a740c",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/nan-yuan/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "aa1718969927ec60955c59ed55b6fd9b19f5a027"
+      }
+    },
+    "audio:public/audio/nan-yuan/p6.mp3": {
+      "fingerprintSha256": "0e913965862eecd215dd695d6cce50cac48d0927c9d23efc806116bc47fea299",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/nan-yuan/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "c742fafd65d73713e283bd5f5a4e4da15c7d8343"
+      }
+    },
+    "audio:public/audio/nan-yuan/p7.mp3": {
+      "fingerprintSha256": "819932dce8324fcaf3d5b4a8ddd7fc5212d28beea9c281fb79de4bfc5526b69f",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/nan-yuan/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "c69ed6bada50958c7f142d8fa0fad136d2e51175"
+      }
+    },
+    "audio:public/audio/qi-ren/moral.mp3": {
+      "fingerprintSha256": "54b866cb5c664f0fd50cde6d2764459d43c5cf284af043a8613a5b179e7ab012",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/qi-ren/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "7010cfa5ebd69c2afaf437dfaf71208d3b587f81"
+      }
+    },
+    "audio:public/audio/qi-ren/p0.mp3": {
+      "fingerprintSha256": "18a25435f8b4b13a09702277690e125a2cfe53c5163b930c3954866b000d959e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/qi-ren/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "89cef712d00828a4f030e954585160b426b8f7ec"
+      }
+    },
+    "audio:public/audio/qi-ren/p1.mp3": {
+      "fingerprintSha256": "b49804ca0635c4f4b7b96716def6b1a77816def29b76dfa69855691f218e58f1",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/qi-ren/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "2336c5e090c7afd1c92ceb0716a271d4757068db"
+      }
+    },
+    "audio:public/audio/qi-ren/p2.mp3": {
+      "fingerprintSha256": "6a2c2c76ad765d4a4bea2e546b9d1be063d18c187740a17f98e2947091598dda",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/qi-ren/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "026f58c87d9759183e9851f54a3253ed17bcabb3"
+      }
+    },
+    "audio:public/audio/qi-ren/p3.mp3": {
+      "fingerprintSha256": "72ee76d33b333bf225b974a2e849978643b69a323ea30f12e68cdc2ccbb45960",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/qi-ren/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "8a704fde441e4b29c476b2e9bb75e5cb5a3ad7d9"
+      }
+    },
+    "audio:public/audio/qi-ren/p4.mp3": {
+      "fingerprintSha256": "3666ed48b8cdae125cd040416576d19cd6b08af29e1af44134b46f797278e39a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/qi-ren/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "2bff9a757b66d5229e60901421e77ea9b623abfd"
+      }
+    },
+    "audio:public/audio/qi-ren/p5.mp3": {
+      "fingerprintSha256": "d74fdf6183ed1dc4cf54972af58a9c539f5579aea517dcfde4e0864613ff8e5a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/qi-ren/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "88bddfd551330cb9b356a593839cd33a33341f43"
+      }
+    },
+    "audio:public/audio/qi-ren/p6.mp3": {
+      "fingerprintSha256": "2aec19b0cd69eeae9cf08d7005ae929b7e775968b8c310e78000bb0bcb3f4915",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/qi-ren/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "33ad85ec41b4479541cdea98fb5e25e788475cd5"
+      }
+    },
+    "audio:public/audio/qi-ren/p7.mp3": {
+      "fingerprintSha256": "87b03bbd98eac3e5cea75257a71fb96314ac0e7003d34e604ce4a58941a14368",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/qi-ren/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "c8fd7d474cfe547f54398d4d7461ed66e218bf00"
+      }
+    },
+    "audio:public/audio/sai-weng/moral.mp3": {
+      "fingerprintSha256": "48d99a63573b89473ad9f661eb2cad332d0fe0cc54c872474971dee67c39ed2a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/sai-weng/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "9ab32bcbb58ee56665847a27c60d5cde6394b110"
+      }
+    },
+    "audio:public/audio/sai-weng/p0.mp3": {
+      "fingerprintSha256": "367ef353f8887960e675afd9c45421544a8fb31d9c2e113264c2d6fb80b2e16e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/sai-weng/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "e7a8c375997afdc6d795522b78c52890a96c3981"
+      }
+    },
+    "audio:public/audio/sai-weng/p1.mp3": {
+      "fingerprintSha256": "1b4b43461ea55041500ac4213361d1cdaf5966981dd938fe155610acb2e8aeed",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/sai-weng/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "b81c6f07266088350d4b8096e203f5722c11ca3b"
+      }
+    },
+    "audio:public/audio/sai-weng/p2.mp3": {
+      "fingerprintSha256": "30dd3d78e3b8983da39a647bb61cacfa5f74cb3ffa59b544fb692eea6c22bebe",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/sai-weng/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "87cc61c48df385094eea38bc6bd9d068b28d7c48"
+      }
+    },
+    "audio:public/audio/sai-weng/p3.mp3": {
+      "fingerprintSha256": "963b30cf21ee8263011e0193d6e89bce69f1ffecdd8a0c8192abc2e8a7ac0acc",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/sai-weng/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "748569099276ec26477843b16c3706f21a9f7971"
+      }
+    },
+    "audio:public/audio/sai-weng/p4.mp3": {
+      "fingerprintSha256": "adf10972278636391d66b60089c85a9eeb443d0949b281b514f62e8e890f735f",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/sai-weng/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "bc3798c0d96835841667cef25de2c74ef394986a"
+      }
+    },
+    "audio:public/audio/sai-weng/p5.mp3": {
+      "fingerprintSha256": "75da8a4353b465421c6ad0dcfac3c0706e7ce24f913d9abc7becc7f6f1623e1e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/sai-weng/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "f0d471ac35b89f87c61710bd66c8e5cd84a285e8"
+      }
+    },
+    "audio:public/audio/sai-weng/p6.mp3": {
+      "fingerprintSha256": "0639af82abce673e104a1cf9ee068f2ac9ea4ccff8754805c2c274a116afcb12",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/sai-weng/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "51b80997ea55e563079311acc1f3bd43a2bdab08"
+      }
+    },
+    "audio:public/audio/sai-weng/p7.mp3": {
+      "fingerprintSha256": "8d1857e636042ee1ec8982a1907d79620df34be410b2cff88c782260625180b5",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/sai-weng/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "65bbde64f56f1471cd99fdd53f44f6ce11d97db5"
+      }
+    },
+    "audio:public/audio/shou-zhu/moral.mp3": {
+      "fingerprintSha256": "3ab225aca34c3247ebc5dabf52fbf847e63eafdc490234986c4db8cbf1c6a414",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/shou-zhu/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "d950b478d700abd225f5ce94e2f9b4477ab61ed3"
+      }
+    },
+    "audio:public/audio/shou-zhu/p0.mp3": {
+      "fingerprintSha256": "b5a42f0ab46cdbe0e76b346afdc1ca47349a22ca07eb37c90bd8b55df9019174",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/shou-zhu/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "f4302b5e3523d16b62ebc216873b288d0ca85cff"
+      }
+    },
+    "audio:public/audio/shou-zhu/p1.mp3": {
+      "fingerprintSha256": "55976527b8054db029936e300d4e52285bc75e735a4c7225ef52b64e81598a19",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/shou-zhu/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "afa7b36ae6e97d83e29a14ce14eac06141d178c3"
+      }
+    },
+    "audio:public/audio/shou-zhu/p2.mp3": {
+      "fingerprintSha256": "57c6616544f011429a440fb8214ea77ef19a456c144002bd65f80b09406d66b4",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/shou-zhu/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "536b503e163d2fa6f9d847b1ef47e6b7f1b71447"
+      }
+    },
+    "audio:public/audio/shou-zhu/p3.mp3": {
+      "fingerprintSha256": "c8bb85993123a5ff7a9aa0439ebaff6045550ff19255d99d3f36b6778e0dc810",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/shou-zhu/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "e0c9668f34289c5a5e83e1d6316a12f9522703b4"
+      }
+    },
+    "audio:public/audio/shou-zhu/p4.mp3": {
+      "fingerprintSha256": "c80e1f3de1257492deb8db25f63cd972324f106cf4d58aa183fb0b7da1964546",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/shou-zhu/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "52902d896d4df8ccc15e2f39c45dced65b77d130"
+      }
+    },
+    "audio:public/audio/shou-zhu/p5.mp3": {
+      "fingerprintSha256": "5c4faf320171df964025f8e401e0c7b2fa0e432e7224b5568cbe05f7b0a17e46",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/shou-zhu/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "57a955d248f73476376f787a1cdd87d91071840a"
+      }
+    },
+    "audio:public/audio/shou-zhu/p6.mp3": {
+      "fingerprintSha256": "7439b2c39c95369c5d54fb9afe45a61200201f741d4ea77bea46ae52a0454479",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/shou-zhu/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "8db0c536eda2aa6d052a18d528ad5c1b48c2a4a4"
+      }
+    },
+    "audio:public/audio/shou-zhu/p7.mp3": {
+      "fingerprintSha256": "1aea110636e01473db19742e1a2c02f9195d2e05c325c8f1cfaff20ac461a45a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/shou-zhu/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "0e5a9003a43a833391691b36b2bfa51bd11d7ea9"
+      }
+    },
+    "audio:public/audio/wang-mei/moral.mp3": {
+      "fingerprintSha256": "40d6a5aeb9e9c73f71a0143267d6041df8c44e46fed68b2df01ab147f4424cbd",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/wang-mei/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "f0ec446e9f97c82a3871e17316e3b95a45af3c0d"
+      }
+    },
+    "audio:public/audio/wang-mei/p0.mp3": {
+      "fingerprintSha256": "bee4332b60b3036bb9d53bf56703caf599dccc83230f4272cccda3d518cac915",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/wang-mei/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "c49572c7d4c16297e62f4b081ecc6450cae82ac8"
+      }
+    },
+    "audio:public/audio/wang-mei/p1.mp3": {
+      "fingerprintSha256": "a9ead7c7071408069f9e921c59fe5cec31ec0e50e890997b16480a4ec8b43e9a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/wang-mei/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "15025ad455a8821190bef8e656bfe4ae506acfb0"
+      }
+    },
+    "audio:public/audio/wang-mei/p2.mp3": {
+      "fingerprintSha256": "8f3537b40f81b34c24229af6dbda29a0dcce052fdcf85aaef16c112fc157d1fd",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/wang-mei/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "66cabd2ae68d6f7f36a1d0444f98639acaaf5f9e"
+      }
+    },
+    "audio:public/audio/wang-mei/p3.mp3": {
+      "fingerprintSha256": "911c35ac0207036f0eef0dc364c578629931c7c117f4235b2c3efbf28dd4cb39",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/wang-mei/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "8d99077afc2de373a00b708fca66595baf231fe0"
+      }
+    },
+    "audio:public/audio/wang-mei/p4.mp3": {
+      "fingerprintSha256": "58fead771596756e763484568f1cd2ecfcdaefdf737005db5b39d6e53c058813",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/wang-mei/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "d81244f801be5e1f58fb7f366a03c7548380ab12"
+      }
+    },
+    "audio:public/audio/wang-mei/p5.mp3": {
+      "fingerprintSha256": "9a2ca99fe198505fc4c2b3618b6d6231481f2e193773b05c1d954dd63434b587",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/wang-mei/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "b4351b6b85623b1ebe9bfaba129ed5f380e7c464"
+      }
+    },
+    "audio:public/audio/wang-mei/p6.mp3": {
+      "fingerprintSha256": "ff30f2ef6ea295eedaa3793c3c7cbd332aa5fc62fbb59dbeb196d905c68349ab",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/wang-mei/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "9228d8625915c7cae008eb30d6a9ff2a408752cb"
+      }
+    },
+    "audio:public/audio/wang-mei/p7.mp3": {
+      "fingerprintSha256": "7f56df062f87b2b9b5d52a923a51fad878dfa8345c6c15d2b3c5f31cab25c6a8",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/wang-mei/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "6fd41cab2868b1e02988845825421c568befa46f"
+      }
+    },
+    "audio:public/audio/wang-yang/moral.mp3": {
+      "fingerprintSha256": "f6fb1218c89b8d3f06e4f3fb406b250d73af876760df47b188af6a9d36266787",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/wang-yang/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "7fa3574db120d2b0f71ad560a110e31a350b1bc7"
+      }
+    },
+    "audio:public/audio/wang-yang/p0.mp3": {
+      "fingerprintSha256": "7048e69810eebddcc1397d3f9ab2e7f24164a6488847d44eff61f321cd63f19e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/wang-yang/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "27810c782d923b733a16692730edcd105b9754af"
+      }
+    },
+    "audio:public/audio/wang-yang/p1.mp3": {
+      "fingerprintSha256": "7528ec237ba712175266f92293e2b8c50f71f1bad6a79e62ab1c5e852f257da2",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/wang-yang/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "14092920cf5e28c44cf6f5ff8c03750fbae146e9"
+      }
+    },
+    "audio:public/audio/wang-yang/p2.mp3": {
+      "fingerprintSha256": "11ea4448f1e4c85405207f3478b0a591020b35c69e0764992c9aed1884d8eece",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/wang-yang/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "78b309d6935acf94313e42bc3c79e8f855d5648e"
+      }
+    },
+    "audio:public/audio/wang-yang/p3.mp3": {
+      "fingerprintSha256": "0b081bc8adf6b050c0b2885277809eda0bb16fc2ef3650ca3abab980cf9fbd87",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/wang-yang/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "9e89dd0580270858acb814bbd86dce280cc59449"
+      }
+    },
+    "audio:public/audio/wang-yang/p4.mp3": {
+      "fingerprintSha256": "c7b74a03c46b1202f2d099d52a57fe7998ff899d70c4a453ebaec86918973582",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/wang-yang/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "2b4f8615a22367dfa5923670321677ae716b3f6a"
+      }
+    },
+    "audio:public/audio/wang-yang/p5.mp3": {
+      "fingerprintSha256": "46da8da02681367dc162b069bf09425012d4cd6570879aeb8e07789c697bbda6",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/wang-yang/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "4876d0510a528b68df9b19a120e14f980d9de9a6"
+      }
+    },
+    "audio:public/audio/wang-yang/p6.mp3": {
+      "fingerprintSha256": "a3792187798e55a5b211c4094ee23c43f9726912b4530ee85ce73d8310023b19",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/wang-yang/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "f1bf66dfdd6df312c62aa597d3bfff359ae7c3d2"
+      }
+    },
+    "audio:public/audio/wang-yang/p7.mp3": {
+      "fingerprintSha256": "cc3d8dace2d4adf17a3672c45dddad56ca0b3ec9c1eafd943dcf26d790ef3cfa",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/wang-yang/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "fd6a4c0d82960fa290178e8c7881467c12677da2"
+      }
+    },
+    "audio:public/audio/yan-er/moral.mp3": {
+      "fingerprintSha256": "b34ea01d66c2f29d5ba7b72dd881f40e34184adeb8f76dc1b7c622547565f400",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yan-er/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "d6da18ece7aa908cd9947c16f173d8a201c557a6"
+      }
+    },
+    "audio:public/audio/yan-er/p0.mp3": {
+      "fingerprintSha256": "c3be53d069dc78bdf335606f082cf3fd17f57324b168aa434d5f8864f7ec2467",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yan-er/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "39119a151dbba943f783b26da89075397f41b32c"
+      }
+    },
+    "audio:public/audio/yan-er/p1.mp3": {
+      "fingerprintSha256": "92ba1dd40fdda813c18a729c43b0f64c7ea59e6f9bebc9ccdbe8650d0ebcda90",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yan-er/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "a99e7d2f25c9f0b263081aed5ec507c30038d747"
+      }
+    },
+    "audio:public/audio/yan-er/p2.mp3": {
+      "fingerprintSha256": "682632b4884fd4f977a64f564151df53aeeabc74a52e3dabb3299e68f626202c",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yan-er/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "da78631d0658397547216e676d1f4b9496abe144"
+      }
+    },
+    "audio:public/audio/yan-er/p3.mp3": {
+      "fingerprintSha256": "1e94ef1591119349f71da7e4c461d1c8862d4f46a0860da16611360660102eda",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yan-er/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "0a2cde12181e61c00ac68db075c7307faf8a6dc0"
+      }
+    },
+    "audio:public/audio/yan-er/p4.mp3": {
+      "fingerprintSha256": "4987991d314e611f4f10997393be28d0a8704c1720d911a305bafbcecbb2ad60",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yan-er/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "bb011fa752d0ddb0d3b57e0a4040ad5e8746bb86"
+      }
+    },
+    "audio:public/audio/yan-er/p5.mp3": {
+      "fingerprintSha256": "24f3c002df21ddbd4b558cbdf39cac058323ad917f6d92eed5debcfca5e528ae",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yan-er/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "0767c952132cca29cb708bda031a41af2d925d5c"
+      }
+    },
+    "audio:public/audio/yan-er/p6.mp3": {
+      "fingerprintSha256": "292742a5fdd2e325d311c0e9f45ca3fe63d8cb9aed06ee9cd6b7d27b11c67172",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yan-er/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "3b18b29158b62fa98a3cf6d77c4e61b74b6ce041"
+      }
+    },
+    "audio:public/audio/yan-er/p7.mp3": {
+      "fingerprintSha256": "b4e3c896dfa18249bcd7c2318c9846d8500b1a5c68e36f18ff1a498affc6f6d1",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yan-er/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "f994f6211f6e9e6e5a56413421a9e7566d6eb1a9"
+      }
+    },
+    "audio:public/audio/ye-gong/moral.mp3": {
+      "fingerprintSha256": "55e22bdb5dab4d5f854c4dc204cbf71c357dbd0c41fc3a429bad86fed8e2d609",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ye-gong/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "8f74d89d80028850316a3a7cc4f030ecab0eba63"
+      }
+    },
+    "audio:public/audio/ye-gong/p0.mp3": {
+      "fingerprintSha256": "2cdbf3c7ec9ce0112f8d8cfafa1f4ce440c35021ad309dc3b500e5c8472e3fd8",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ye-gong/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "b80d26c9ce44726c43c271d0d9396d38a35b634b"
+      }
+    },
+    "audio:public/audio/ye-gong/p1.mp3": {
+      "fingerprintSha256": "c48855ec9304badb4ec49cf4d2e437b757c262cde2bdb5e13d1aba9c5817c944",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ye-gong/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "b6179c3a984b62648509e713ceef4d65faf15b19"
+      }
+    },
+    "audio:public/audio/ye-gong/p2.mp3": {
+      "fingerprintSha256": "39cc8e8a4e59ff53b5188fc6e2636dc3725eb8d9cd10f4d58e5a510bef7dfcd7",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ye-gong/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "39c9dda053ad8e993dcbbd9c24f5d23ac9c1a393"
+      }
+    },
+    "audio:public/audio/ye-gong/p3.mp3": {
+      "fingerprintSha256": "1c5239176d06fa7c51baa8436b7cf696f5f1b9795f34f9403072efef608d1634",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ye-gong/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "fd435e63d5ac9b3b65e44ad49810e6c88e5e2ffe"
+      }
+    },
+    "audio:public/audio/ye-gong/p4.mp3": {
+      "fingerprintSha256": "92433c86d17a52e9b05a06033980b32080ca80a5df83aff0865c0aa0c93a91bd",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ye-gong/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "ec963e11875e57315b0fac8aa5b0d3bd5edea7a6"
+      }
+    },
+    "audio:public/audio/ye-gong/p5.mp3": {
+      "fingerprintSha256": "7a5af175cf8a0eb6b0b6c7ed627def7c1ff36e188229c4715d148c568ad53f89",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ye-gong/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "6ddb76243148ebdf230699f1b230e2671e9ce4d7"
+      }
+    },
+    "audio:public/audio/ye-gong/p6.mp3": {
+      "fingerprintSha256": "cf057e1a27fc9d9f8df6608880eb4e1ace89fa4b3ef4dcb1ed8953eb80f58a0b",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ye-gong/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "f0cb15509866213354c2edb79ffe585e376aa1c8"
+      }
+    },
+    "audio:public/audio/ye-gong/p7.mp3": {
+      "fingerprintSha256": "6aebb02b30560461f715d86b82427e0350b212709e486fa2fa5bc6cc634a0dfa",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/ye-gong/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "f44056ac6f42f27a856e8e83a2ff95ee571b3e82"
+      }
+    },
+    "audio:public/audio/yi-ming/moral.mp3": {
+      "fingerprintSha256": "5209b6e5ab4434d8c84e0250efe43e3eacc438dde8fce6e356af2087b6035b9e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yi-ming/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "6b71e86a35025adfe3a75b2072123e4eede9b719"
+      }
+    },
+    "audio:public/audio/yi-ming/p0.mp3": {
+      "fingerprintSha256": "b51cd7fcb5572bd42be8adc9cb627021e26b0195496d922a05fae1940c716459",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yi-ming/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "aea49cbd057220bab74e2cde87159d0f35118a4d"
+      }
+    },
+    "audio:public/audio/yi-ming/p1.mp3": {
+      "fingerprintSha256": "8ec2bfd7a02c83606f52754e22a70d47eabcad10d8d4a469cc8b685007fb0cb6",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yi-ming/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "f2f5eabd7e664d7103ad3542cfbd05d0248bcf13"
+      }
+    },
+    "audio:public/audio/yi-ming/p2.mp3": {
+      "fingerprintSha256": "c4ad9a6797027056cd6fdf15dda69963e30177188ba5003927b96b98e9e17ccd",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yi-ming/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "6ed912d08528395b8edd900a817a49a4dea833b5"
+      }
+    },
+    "audio:public/audio/yi-ming/p3.mp3": {
+      "fingerprintSha256": "0df9b94ea1124912c85a09ca05eac249992cdf373dbbf03f3de3f11f45a35586",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yi-ming/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "65dad55d7c8441e95bb4eea2da2f95e1daa9b12b"
+      }
+    },
+    "audio:public/audio/yi-ming/p4.mp3": {
+      "fingerprintSha256": "5f1f89988ba9e8fd0f4878882450ced6e00eac1803107324323b194594e59494",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yi-ming/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "72b40e23d59042cb22ae35345af2d4767f01c1fc"
+      }
+    },
+    "audio:public/audio/yi-ming/p5.mp3": {
+      "fingerprintSha256": "84df18e2627050518afc581316ad62622074c6fdf0e540f9cb7604880385994a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yi-ming/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "d663f91340651fcc9b659de4952c2c32266fd6a3"
+      }
+    },
+    "audio:public/audio/yi-ming/p6.mp3": {
+      "fingerprintSha256": "ff21dbde31a22e06a0a6161b63529b2e0f930c826c870bf2f250c8dbb4bd80e0",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yi-ming/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "f49c9ad4e3ac713ba238ec6d01113499eb2680e7"
+      }
+    },
+    "audio:public/audio/yi-ming/p7.mp3": {
+      "fingerprintSha256": "f3c663125378eeea41b3846e4b675d907612069088b995219d26908f8b0701f1",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yi-ming/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "013e83ffa434ad8a8f95dbf6ad8b4fc4b6b5994f"
+      }
+    },
+    "audio:public/audio/yu-bang/moral.mp3": {
+      "fingerprintSha256": "9ccd444a15cf5150bf536073d5629fb621fc172c0c6cf1dcffa54d40b8d2c539",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yu-bang/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "0419adb04a3ed936666b814c5eb07c09eb5c2f8d"
+      }
+    },
+    "audio:public/audio/yu-bang/p0.mp3": {
+      "fingerprintSha256": "ceb4db7c5c7a455220505158f0026953369c3d469bb5ea6ef6492785f68f2f35",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yu-bang/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "fab7da57822fc518b1efa300836a8970ddb07493"
+      }
+    },
+    "audio:public/audio/yu-bang/p1.mp3": {
+      "fingerprintSha256": "f205dc6866551f1c30cb604d3dab9f206c3c5c20d12ce8949ff689e501619484",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yu-bang/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "5b50bbb81f3a7074ba9d4c00e49de0a4d81a7ac8"
+      }
+    },
+    "audio:public/audio/yu-bang/p2.mp3": {
+      "fingerprintSha256": "4e98c5a992d0a957651c504bc44c02189e7a89358fe38a840d5fc227e4535427",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yu-bang/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "88010a556b4c4e986fdba0d64c591b70f6833da7"
+      }
+    },
+    "audio:public/audio/yu-bang/p3.mp3": {
+      "fingerprintSha256": "8951f0c6d6758536f56496cb216a86714c20cf766eef896b5f9f0a4de8e086ec",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yu-bang/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "0fe8c972bdefe48f01d6a90cdddc07e8559e1774"
+      }
+    },
+    "audio:public/audio/yu-bang/p4.mp3": {
+      "fingerprintSha256": "79603cd4cf475ef4e37d58e1a8f9bfeff5184a50effcbb0bd874fe66d45fbe27",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yu-bang/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "aea36a5bbd3148b1463234c60eca8108be2fdbe7"
+      }
+    },
+    "audio:public/audio/yu-bang/p5.mp3": {
+      "fingerprintSha256": "9560b27f31ac69a7133cc6ded7006553d061bc3c0512c4ba98406e24ef6cc6d9",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yu-bang/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "75cee61891451a2a03b2abf2115abf8a23a4d83f"
+      }
+    },
+    "audio:public/audio/yu-bang/p6.mp3": {
+      "fingerprintSha256": "42fa9014edc799998acee88a00c0fa63ad2ae04afdf07e61bf2ddf3d8ac01898",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yu-bang/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "853ca4566c57ccab73dc765bd09ae6e8dbec7f17"
+      }
+    },
+    "audio:public/audio/yu-bang/p7.mp3": {
+      "fingerprintSha256": "e6780e57199add7d88e204a0c9c537c288179a36de04107216f410656ea8aabc",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yu-bang/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "73001d748dd42dde9897fdc50e3deda36e5683dd"
+      }
+    },
+    "audio:public/audio/yu-gong/moral.mp3": {
+      "fingerprintSha256": "33e74c6a2877142543e1624ddb9dc72f4e9c5c316fe58b7fca4096b43f816f87",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yu-gong/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "fb0d55095769eb2ea0a4d119052273dd47c87e8e"
+      }
+    },
+    "audio:public/audio/yu-gong/p0.mp3": {
+      "fingerprintSha256": "d332314c05bbe3b6265eeddbf5b941b4a1ed1e363171c3f332e0a5ab147868e2",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yu-gong/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "c44cf33ebcd65e5fb8ef3f0e3da00acc34bda4d4"
+      }
+    },
+    "audio:public/audio/yu-gong/p1.mp3": {
+      "fingerprintSha256": "cbf3dfa5af5fec19464617c78f7d29910c5d1ba07417f6d6d0b45ee203d61308",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yu-gong/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "1f149a14d9d01125bd37b582e1b7f3bba4b42c18"
+      }
+    },
+    "audio:public/audio/yu-gong/p2.mp3": {
+      "fingerprintSha256": "0af0c7b8628b185d50bad08900603393dd2b6d1605444aa9596008c0ca6cedfd",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yu-gong/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "c70260aa60d9ec182ffefd356ee408081e6b9714"
+      }
+    },
+    "audio:public/audio/yu-gong/p3.mp3": {
+      "fingerprintSha256": "5ba515fd5d95210be4b233911f37a3f79d1c85851c59ebabb8ddbfeb4a117fc9",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yu-gong/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "4f56da33ccd662f05b81e2d316ef909baf1847de"
+      }
+    },
+    "audio:public/audio/yu-gong/p4.mp3": {
+      "fingerprintSha256": "5f24ba191d64be95c4c29c3a460787880302a0d50531e931876af4f1dd4965d4",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yu-gong/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "e25e3673eed5a105e4e80cd71b1b6b3aa1b899cd"
+      }
+    },
+    "audio:public/audio/yu-gong/p5.mp3": {
+      "fingerprintSha256": "50fdedcb89aca22347361e02099bfb5d95a016045fa656908ac67115eebdaef6",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yu-gong/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "c94c4fe9735859d4fb8c3c928bebe9e1bbadea2d"
+      }
+    },
+    "audio:public/audio/yu-gong/p6.mp3": {
+      "fingerprintSha256": "1f96f7bfde79750a146bb587b317b61a4e754139cda5de390ef914268c2925b5",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yu-gong/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "18944ebb09547f06ffb539cf1b8f2f2e106e740f"
+      }
+    },
+    "audio:public/audio/yu-gong/p7.mp3": {
+      "fingerprintSha256": "8ee85232633fbaac1e9fbed0962a8648f86e2d7d7eaf803c69b74020669330c0",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/yu-gong/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "1d9e965ae5c64f45045a06efc195abefcf7588c4"
+      }
+    },
+    "audio:public/audio/zhao-san/moral.mp3": {
+      "fingerprintSha256": "a09c57f7a3115caeaafca67cd9bdf6e50cb82e202646109c25e2d0757cb853b3",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/zhao-san/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "00eb4afc304423b4d8ed4c398d05f5c5c2f59125"
+      }
+    },
+    "audio:public/audio/zhao-san/p0.mp3": {
+      "fingerprintSha256": "8b24d0aa731a94e5858d17fa75365d9b6219052f075e3bbec0fbf17628022214",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/zhao-san/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "b1657a968bf78669760819e11de9834223ef3f22"
+      }
+    },
+    "audio:public/audio/zhao-san/p1.mp3": {
+      "fingerprintSha256": "c490498ffe3fb39d0e70e874377536df46dec8714c0be48a1aa3845b40e09556",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/zhao-san/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "d1b55944069d5b7c0433b4f12370a9e9c070bf4e"
+      }
+    },
+    "audio:public/audio/zhao-san/p2.mp3": {
+      "fingerprintSha256": "4ec1b69cd3921c6d705925b88c06e33f30fa22267dbe65a630337e5b0d9e8f31",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/zhao-san/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "27e0a641613519e16f3799e10dccfad0f0fff697"
+      }
+    },
+    "audio:public/audio/zhao-san/p3.mp3": {
+      "fingerprintSha256": "366b78bca94d4b53b6bcb3d49d7aeec2d88ebe4d7fbecf94eba81e4668f5566e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/zhao-san/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "bb2ba02552909ae20937fdd14ff835788e5eba22"
+      }
+    },
+    "audio:public/audio/zhao-san/p4.mp3": {
+      "fingerprintSha256": "468c95063746c582a081fa3a0bac74d3ee9d6323d2a2e47d577f651ebb73b5cf",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/zhao-san/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "f2b4d50d03c4397372b8a937a2364bc325053ee2"
+      }
+    },
+    "audio:public/audio/zhao-san/p5.mp3": {
+      "fingerprintSha256": "86633099ef6897113bf83264dad57714164c04165f20571bc80a6dfc487418b0",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/zhao-san/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "f771351c040db5dea586bc2c3cca1477597af655"
+      }
+    },
+    "audio:public/audio/zhao-san/p6.mp3": {
+      "fingerprintSha256": "a5033c561f281c950ec2aabb92ff330230e6d3e568edb59684132339e3830d8a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/zhao-san/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "39fad2f457f0b661554d30cfc2a03cc36b386f72"
+      }
+    },
+    "audio:public/audio/zhao-san/p7.mp3": {
+      "fingerprintSha256": "fee05222036cf1f1c83591f9f1c21625492fcc4a056447e76976548c17e9076b",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/zhao-san/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "a9d0594370b62c401250c6df819bf3a4b05a5cb6"
+      }
+    },
+    "audio:public/audio/zi-xiang/moral.mp3": {
+      "fingerprintSha256": "2aa964d6eb160a6d8d79bbed3888414ce13f2cc2e08cad9075be315e074ee360",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/zi-xiang/moral.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "537fcd3e46e5040501a8346c24868087ba52fbe0"
+      }
+    },
+    "audio:public/audio/zi-xiang/p0.mp3": {
+      "fingerprintSha256": "8d369d9742aadf720d7097b7c4bb9f44b10b720c30ebc12520dc88cdedd8f5a6",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/zi-xiang/p0.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "39d2ae2c44602be6cd1c9f41a143a3d94ef48c88"
+      }
+    },
+    "audio:public/audio/zi-xiang/p1.mp3": {
+      "fingerprintSha256": "8db3321a8e00a401de1a3a3d384e908733b8137e609dd0d63d9433a947c54018",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/zi-xiang/p1.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "35eb8f11106818098bbe20b5f8706d03d1848ce3"
+      }
+    },
+    "audio:public/audio/zi-xiang/p2.mp3": {
+      "fingerprintSha256": "4616a0954c181333aa5d8dc67aabfcbbe82355946ae3c68abb35a747419d3eb6",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/zi-xiang/p2.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "d89be40ee34411eeaef4fe0ef7a531a1437dd9fa"
+      }
+    },
+    "audio:public/audio/zi-xiang/p3.mp3": {
+      "fingerprintSha256": "63c2263174d497ba27e1a9a899e3f92d1583d7a4f14c9021ad389098c79c3ada",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/zi-xiang/p3.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "a5b918bad38344a83c8a9b903d5f946cf1c80c05"
+      }
+    },
+    "audio:public/audio/zi-xiang/p4.mp3": {
+      "fingerprintSha256": "b31eadbc84880bffa4187843cc276f823556d77a0cd516ec5bf640f9992a53b4",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/zi-xiang/p4.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "c07b4f4c0cc318da2e46e20e7d704b6f467bf499"
+      }
+    },
+    "audio:public/audio/zi-xiang/p5.mp3": {
+      "fingerprintSha256": "68c3946df2bfc7d1ddf4247acb4fe3518f515857c34994c3e65f2adbdceda63a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/zi-xiang/p5.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "7214d5ee1875ebaf58e727531cd0a39a29d820a5"
+      }
+    },
+    "audio:public/audio/zi-xiang/p6.mp3": {
+      "fingerprintSha256": "61a69b1a98d9b1ff1afd199f93b5a7cf09d2dcd752f80a213614bd6fe7b7c412",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/zi-xiang/p6.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "c79fb894545875dbdda8780277e970328d3fe962"
+      }
+    },
+    "audio:public/audio/zi-xiang/p7.mp3": {
+      "fingerprintSha256": "2729b04325633da3c0b2437a0c4ed3e764809fc23aaf032df8df7d12a8ea66c2",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/audio/zi-xiang/p7.mp3",
+        "method": "git-blob-identity",
+        "gitBlob": "ea3a3574a91f8622f0d649f67d75a21dcc278a9a"
+      }
+    },
+    "font:public/fonts/MaShanZheng.woff2": {
+      "fingerprintSha256": "11e2c8cbcd09ac08fa38066a2e9699e57fda40a8e2880fbf7cbf101f5926a595",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/fonts/MaShanZheng.woff2",
+        "method": "git-blob-identity",
+        "gitBlob": "79f30c6963e45e7da0b821dc8ea1fec0b1196b1b"
+      }
+    },
+    "image:public/stories/ba-miao/cover.jpg": {
+      "fingerprintSha256": "822bacaa2b667ed2191e2ca1affcd68b7152b18b45baa332504b556ffd396513",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ba-miao/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "c6eee5eba7df1a7efb2a0777a162ffb5f59896af"
+      }
+    },
+    "image:public/stories/ba-miao/p1.jpg": {
+      "fingerprintSha256": "c9ae3085d887ee27cbad729a95fc0433c17b89bfaee815fb0e93fccaa3862e0d",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ba-miao/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "b10361bc531a4c5e1bcc64c46c88b976c65ff3b0"
+      }
+    },
+    "image:public/stories/ba-miao/p2.jpg": {
+      "fingerprintSha256": "e23c9937410e8cd17c67f9a22346152518cdd4c9aa605723b9cdb5870dd1e636",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ba-miao/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "28c204c1a0b1a54bd474bac7cceb94dd50764981"
+      }
+    },
+    "image:public/stories/ba-miao/p3.jpg": {
+      "fingerprintSha256": "d224b425554023272e9743f3e451ce98e402edde4c81f84f6a84a7fa8faba90f",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ba-miao/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "75d83563d79feeb83ab8a8d2ddf57a8c750c69ca"
+      }
+    },
+    "image:public/stories/ba-miao/p4.jpg": {
+      "fingerprintSha256": "2cf6bd29288de90a02fc0fc968c4e5e73068cb19fe5039984af60ed52f7890d5",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ba-miao/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "602c593b7485c96acdda629134994979533658e5"
+      }
+    },
+    "image:public/stories/ba-miao/p5.jpg": {
+      "fingerprintSha256": "d2a0c3faeaf06a65518ff512a6873e28753720904c6e84c463216155136cfa04",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ba-miao/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "90180222e97124160d0773d5972309d0903b4512"
+      }
+    },
+    "image:public/stories/ba-miao/p6.jpg": {
+      "fingerprintSha256": "5902796d0321a8bb549c83c96a0180fa366d90056599b6365daabce1444e1305",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ba-miao/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "e697ab231885ade54a200d548a540dbee8435fca"
+      }
+    },
+    "image:public/stories/ba-miao/p7.jpg": {
+      "fingerprintSha256": "815d1c4af898a1cb22dce4e30a3836e50aef755b9455d8917201b2aa58314197",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ba-miao/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "1c1f1ee57803f91904c254e8dae8ba3d5ea35e63"
+      }
+    },
+    "image:public/stories/dui-niu/cover.jpg": {
+      "fingerprintSha256": "75dd390f39569fb877bea95014d87199d2576756ce293b23ea4d453135bfff20",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/dui-niu/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "bdef926a9f67f057bd938c655e1ae9519457f36c"
+      }
+    },
+    "image:public/stories/dui-niu/p1.jpg": {
+      "fingerprintSha256": "565b68a1c19d2ca7d9746d775e477bf31f2be0a6f878b0a4bf122c8f9fe2e20b",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/dui-niu/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "225a303b5a06ed04b9a35f8c45164d881596988d"
+      }
+    },
+    "image:public/stories/dui-niu/p2.jpg": {
+      "fingerprintSha256": "ca4800256f83bdf38c370768dbf31f7d3c66824a3f7199303e3272a3aebae37b",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/dui-niu/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "f01bbdceb9fb1ca78a6ec6ae8c28f7d190d7bfa7"
+      }
+    },
+    "image:public/stories/dui-niu/p3.jpg": {
+      "fingerprintSha256": "7ad78b58abd1b5a0c05f3fecd115cb283a2dd4e1060836ea4d1c62f739274268",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/dui-niu/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "4f14022b6e40de1fa604a34f7021d5ce739655fb"
+      }
+    },
+    "image:public/stories/dui-niu/p4.jpg": {
+      "fingerprintSha256": "8c94db1cff6aa94cf6fb1cd474cdad15b1aac08c59a5594f834708df81f96630",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/dui-niu/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "0b120869d9f74eae3b73d8080b1351520af2ceda"
+      }
+    },
+    "image:public/stories/dui-niu/p5.jpg": {
+      "fingerprintSha256": "8e1a325cf2d512c869283152c0bab1ae45a91f841d3c5d184742c4908ae2c236",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/dui-niu/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "0ccb18e4fb381c210d290f05c886591001b33ee8"
+      }
+    },
+    "image:public/stories/dui-niu/p6.jpg": {
+      "fingerprintSha256": "43fee9d1073fb20dd627a11409231bbd73cc434e622d0278298a2dbb0b69c1a8",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/dui-niu/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "58e25a0cbeb7365949ca39059f9694b11357afd4"
+      }
+    },
+    "image:public/stories/dui-niu/p7.jpg": {
+      "fingerprintSha256": "7cc542e47d17391a16c52157b7cefd3414c1b35941ce466ff8f86bb698d72d97",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/dui-niu/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "986931ae727c5647bab8d082884106d7b6fa5c5a"
+      }
+    },
+    "image:public/stories/hu-jia/cover.jpg": {
+      "fingerprintSha256": "60ef8e992586d01a21cb0b0507163091ad0cd27a764ab67958f7bf43d03fca62",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hu-jia/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "f5c7585b7ed50276a8581268ce3080df79b2f597"
+      }
+    },
+    "image:public/stories/hu-jia/p1.jpg": {
+      "fingerprintSha256": "624df34fc40c1ea997987d71a6204883d58225f68488ac1a12fc192cc5146f89",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hu-jia/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "b116ec36d220e02bec9085679b3243984b83534a"
+      }
+    },
+    "image:public/stories/hu-jia/p2.jpg": {
+      "fingerprintSha256": "1abc9030e7b9501ab015b3378d0028af0a3fb0135b9dca42e35f5131b3f2472a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hu-jia/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "b9e4a046788d5cf80b794db17d45704ba356364d"
+      }
+    },
+    "image:public/stories/hu-jia/p3.jpg": {
+      "fingerprintSha256": "0c7ee52399797d4ba49c20d5f16ff44adc94ab922cb25c468b4b520c9ea84e85",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hu-jia/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "ba962a875b17e6ad082f693139954e8a49e988c8"
+      }
+    },
+    "image:public/stories/hu-jia/p4.jpg": {
+      "fingerprintSha256": "9bb44158a66aba2d479bd107aa7d365e4339af7b35845efd2cc3831e7a410820",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hu-jia/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "9cac7012a861d11488543ca8d9bda628eca7f76e"
+      }
+    },
+    "image:public/stories/hu-jia/p5.jpg": {
+      "fingerprintSha256": "c42861db04f45119a40bdca6f3f666995451e2946d3336cc10f2dc75bc1a38dc",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hu-jia/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "1872ac3683165299e470737ccaf891ceef9dec16"
+      }
+    },
+    "image:public/stories/hu-jia/p6.jpg": {
+      "fingerprintSha256": "24c101de5938b89226cc9aaac477ea46864132d9bf32a5a6509bae2c37e361f1",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hu-jia/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "6165d70d168bb2b20bfba2abbaa49661730d608c"
+      }
+    },
+    "image:public/stories/hu-jia/p7.jpg": {
+      "fingerprintSha256": "894080d1b22ea21a477274322ceb4e967aad1da7e286b6de394ebe68a3c3cd43",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hu-jia/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "2858daa29564aa12a78c5691b3c8aec07658fb07"
+      }
+    },
+    "image:public/stories/hua-long/cover.jpg": {
+      "fingerprintSha256": "0dc52fc0033f20fd5a0db68dad96f1ff2fbccb8e47fa1d3255a96323450174eb",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hua-long/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "5e7dc7f4671c466e06db8627cf6b4d9eec9b89aa"
+      }
+    },
+    "image:public/stories/hua-long/p1.jpg": {
+      "fingerprintSha256": "2c8fee5a080989d1f28777ed7870bad809e63a39f79cb0e20040bde0c05d7e24",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hua-long/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "53111af6adca44c9374db22b98bde4cd563822a3"
+      }
+    },
+    "image:public/stories/hua-long/p2.jpg": {
+      "fingerprintSha256": "610de01952b99a72a0573e02068bdaadae2f149e41516b01c7278b25b8bc7a4a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hua-long/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "a9b4f51dae2cd14080eb1449a69d489a0881507f"
+      }
+    },
+    "image:public/stories/hua-long/p3.jpg": {
+      "fingerprintSha256": "031c8156c0f56a08d71c61707f4be3451ddf6882016683db8938dffc6fefcbd3",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hua-long/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "2733ba54e53df32de4f935676ec231d6715ea743"
+      }
+    },
+    "image:public/stories/hua-long/p4.jpg": {
+      "fingerprintSha256": "9b10b837514c99c8c7869cddd218b022a82f72cbf6f5f027cf5f6f767f5b9524",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hua-long/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "f22128956ac1cbc26ffaaf372eb2a556ffe02d02"
+      }
+    },
+    "image:public/stories/hua-long/p5.jpg": {
+      "fingerprintSha256": "c361b1ca2d3efdea0f820b09a8e635dfa6a24198cfd934699d3488f0fcc97294",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hua-long/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "96249b77231039e72ce48d170bf91d02eee95e76"
+      }
+    },
+    "image:public/stories/hua-long/p6.jpg": {
+      "fingerprintSha256": "fde52c47f3644e3ee395408bb8a2e4086dbacc59745b1aed63ea5c4ead3e8ef5",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hua-long/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "aec89a6bd4dfcadfe59d8aaeb3d154e4c5a37fd3"
+      }
+    },
+    "image:public/stories/hua-long/p7.jpg": {
+      "fingerprintSha256": "d8241cf4b573bfbee65434b8de634c7facc4d425ffc1091d347796f559e73ff3",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hua-long/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "1de403f4c4662ba5548687a297750ef23c7ed877"
+      }
+    },
+    "image:public/stories/hua-she/cover.jpg": {
+      "fingerprintSha256": "7605ae3b75f00ec331a1c96495d03bb3b8b6cab1475034fe2241d1f09011170e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hua-she/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "8af75c54ade6c4be6ad41ec9e74394c3fec457f5"
+      }
+    },
+    "image:public/stories/hua-she/p1.jpg": {
+      "fingerprintSha256": "acb4de573fab71529aa4d57b84fb2f6bd8b149e03bb18b7a405fa82eb76f32d6",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hua-she/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "f8211c1cd7f697f5072aec4f44231b0f21dc9dc1"
+      }
+    },
+    "image:public/stories/hua-she/p2.jpg": {
+      "fingerprintSha256": "3fb62be6c516db783dafb0b7624e8c152d7b1ffbd2f46bd6b5885c8d71e33d9e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hua-she/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "74569d3bc2215bc83594a5a67c2945ee1887976f"
+      }
+    },
+    "image:public/stories/hua-she/p3.jpg": {
+      "fingerprintSha256": "4c4958e38c2a46254fbb90c4361b2b82ac2f0b4e61e69deac62840e0f9cd4ff6",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hua-she/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "d6107d670d3436a31c52be9301efb3e48a99fa91"
+      }
+    },
+    "image:public/stories/hua-she/p4.jpg": {
+      "fingerprintSha256": "6c8d9ff508da95d75c8f91dd61921721ac422cf8a6f609eb88754e23a3b9a2fc",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hua-she/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "ad33b08b6db1ac7cb4c5d8fc1623e751ce9cc7d7"
+      }
+    },
+    "image:public/stories/hua-she/p5.jpg": {
+      "fingerprintSha256": "7801426f1920531299c1e1a683c5125bdb46558966d38262f22419796376045d",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hua-she/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "0344ef09d200cceda4c63670ec1b84e9661ce75b"
+      }
+    },
+    "image:public/stories/hua-she/p6.jpg": {
+      "fingerprintSha256": "9716366b94035a869687a115ce2d2b427bcbadaa1175ca9bb91c939ef9d44a45",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hua-she/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "8cd11d2fbd871dec84cf961d925dbd96a4e384e5"
+      }
+    },
+    "image:public/stories/hua-she/p7.jpg": {
+      "fingerprintSha256": "aa9b93a97cf6c9b79adecce334cc50eb4379f949738dde0ba9c5eb21509b28dd",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/hua-she/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "6058c66363c907432d58acb1bb7aea211c384ff1"
+      }
+    },
+    "image:public/stories/jing-di/cover.jpg": {
+      "fingerprintSha256": "69546b73d0447abad28ad946bf9eef2102ad9102cf714c435b80190aedb8256b",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/jing-di/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "f782c0c1b5b610679c27a1af763a0ace4ceb2022"
+      }
+    },
+    "image:public/stories/jing-di/p1.jpg": {
+      "fingerprintSha256": "97ba201b1d467b04bad85b08c7969322e76158268270ece26d6781ca9e2ca7f5",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/jing-di/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "df73b55415b4a26b71066cd09081a39e70167ff4"
+      }
+    },
+    "image:public/stories/jing-di/p2.jpg": {
+      "fingerprintSha256": "806a6ecfd70b7543f6a4f86f4e2f8335465cc4f1522de162d2671dcc7eaaed70",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/jing-di/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "ecf62986ebafce969e9fcbc7e9a1839d37d85907"
+      }
+    },
+    "image:public/stories/jing-di/p3.jpg": {
+      "fingerprintSha256": "d3ef679f96864d05f60a17164f6114523b2c8cea71c4279abf88dc305f225825",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/jing-di/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "f8a8aad0dc60770c95e9fafa83eee12041918657"
+      }
+    },
+    "image:public/stories/jing-di/p4.jpg": {
+      "fingerprintSha256": "73946e50dacc4b9486f42475669730b929371032d10f0a15fbf61e3528981b42",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/jing-di/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "1c6a7b4af9d5adcacbce5c8caa56ce996bbbcc5a"
+      }
+    },
+    "image:public/stories/jing-di/p5.jpg": {
+      "fingerprintSha256": "9fa2c18f854f360e021504a482c1806bbfef4ae0c89780173d17949ef124eb28",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/jing-di/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "07161a31087f8c93f83a5fbb02193c9847f0a44a"
+      }
+    },
+    "image:public/stories/jing-di/p6.jpg": {
+      "fingerprintSha256": "cf4b51999a7b2a9eefbd3e235a349fe0b98a921805fbb0200c6b68b050f59bb5",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/jing-di/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "aa78f69a3c4059bc24028a242bee54e2ff3fece4"
+      }
+    },
+    "image:public/stories/jing-di/p7.jpg": {
+      "fingerprintSha256": "edac37135c94cd7e8178bcebc21e407c0d932b9fbc1eb61f0aa4cb743ca6ac8a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/jing-di/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "f183f5fd1de764eb85a5ff3facd79a0699de363d"
+      }
+    },
+    "image:public/stories/jing-wei/cover.jpg": {
+      "fingerprintSha256": "e64574b44f86bbf0e93151c8de73e8dcdc2a5546e1ced7a722835272a4b15e01",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/jing-wei/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "2a438fedeaad5fcf62fe0d8f8a0bf45b624dff89"
+      }
+    },
+    "image:public/stories/jing-wei/p1.jpg": {
+      "fingerprintSha256": "daed07aade531683145353632eb88c47e738d371caa365c27091411f8156cb93",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/jing-wei/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "14379f9e6f1740a1f7f77addfcc530e5f09058bb"
+      }
+    },
+    "image:public/stories/jing-wei/p2.jpg": {
+      "fingerprintSha256": "a1ec8b5b2301fcbc9a05734225bd34eaa14c097500663413fd14494ebb7d2218",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/jing-wei/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "98392230cee2eb310a690d6a9c471e03b359b789"
+      }
+    },
+    "image:public/stories/jing-wei/p3.jpg": {
+      "fingerprintSha256": "e98f39a42f9b5e77099c619ba96efa38d7df3bd4e4cdd128bc0ae28e2aeb0e7e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/jing-wei/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "538b094a6784dd450eb9e1534bc13a677151e991"
+      }
+    },
+    "image:public/stories/jing-wei/p4.jpg": {
+      "fingerprintSha256": "b8165ac66d09b44625a9a3dc6ff11658af9b357c72fd96926159e28d521a0cc7",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/jing-wei/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "aaf3d93df85daf533cb795e3aada62731cafa0ad"
+      }
+    },
+    "image:public/stories/jing-wei/p5.jpg": {
+      "fingerprintSha256": "06e92a2fe9a0aaa4a0a39c91995255c7877ca9c2e8524b01139be5d82a53170d",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/jing-wei/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "5d6498ba41411f9ccb33f26b7ce746c9db803c9a"
+      }
+    },
+    "image:public/stories/jing-wei/p6.jpg": {
+      "fingerprintSha256": "ef95ac81a41518a5c79bb35e0ac1a9f3262d151296fad41eb33fd80625fdf7ab",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/jing-wei/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "77c93fa03ef7a0058a981a02a161b7e9c029f5e1"
+      }
+    },
+    "image:public/stories/jing-wei/p7.jpg": {
+      "fingerprintSha256": "dad5505df248c9fe4a1d20a90c551e717cb229dbe8728f00bbc50fd2f4b640fc",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/jing-wei/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "7055a69061dbc0931c1f38e714f074383664d874"
+      }
+    },
+    "image:public/stories/ke-zhou/cover.jpg": {
+      "fingerprintSha256": "87082e3304796c2b7e46d975c99dca99e75f7921d14ae7a6df2def5fc7495c25",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ke-zhou/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "885e12cb6f26a459ce36d8b1fb1c73a34d13859f"
+      }
+    },
+    "image:public/stories/ke-zhou/p1.jpg": {
+      "fingerprintSha256": "533ada8337e8098947fbbcaaecd8fa5a02cda7453a0d777f493c618fb6c57cb7",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ke-zhou/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "d3a0342fb39ffd5d58c1b45feba750e72c6b717d"
+      }
+    },
+    "image:public/stories/ke-zhou/p2.jpg": {
+      "fingerprintSha256": "2b01fada64f2e95e8cceb2716c1f0d290c95f4519d40b5797f3223b4b5e1abe6",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ke-zhou/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "397c610755ac1fda69eb0fe816e13a9b0c092218"
+      }
+    },
+    "image:public/stories/ke-zhou/p3.jpg": {
+      "fingerprintSha256": "69cc95fc83735997d17fa256b939289fa41ecf200841c9d4e69917ad7a620508",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ke-zhou/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "5a2322b9d1fea7ff6681538c524d50c7887d4da5"
+      }
+    },
+    "image:public/stories/ke-zhou/p4.jpg": {
+      "fingerprintSha256": "15ac146881e810a6cf793d631ccf470c8c02ee1bc4a3b4c2cfc6cbb9eba3b8ad",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ke-zhou/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "9cdca68d829429be095b33d8a3b0684da9345494"
+      }
+    },
+    "image:public/stories/ke-zhou/p5.jpg": {
+      "fingerprintSha256": "3e9034dbfab376b6f6246574aac1f9f16e73560306dfc372e3a68e1223650d5e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ke-zhou/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "a544dd3fb3a2afd910af6b39881387346000e91e"
+      }
+    },
+    "image:public/stories/ke-zhou/p6.jpg": {
+      "fingerprintSha256": "d9bb0d651ea258f34fac87504ef21191972ad1c4fb4b05aa76469417708d5fbf",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ke-zhou/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "45e29b1338cdefb88d0b50992844ae734f83da9b"
+      }
+    },
+    "image:public/stories/ke-zhou/p7.jpg": {
+      "fingerprintSha256": "d0702e771b43be9d0da62bbb960b8ff3ebdc80d9a2a867f34b8103e66da8f2c3",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ke-zhou/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "3e0f67ff4e045572c6ebe04e556602bf13128af3"
+      }
+    },
+    "image:public/stories/lan-yu/cover.jpg": {
+      "fingerprintSha256": "4af7aa1be228b216d1a764b3e244621437bf49600f6f16c49e687a4b7a600075",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/lan-yu/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "3db0c7573eea1f7f33d4086085acb93763701550"
+      }
+    },
+    "image:public/stories/lan-yu/p1.jpg": {
+      "fingerprintSha256": "54afbe21097c854c68c8bb21f4738efffddbb25f45277bd96e520078c337d603",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/lan-yu/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "f2ead40814d34bd848c986810ac76d4a6cc8727b"
+      }
+    },
+    "image:public/stories/lan-yu/p2.jpg": {
+      "fingerprintSha256": "48d2d1356132635da19f768291a14ada5bf1b85858423fb80e0f2e21549d71b3",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/lan-yu/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "63428957ffa4034378bd3811de1507c54cbc6854"
+      }
+    },
+    "image:public/stories/lan-yu/p3.jpg": {
+      "fingerprintSha256": "b0e646d2b8b8eeec20b0f293dfc8f7be0015b96e4cb3c41ac1a6ab3bbc7b71c3",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/lan-yu/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "dad1fc2fcb355fab5d657af31f3dbc77c238a9af"
+      }
+    },
+    "image:public/stories/lan-yu/p4.jpg": {
+      "fingerprintSha256": "4bc8f7add0f16968a7b328be2be634937b2a40a4473e0a48a4be1b4afe693294",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/lan-yu/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "f8dfa4d9533e842f6eec6187d86c245e9973eca7"
+      }
+    },
+    "image:public/stories/lan-yu/p5.jpg": {
+      "fingerprintSha256": "4ad5a9e5b1c57896ae1e19aab77a85eb03af48a30ab352595489374e65569043",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/lan-yu/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "d020d67867220f5812e17f0d637523f3abccf7b3"
+      }
+    },
+    "image:public/stories/lan-yu/p6.jpg": {
+      "fingerprintSha256": "220cbe36c47a699a6b21e3024607bca8fbbcf99b2d56a88e07ceefdd59eccc0d",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/lan-yu/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "6ef09aafbbe3c933a60483dbfcbe5a6dc5bcf37e"
+      }
+    },
+    "image:public/stories/lan-yu/p7.jpg": {
+      "fingerprintSha256": "5d41d55bebd32b635c723a6468e36a7550f1f36b6c22af6569a30c4bd0415f9b",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/lan-yu/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "9f3ce95dbc22819bae3b2788c7394a8b8486ccd7"
+      }
+    },
+    "image:public/stories/mai-du/cover.jpg": {
+      "fingerprintSha256": "359ec733b1ac4ec7374c3ba34d5a9305463503f0cdc273cbe359d15c85466df6",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/mai-du/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "65244eff1fe6ec99ea77481b28130e525466c417"
+      }
+    },
+    "image:public/stories/mai-du/p1.jpg": {
+      "fingerprintSha256": "c6417757066ddc731ff06fca1673b88f3de10be31f34ef7d3ce6c119aefd01d2",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/mai-du/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "9ee783dcd562e6f24d18e9b9cdda4c4f654e11ff"
+      }
+    },
+    "image:public/stories/mai-du/p2.jpg": {
+      "fingerprintSha256": "e418cae307ae8c1e06ed2526eccb8688fef0180c4347651b3e76daf87b4447ac",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/mai-du/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "cbc735c7da48c2e9499e1c7c1a017897dffee2b4"
+      }
+    },
+    "image:public/stories/mai-du/p3.jpg": {
+      "fingerprintSha256": "414eb6e4feff269b4f0cdfd2487a35a99a28b358507de54352ff1dd0b6cac5dc",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/mai-du/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "32614963835349b3964fcaca43fbb375f03fe8c6"
+      }
+    },
+    "image:public/stories/mai-du/p4.jpg": {
+      "fingerprintSha256": "82f027383d8ae03816b6e92ba4b1c73e938a50aa8a9a8b44c91a1383e81a8369",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/mai-du/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "ca034956a9e67977e42b576ecd683951b98342ac"
+      }
+    },
+    "image:public/stories/mai-du/p5.jpg": {
+      "fingerprintSha256": "925a30d055db5e43a1ac37a69408a13b7b62ee9c236e11b26a125d16ce3401f2",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/mai-du/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "737d5d9700697e4a476b97d7c782e21bbb1719e5"
+      }
+    },
+    "image:public/stories/mai-du/p6.jpg": {
+      "fingerprintSha256": "4c490452e6e839b01cbb7c8fa947d8010c8ff3c02ece402698350d00bb523e17",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/mai-du/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "c3986018b97ced4b8db544603e24e668720fb386"
+      }
+    },
+    "image:public/stories/mai-du/p7.jpg": {
+      "fingerprintSha256": "5af3557da18c852b905dad61766bc03c79744cad6429e55ce79432c4ac02824c",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/mai-du/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "b4a69f39658e0dd779eccaa968bd7752375ccfb6"
+      }
+    },
+    "image:public/stories/mang-ren/cover.jpg": {
+      "fingerprintSha256": "4e4045f026cfa2280cd1627799933c6d3fb7ba52f4aeb5205e620c2d75f9a79b",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/mang-ren/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "dc03a34f750f81a34aab4b86aaf81d5ba1488b80"
+      }
+    },
+    "image:public/stories/mang-ren/p1.jpg": {
+      "fingerprintSha256": "350cca8f85c20c981c323a97f70acc9d99e29f80f591dc5f0052244d7f11e977",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/mang-ren/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "4cb1ed07ca937ecac6b050d2b3993aafba578b23"
+      }
+    },
+    "image:public/stories/mang-ren/p2.jpg": {
+      "fingerprintSha256": "6cbd563d241350f89f14b9cd1bfefc6c5e3207824e9646711e0a37a348088bf8",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/mang-ren/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "6014f9b1660c852f36afe79e96ed0dd922381582"
+      }
+    },
+    "image:public/stories/mang-ren/p3.jpg": {
+      "fingerprintSha256": "b0eb8268294085730b4dbe7ffeb6e29cb630e9b9074e89bfdcd6bd418d34500c",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/mang-ren/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "934f8e6afcd07a964d16255ddf6f932200d36261"
+      }
+    },
+    "image:public/stories/mang-ren/p4.jpg": {
+      "fingerprintSha256": "00236ae69f2992681626a9714bcf24048c998e20a952fcc2034c41193dcd5936",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/mang-ren/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "92f55c541ef435bfb9f28a1c1925da6646c1b1b2"
+      }
+    },
+    "image:public/stories/mang-ren/p5.jpg": {
+      "fingerprintSha256": "3490cbda8e5699dadc721b851ebdd6a394435820e061c21387c7e6e3d97fae36",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/mang-ren/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "0a649b7cb6dbf2e2e7b8be0e43f1b6764431e579"
+      }
+    },
+    "image:public/stories/mang-ren/p6.jpg": {
+      "fingerprintSha256": "1a94b851a3cef89783220869dfc8e0f636fdfb98886b215f46f2f6fd32e3f0b9",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/mang-ren/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "c7e04e15d1ab08e9016c6cb53532f96b4b9b846c"
+      }
+    },
+    "image:public/stories/mang-ren/p7.jpg": {
+      "fingerprintSha256": "819438b06a878b83048cbc20b8d7aa564237b5acb83456b368125ecc8c4934ae",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/mang-ren/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "6ced955f5073927e94f5e50a66888d4bbc24fafd"
+      }
+    },
+    "image:public/stories/nan-yuan/cover.jpg": {
+      "fingerprintSha256": "f633e8c759b5e4b8f16397f487f5e952d694a7187140b31d64a6935a7eb44797",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/nan-yuan/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "ebc4fae65e6529d24d7662e703b0cc7e4f41bc71"
+      }
+    },
+    "image:public/stories/nan-yuan/p1.jpg": {
+      "fingerprintSha256": "15c61efe3fef94ec2b9324084591d822ea9c3b506e134becd811be3c6920405b",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/nan-yuan/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "c390561b43b28984849ae181f047bd04ac02d0cb"
+      }
+    },
+    "image:public/stories/nan-yuan/p2.jpg": {
+      "fingerprintSha256": "192615db8930bbb1cf1ee2a02aa760436ce63d544c90c8719cd61ad009939356",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/nan-yuan/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "294d6160177de0e1097d96d2e745b80c49d09de4"
+      }
+    },
+    "image:public/stories/nan-yuan/p3.jpg": {
+      "fingerprintSha256": "983db3461faf3a2395b4305d9536df360c1d59b62144c2fe7b1b12df94156443",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/nan-yuan/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "9af92abefbe2b47e0f5293675147f376b41540ea"
+      }
+    },
+    "image:public/stories/nan-yuan/p4.jpg": {
+      "fingerprintSha256": "050129d561af5fcfee3b9ef31be36658360c58c921a4bac4e0d0e2df8e32b1f1",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/nan-yuan/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "673580572862d7fea68b865f000a350a6e63c2eb"
+      }
+    },
+    "image:public/stories/nan-yuan/p5.jpg": {
+      "fingerprintSha256": "813e30d855c6d5b140a3fc6fd3372942818e7703fc7fad7d5fcd8549140720ef",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/nan-yuan/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "7da2b7c76b4ab42051721d94348456d83ac0ad4e"
+      }
+    },
+    "image:public/stories/nan-yuan/p6.jpg": {
+      "fingerprintSha256": "17b599a2bfb8acb99c8ee757b404e44f56431c2906a126b70415175bc3ede376",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/nan-yuan/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "3f1fee37550e0445be48bc3934a7694a8ece8daa"
+      }
+    },
+    "image:public/stories/nan-yuan/p7.jpg": {
+      "fingerprintSha256": "26543c6e4651b31b22db67e53460c51c610b1da5774fd8d0ca268066cfd920b4",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/nan-yuan/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "a17b5282ef42e2fdcad7f1fc4e2f1d1c9565b5e1"
+      }
+    },
+    "image:public/stories/qi-ren/cover.jpg": {
+      "fingerprintSha256": "d97751a60ce38cf5eb3c2abcab385281e6af062cd45dcbfc14e0cc6e4b6a7d11",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/qi-ren/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "f99270d059e8842a34ce9fff8fb93c513d127f96"
+      }
+    },
+    "image:public/stories/qi-ren/p1.jpg": {
+      "fingerprintSha256": "c605fbd000a6ae7157c4312b4e5dcbc5e5f8ed503d6559f19fc5d04d7eb48e32",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/qi-ren/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "042acf1f13e59ecae8e6be4ba2932e954d752204"
+      }
+    },
+    "image:public/stories/qi-ren/p2.jpg": {
+      "fingerprintSha256": "4e4b07b5513ff20bd6e28edad352fdc6486504c6cccf5449181f6242fa5410ac",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/qi-ren/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "047d1ca81b6f215bc413b33e987588e5daa60a32"
+      }
+    },
+    "image:public/stories/qi-ren/p3.jpg": {
+      "fingerprintSha256": "feeadd4c8afcd9203fbb368480fea51cc0a277e68e95087b1fb5545bc7e52293",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/qi-ren/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "7926b7eb1aeefeebc74c99ddc0dbbd1e1deb97d1"
+      }
+    },
+    "image:public/stories/qi-ren/p4.jpg": {
+      "fingerprintSha256": "17a5f4bc68e0b640603e8ec1f05332d97a3fbc3c45cda1242f3dc0ab378fb320",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/qi-ren/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "2dad84a0e89c6b91b91fe0810a71b6f811f95b0d"
+      }
+    },
+    "image:public/stories/qi-ren/p5.jpg": {
+      "fingerprintSha256": "f6cc41495e7ab1e69c10558e5311a45c30089ad4dcaf8cbd82d4394f36c2d03e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/qi-ren/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "a2a9cf82bbcab8209edf1e8a6e62c4e5fa8d7d93"
+      }
+    },
+    "image:public/stories/qi-ren/p6.jpg": {
+      "fingerprintSha256": "07997f846fde58bdc90ef9fe007e00190d69d71c51c708e4c8d4e8f40a012f29",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/qi-ren/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "26bdde2c3e027c0088e7c14e569f633b3ae2767b"
+      }
+    },
+    "image:public/stories/qi-ren/p7.jpg": {
+      "fingerprintSha256": "296d4f51025fa6cfd44fa6b4d201362d2e192d67f638a0c93197ae73cc4c29dc",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/qi-ren/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "00c96333f7fd6875ec73587dff8e8d38e8090b72"
+      }
+    },
+    "image:public/stories/sai-weng/cover.jpg": {
+      "fingerprintSha256": "e93f33dca1bff53dd580e8666dfe069544f3e0ecdca2b00894aee89fa6e24191",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/sai-weng/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "e138c1d332dc86ae083f5b358bafc8451cab074e"
+      }
+    },
+    "image:public/stories/sai-weng/p1.jpg": {
+      "fingerprintSha256": "b8f4ea7de7c047538db2832f37ed2c9df0ac17c60353e7eb13632edd75952d0c",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/sai-weng/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "315d6910523a0fbc5654af2239572ae357bfaa68"
+      }
+    },
+    "image:public/stories/sai-weng/p2.jpg": {
+      "fingerprintSha256": "cd042f60a21e1107c57ad685bb453823e13ca2c06838a808cc5e29a272a9e353",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/sai-weng/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "4231bab4ed18c66d4a9ada4d8127504ed818b1ed"
+      }
+    },
+    "image:public/stories/sai-weng/p3.jpg": {
+      "fingerprintSha256": "bed172f08fa17fd2684174f1c101e895a526f31be59e9df0483034bb5bd431b9",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/sai-weng/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "159b882990c7b4099bfb0ab67bb22d9451f336b7"
+      }
+    },
+    "image:public/stories/sai-weng/p4.jpg": {
+      "fingerprintSha256": "823c6099cf8e6ea26e17d198c1d75f313f424259ee7d9c99407cf8d44992a9aa",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/sai-weng/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "53588aaeee2e2ce0f00d64370d4c5a55fcba48e4"
+      }
+    },
+    "image:public/stories/sai-weng/p5.jpg": {
+      "fingerprintSha256": "812f29700d5a892f7ff9fc294e486e77a0bb4d625b6bda0cca5ee7a736172e52",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/sai-weng/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "fb04736620c6dfa230e628cc0688883aeb332cd6"
+      }
+    },
+    "image:public/stories/sai-weng/p6.jpg": {
+      "fingerprintSha256": "1cbd34e221cecd6e374aa533d74000e568f6e8c2717e856b80b77877ea23c48b",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/sai-weng/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "07152067a7bd21b339bae667f0ea5ec4bde1e317"
+      }
+    },
+    "image:public/stories/sai-weng/p7.jpg": {
+      "fingerprintSha256": "e39cdff1e9d2a0cfeff60f32c30ef0df1444a421ef489b2b14ab32c4f181529d",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/sai-weng/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "ed1bdb2c54fa0ab61ed4f679bb6dedf05c636252"
+      }
+    },
+    "image:public/stories/shou-zhu/cover.jpg": {
+      "fingerprintSha256": "e43cf8b73c88fe6a16f56837490588f0a1f6d192e5f396979a20840ab96fc6f0",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/shou-zhu/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "7b2f02f78f32a4a5162bc7bcdbb557de5552cccb"
+      }
+    },
+    "image:public/stories/shou-zhu/p1.jpg": {
+      "fingerprintSha256": "44f55c3e3320090129c16c5080997e89a91e94c28df41780bc5a17b403efbdb9",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/shou-zhu/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "d25220180479293729e3f532a8215efaa17bb178"
+      }
+    },
+    "image:public/stories/shou-zhu/p2.jpg": {
+      "fingerprintSha256": "f34a0d37747d4aa20e666feb63c11e59971abef85ddaaaccfbd01ce69d4488d5",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/shou-zhu/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "01e5a7089f8ef57f4ae1752590162171a592a1dd"
+      }
+    },
+    "image:public/stories/shou-zhu/p3.jpg": {
+      "fingerprintSha256": "33ca4e60294c22edf07ee9687645cfd1e11243f4bfc98bebc272a553d1b071b8",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/shou-zhu/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "8ade17a7c9dffb701dba630b9d254d1c3ca67f25"
+      }
+    },
+    "image:public/stories/shou-zhu/p4.jpg": {
+      "fingerprintSha256": "45120195d6b6e51c8cc7dfdfce854cfecf7c05e62d62c5da386b15241300d2ba",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/shou-zhu/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "af0ac6fe3c923c3a6aaac1f0f72c24b8537cbf39"
+      }
+    },
+    "image:public/stories/shou-zhu/p5.jpg": {
+      "fingerprintSha256": "a1df5b4e539df94dedfdaf00bbca22ed994685a9d4abe70c393eee586fb556ea",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/shou-zhu/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "08b5f9261447d1fa4c11abfe316833259a5ec1f9"
+      }
+    },
+    "image:public/stories/shou-zhu/p6.jpg": {
+      "fingerprintSha256": "a65b8f41746123a06493be5c52b7925dbe980be33a8abd6578999091b13d34bf",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/shou-zhu/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "c9bcc06ca9f29fccba5a3a6006aa12c9953ad098"
+      }
+    },
+    "image:public/stories/shou-zhu/p7.jpg": {
+      "fingerprintSha256": "16de22edf2bffa4aee34fbf5a4b4bc68b82d633ecf35627ff2693671c328c964",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/shou-zhu/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "fdcb65bcec8791c66b9afeaca657e51816d4c8a3"
+      }
+    },
+    "image:public/stories/wang-mei/cover.jpg": {
+      "fingerprintSha256": "38e91ca01cd78fe067adad1878f6bf89026a658e5b5ebad5b88a74e5197bd621",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/wang-mei/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "0d5db2580ed03a8138141d2614bc8155dd36f050"
+      }
+    },
+    "image:public/stories/wang-mei/p1.jpg": {
+      "fingerprintSha256": "ea49c86ec52a301957987f097ce6f6c593fce6e55280deb140d6a2630c262739",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/wang-mei/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "79947ed663abb73740040c8b68101e25a36f69aa"
+      }
+    },
+    "image:public/stories/wang-mei/p2.jpg": {
+      "fingerprintSha256": "6427c3a53eb97967eadde31aa80e8b19f21d05f90a437458ff2d039b3405e444",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/wang-mei/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "b86d62321ab67c346c6971b30a58562e38266bad"
+      }
+    },
+    "image:public/stories/wang-mei/p3.jpg": {
+      "fingerprintSha256": "d25beddd571783f3fa40df7d1b82efc614f00f66ca32adc70e509e3ea6bbf2a6",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/wang-mei/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "3d38322c0519b4076f12faa3b11d73d649658113"
+      }
+    },
+    "image:public/stories/wang-mei/p4.jpg": {
+      "fingerprintSha256": "6583e1be6c5f25a402ca2ca29c76b4cfc3fcf9b9dd9ce9f7abf427be8429fb3a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/wang-mei/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "b45d0ad680e26c63e4dcc02a97ab3a3caea277a1"
+      }
+    },
+    "image:public/stories/wang-mei/p5.jpg": {
+      "fingerprintSha256": "97d2c08df6da3a9ab7a119812e15446209f30bfe9e970083ef4a0b708f03e379",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/wang-mei/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "24fc3b1bc48ce9eed561953a2c52cafc8d66769d"
+      }
+    },
+    "image:public/stories/wang-mei/p6.jpg": {
+      "fingerprintSha256": "2b06c30e2fdfbe5025d0c1501286484187dd782b811d135950ccab653da85d17",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/wang-mei/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "6c8a3ae76f7beccbebe2dec282a5d8c657a95c5a"
+      }
+    },
+    "image:public/stories/wang-mei/p7.jpg": {
+      "fingerprintSha256": "d5315b7264137aaa135c6671e4a06247f7ec5057ad410ca12c0464e2a11671c4",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/wang-mei/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "96f61a0ea7c8cce9f175e82016d8561e155611aa"
+      }
+    },
+    "image:public/stories/wang-yang/cover.jpg": {
+      "fingerprintSha256": "1a76349236b5a466dba6eaef53a7deeefc30d7885c3b8367b0b4d84702f4f988",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/wang-yang/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "3f644d72a50cc1798f334020376951f8a30cded6"
+      }
+    },
+    "image:public/stories/wang-yang/p1.jpg": {
+      "fingerprintSha256": "9533816ebd7d290682e79fbab2afe01bd6d579e73c0e4fa02c3929f25a8dd1c8",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/wang-yang/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "6995a1b6332f1fca50624afbecc32fdd41cea332"
+      }
+    },
+    "image:public/stories/wang-yang/p2.jpg": {
+      "fingerprintSha256": "21decf68b738729fd51d3066e05751f1bdd9b4c03f97fbe5656b52bc8255dc0a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/wang-yang/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "34065c839b8f8372af54ec5c2d3245f12ac0bda8"
+      }
+    },
+    "image:public/stories/wang-yang/p3.jpg": {
+      "fingerprintSha256": "a3ac3942fcc8bed7ca5205768d848711b70fe607a00a19f04d7b8d01d8ddc3c8",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/wang-yang/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "7396b7f880aac38021e67b924e55fb167655bcd9"
+      }
+    },
+    "image:public/stories/wang-yang/p4.jpg": {
+      "fingerprintSha256": "dc6fca2f09ea0f69a62d88a8a36d7f4666c7fb34878d7c1d396ccdb3931f5693",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/wang-yang/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "1bbec78ddaf1ed1609e74c388c93293420bd5081"
+      }
+    },
+    "image:public/stories/wang-yang/p5.jpg": {
+      "fingerprintSha256": "3941ca31df638658a77b25e1a12f700c71e1bd1c098bece861a96639cf0002ee",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/wang-yang/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "b9ecf95a7e5f0adb16df6b2fd759b9db5a6ef6aa"
+      }
+    },
+    "image:public/stories/wang-yang/p6.jpg": {
+      "fingerprintSha256": "5d4230d7e2fcf8089dea4a4000d10302e8085702cae2f2aaaa7a9c39675ec571",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/wang-yang/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "a0fc74f2891047a25c3a5d73196d11cc074caa0a"
+      }
+    },
+    "image:public/stories/wang-yang/p7.jpg": {
+      "fingerprintSha256": "7c8c1644a12bf466e3f541a7981028bd0936f63f5df23f7f47d9516c7e636e2c",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/wang-yang/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "31c3715334f36a6a9ebe8c47649c8fb95a5cfc62"
+      }
+    },
+    "image:public/stories/yan-er/cover.jpg": {
+      "fingerprintSha256": "7347ee43bec4afae27b11ed44aefb559cea5e9e3867546451f3f623acad06d21",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yan-er/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "3b4f5e266f7dbf2bbf9ebe0701a5d6591d53c3e0"
+      }
+    },
+    "image:public/stories/yan-er/p1.jpg": {
+      "fingerprintSha256": "d7cef8f0e190ce423c01e688f61b022319088db230cf3e1171cecf999c9a91be",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yan-er/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "15420f80ade9e7ac1eb9434dc7fef9c24f938ade"
+      }
+    },
+    "image:public/stories/yan-er/p2.jpg": {
+      "fingerprintSha256": "1699493b0870a616f0cdc8676a2412748080de1103dd6ecc71a2267619114801",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yan-er/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "d279fc2924333d4c9c886b417de94b5ab300a929"
+      }
+    },
+    "image:public/stories/yan-er/p3.jpg": {
+      "fingerprintSha256": "bbc1efdec9eed1a7a87732b9184d0724ad5cab2c57e0f27ef7b43be09e0d2233",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yan-er/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "efa8aa2204c71bdd8b188ae20da8a211493183e1"
+      }
+    },
+    "image:public/stories/yan-er/p4.jpg": {
+      "fingerprintSha256": "67ac8b54031a16f6fa57b0600a1b5daa4ee5acfaeb8279665ed93e49f04a5b93",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yan-er/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "2dbe739e06f5889e71b7ef89e9d4bf7c5827112c"
+      }
+    },
+    "image:public/stories/yan-er/p5.jpg": {
+      "fingerprintSha256": "70f7aa0599dbee2277023d687aa7e360ff63fac8b086e0560cd6d1403c43448e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yan-er/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "f74aba518b0fc86257442216743377380d012c64"
+      }
+    },
+    "image:public/stories/yan-er/p6.jpg": {
+      "fingerprintSha256": "17067671a906be89913cf3cbc26ed5a981b630bd6ec958220d5fb6dfb6163196",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yan-er/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "6a937b2f8abf0cd7c5584081d2bb94f1f21297b5"
+      }
+    },
+    "image:public/stories/yan-er/p7.jpg": {
+      "fingerprintSha256": "40b7a504655324690c7b621243d0f8530b2f4156dcb096a2425c0c2f8dbaaae4",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yan-er/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "2cf934c3de5c4897cc5b61c315e17eabcd64b854"
+      }
+    },
+    "image:public/stories/ye-gong/cover.jpg": {
+      "fingerprintSha256": "cb1a373c03324881dcd176db0cc19c736abd8ddbcce2cd82584f9a688043c59d",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ye-gong/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "c86bfcb9b70506ea6a0ded136330f74480c323c9"
+      }
+    },
+    "image:public/stories/ye-gong/p1.jpg": {
+      "fingerprintSha256": "e58f4243442a3b9004d11548bb670c51e53f50e0f33e298ca9ad013d30426745",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ye-gong/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "c7f8053448b531dca7b269f170fca966e8f3e8c0"
+      }
+    },
+    "image:public/stories/ye-gong/p2.jpg": {
+      "fingerprintSha256": "322dad01b80c995d3fa113ceac7a61504f52c08de55762f1b671dcb190001d39",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ye-gong/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "a46e16952be87b0811a8f2d0fdb8c6bc91416152"
+      }
+    },
+    "image:public/stories/ye-gong/p3.jpg": {
+      "fingerprintSha256": "fe3432f55c79981960324e632b12b0bb6f27e2c32f9e95c2201e42ce2f3410a7",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ye-gong/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "3f5a74117b53b9cefdb9313d07ae3d63b16a9e8f"
+      }
+    },
+    "image:public/stories/ye-gong/p4.jpg": {
+      "fingerprintSha256": "ad6fec7d9a962ff6ffa4601008fb8359aa8a886dac38a1eaa0b671e8b99a6d1f",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ye-gong/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "70b5064c46baf7c8f557209ed6b9fe404dce35df"
+      }
+    },
+    "image:public/stories/ye-gong/p5.jpg": {
+      "fingerprintSha256": "4ca2e3d23af0235452cd81787f6f92d40916861d15467026467f388ffaac8710",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ye-gong/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "40faf3ad9693a73bb257bf4f78f94dd4abeb8673"
+      }
+    },
+    "image:public/stories/ye-gong/p6.jpg": {
+      "fingerprintSha256": "68ea4c9e50258109fda4a2888cebc6b7af8e5fa4749dc44de5808b2803fdf59d",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ye-gong/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "c44526d7f7b79a204b78aa8908a335bbbe5ffd90"
+      }
+    },
+    "image:public/stories/ye-gong/p7.jpg": {
+      "fingerprintSha256": "a7f9878ba6a0d5480c5bd513ac693d8268d9efe8aef08c122e88181122c42a29",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/ye-gong/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "5cee6a54bbec3ac4db44baa256792299962b1a07"
+      }
+    },
+    "image:public/stories/yi-ming/cover.jpg": {
+      "fingerprintSha256": "1fc7322067d23d4f055a4e30ba360f6fe8c5bb2594f92de385e2e754e0573764",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yi-ming/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "7ad3d3441a5a93b3108b5d99b990ef3e9e2b47ef"
+      }
+    },
+    "image:public/stories/yi-ming/p1.jpg": {
+      "fingerprintSha256": "25661a7185824030a7b719761350d18ad14042d915f7e9aa02dab13b6a2538e8",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yi-ming/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "bd7defbbee368b041ced3a72d505547db9da7928"
+      }
+    },
+    "image:public/stories/yi-ming/p2.jpg": {
+      "fingerprintSha256": "9ac204c897cd5b518cb14980db3c14a491f0c673c0307fcd6a3eb72a5b3a4d61",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yi-ming/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "6280acb64f65184ec8814b30d98c9adea7c24e90"
+      }
+    },
+    "image:public/stories/yi-ming/p3.jpg": {
+      "fingerprintSha256": "afff74f5526dcc5edb5cbda01644672256ba8d293a4981026178f19ad3a26ae3",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yi-ming/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "267f933552d09d64b98882551191bfd71b219f02"
+      }
+    },
+    "image:public/stories/yi-ming/p4.jpg": {
+      "fingerprintSha256": "840c29952c515772d8d9c161c2de95934677deeac1fad17c1fec59abbe8a1f3c",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yi-ming/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "4943eb2f32b65e03a90fff7a50ed52ed4ad0a815"
+      }
+    },
+    "image:public/stories/yi-ming/p5.jpg": {
+      "fingerprintSha256": "89b3a0f75092965c57da4bf7201fb388522eb523ee755ea510bd5e767c4f8465",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yi-ming/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "a980916a6da55b9680840909dcd25c0e3e12b1a6"
+      }
+    },
+    "image:public/stories/yi-ming/p6.jpg": {
+      "fingerprintSha256": "b05f88c9a4df845bfa87f42653e6f1ea7f0821f2f4b4cd750ea5a9cb9652ddcb",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yi-ming/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "3cf76909d706c1a5b49012c0bd1dd4461aee2e00"
+      }
+    },
+    "image:public/stories/yi-ming/p7.jpg": {
+      "fingerprintSha256": "b9623d3614801beac5bb58d78df4d45ae520b0fb022eb64c6fd9559c028b9601",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yi-ming/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "cba01d4d7500a14b77ec008cd5950f7e50b4fac9"
+      }
+    },
+    "image:public/stories/yu-bang/cover.jpg": {
+      "fingerprintSha256": "f2b58c518a311ce24b9c666f874b61d6f1d237c3e3b7141985152260ab995bd7",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yu-bang/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "f3a6ec815767979ae9e408439ccf26b1a0fcc3ba"
+      }
+    },
+    "image:public/stories/yu-bang/p1.jpg": {
+      "fingerprintSha256": "304798a0d3e7e0a06e505b0896d3e180c97b713eb8c269fa93420096b7278d54",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yu-bang/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "4310d7a2cfdc2a6f2c6e4157beea475a8e6db1eb"
+      }
+    },
+    "image:public/stories/yu-bang/p2.jpg": {
+      "fingerprintSha256": "3f553913f4eb52b35b7e4280309441ee1954a89cb20256486b96d419856c5923",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yu-bang/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "79b9c4b6d24aaada7b8e3c156b70bdb03e0ff0cc"
+      }
+    },
+    "image:public/stories/yu-bang/p3.jpg": {
+      "fingerprintSha256": "dd9b33f533b378c9528cb6de62dedcc3c1b209d46b803a06517937ac1e74caaf",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yu-bang/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "ddb9f3c2b2c95ca1add7f1b817aedd6073262573"
+      }
+    },
+    "image:public/stories/yu-bang/p4.jpg": {
+      "fingerprintSha256": "1fdf82aa96f88f69fba7d8ffe9cae82fe51c54eb35b47717cc436a0dccb43a90",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yu-bang/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "ae81ba23bb95f0fe16db6c79c140ac9407af6451"
+      }
+    },
+    "image:public/stories/yu-bang/p5.jpg": {
+      "fingerprintSha256": "a6659e11f2b7dcd9893f00962b11c50b036af8e2b20c10f2c5bb20b1d826853a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yu-bang/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "770a536bfb90de947f12d339c1832dcac6ca58ba"
+      }
+    },
+    "image:public/stories/yu-bang/p6.jpg": {
+      "fingerprintSha256": "ceb7f5cb5959320161f046b182863265b65b1828aea28ce4461c732d7834b244",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yu-bang/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "66b9a747dcfac88e2dec8d54c27fb01926abf416"
+      }
+    },
+    "image:public/stories/yu-bang/p7.jpg": {
+      "fingerprintSha256": "efc53241d760360e975277294d707da18d3c08140158569513b0a75518d3f820",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yu-bang/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "ce6b74113aba87fe3e7d6efb3cc6e0271dcc2db2"
+      }
+    },
+    "image:public/stories/yu-gong/cover.jpg": {
+      "fingerprintSha256": "0881def6bfd00431489ce47cff69a1d9a3ff571c12f40ecf5cc3e822a17a323e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yu-gong/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "f6fa541c22bf157e30f9bb06010326a4c388806e"
+      }
+    },
+    "image:public/stories/yu-gong/p1.jpg": {
+      "fingerprintSha256": "1f75c8179315f06d56942e64ba164a4d2e85ad36938e039fa799bb2fef5d4532",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yu-gong/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "3aadf8d5a7348c937651c778bdc516bcb2213bd0"
+      }
+    },
+    "image:public/stories/yu-gong/p2.jpg": {
+      "fingerprintSha256": "db12894e499ff301a576530a218141f5c8743dfb08368c64b39caf6cd71c96cf",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yu-gong/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "7b5117e20b649c6ba106067740118743a0ef8675"
+      }
+    },
+    "image:public/stories/yu-gong/p3.jpg": {
+      "fingerprintSha256": "cd20499b9ae4cd1104b2aa8702a804e6e86c5df2b993725eca0d6cb783cbfc5c",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yu-gong/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "b58dc481dc7ee87bfc4cfaecd34867075d1bc729"
+      }
+    },
+    "image:public/stories/yu-gong/p4.jpg": {
+      "fingerprintSha256": "0e149f56e975d555ff47cf96ad64379fa2ab63becbadd404e1b58167880e451e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yu-gong/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "32603723c44e481b42819c9afdaae9a31b06ea19"
+      }
+    },
+    "image:public/stories/yu-gong/p5.jpg": {
+      "fingerprintSha256": "eba43440391ba85ec5f564216e4e7c7eab133bc7f49781eb5fee88498a768655",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yu-gong/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "a33ac063c588729745390ff59766398131fa6234"
+      }
+    },
+    "image:public/stories/yu-gong/p6.jpg": {
+      "fingerprintSha256": "cea8a83c4478baef323bc634840d2fd57cacfd4218353dad63a84b5e3acd41f4",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yu-gong/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "966f3593741ba5648bddac4a6a40c00dc20e7d60"
+      }
+    },
+    "image:public/stories/yu-gong/p7.jpg": {
+      "fingerprintSha256": "342d3b015791baa6becdcd5e476d389e18179ac2f3fd9e1f6eac6e21383a898e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/yu-gong/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "9c7370179019830be563b0f689caedd4e0d6a8b8"
+      }
+    },
+    "image:public/stories/zhao-san/cover.jpg": {
+      "fingerprintSha256": "c486061cdb918235aa2e9dd178e52f2708c634196c2e2c177eeeeb5186352dc8",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/zhao-san/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "8f34e323782f169f832b1f4ce53c9316963d7218"
+      }
+    },
+    "image:public/stories/zhao-san/p1.jpg": {
+      "fingerprintSha256": "84f1400f320db69bfd42652a09681ce5592c631e5944df7c7cef732222d598e6",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/zhao-san/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "e6b84a4dc199cb89734140daeeb2355464b28613"
+      }
+    },
+    "image:public/stories/zhao-san/p2.jpg": {
+      "fingerprintSha256": "2ffe9ac4f9ad7e7c1176f7df2514006f10134b065044e28bc8630a0d973f528a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/zhao-san/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "ff57dcd4e78b66149ecaddf27d60509ff6fd0bc3"
+      }
+    },
+    "image:public/stories/zhao-san/p3.jpg": {
+      "fingerprintSha256": "8ef0dbd3a4b5fc1e880b7e7ab6bace8c1e5368a6ffca6fd64a48223f2a605de1",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/zhao-san/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "83b1a0a746cec2eede8555fff2006504431be968"
+      }
+    },
+    "image:public/stories/zhao-san/p4.jpg": {
+      "fingerprintSha256": "aa9fd54f8eadaf041a86daa69f012d6bc2c89881b3b6c3e69cf6700c75dc59d4",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/zhao-san/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "df78765cebe39890ddd9ad97d1f418014a38b28b"
+      }
+    },
+    "image:public/stories/zhao-san/p5.jpg": {
+      "fingerprintSha256": "1699467bd6d6236608b733402b360bb8bd64cfbb291109e71a152df012ba2eb4",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/zhao-san/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "4d0d18722e0a901a9e4dd3b9b66f0116a1c07240"
+      }
+    },
+    "image:public/stories/zhao-san/p6.jpg": {
+      "fingerprintSha256": "c5c7eb0a8fa99850d5084b3cbfb53964605e96aae3a0dfb11c0b7c01503d914f",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/zhao-san/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "03ec70b097ce54baf5b1e8ef7b98fda386014000"
+      }
+    },
+    "image:public/stories/zhao-san/p7.jpg": {
+      "fingerprintSha256": "df76fce659c4f5608d903ede60ff3f369b974d168822ef4500aba786451b538a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/zhao-san/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "459e2f1fb0854ba7be5b4c7be147d0ab1aa468d4"
+      }
+    },
+    "image:public/stories/zi-xiang/cover.jpg": {
+      "fingerprintSha256": "9c9b410621518eb122a1b1f5246210f21bed65ff9024251471e69d2de31a4190",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/zi-xiang/cover.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "a4106b527e0811f08e846013880b3695d4712a13"
+      }
+    },
+    "image:public/stories/zi-xiang/p1.jpg": {
+      "fingerprintSha256": "156d7aebb8ecd5236ce3a06357f4ffeea89cb3ef85adfd7c858c006e8a803080",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/zi-xiang/p1.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "17cbf39f6acedaefa7f590cb0c6dd496b11fc8c1"
+      }
+    },
+    "image:public/stories/zi-xiang/p2.jpg": {
+      "fingerprintSha256": "448dafe3afcb10325c1eab1beb0c4ae4e8829bd07547c7b926be2130305bf219",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/zi-xiang/p2.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "8a3c1068432633b695d254dea5155dc10bc720f8"
+      }
+    },
+    "image:public/stories/zi-xiang/p3.jpg": {
+      "fingerprintSha256": "e0be68cbd83b84f10452a6ed0d665b18a05aa549ca05e657c4456ff009140e50",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/zi-xiang/p3.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "be6278728e3cbfe6e4fe4b80444830cd08d360b8"
+      }
+    },
+    "image:public/stories/zi-xiang/p4.jpg": {
+      "fingerprintSha256": "8a96f438ef5846b84753be9a1a00aed78a1f091608cb301d4af4a9de24e3b8ff",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/zi-xiang/p4.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "e30ac3961f7aadd90e09faee294813c50f4c47de"
+      }
+    },
+    "image:public/stories/zi-xiang/p5.jpg": {
+      "fingerprintSha256": "038c66de3c5145cf3d68b91988298015b900d956be8f6bf674d4f3863a4d5edb",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/zi-xiang/p5.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "27dbd78a77f393df67188ce2401067e9cbcb4df1"
+      }
+    },
+    "image:public/stories/zi-xiang/p6.jpg": {
+      "fingerprintSha256": "cdebf1a57f652015d1878c90cf2f19bef343866acff23df1ceb958606e3f030a",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/zi-xiang/p6.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "80a156c89bf893cf574f891100fb5a5f6a386a75"
+      }
+    },
+    "image:public/stories/zi-xiang/p7.jpg": {
+      "fingerprintSha256": "e5fe65fd8a4de7e285cccdfbee7ed108aa9d2084fa0dac66f36f5076fa4710c5",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "public/stories/zi-xiang/p7.jpg",
+        "method": "git-blob-identity",
+        "gitBlob": "30195ab0a7c67efcb694e5a176e666665ad2fae8"
+      }
+    },
+    "text:story:ba-miao": {
+      "fingerprintSha256": "8bd442a16b164c53485529c8e576bf364845560d1bad8b55ef79456b86b83cb4",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:dui-niu": {
+      "fingerprintSha256": "70b5c2790420d670b1282700605e3e186f2368f89cdc2001bbf1613eb4add358",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:hu-jia": {
+      "fingerprintSha256": "63810bf788a681c82fff8887db2f0b431abe7c7199c8070bee869968e89de2dc",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:hua-long": {
+      "fingerprintSha256": "247e2acb04abe55f2f32db849f521fb3dbd5fbcdbbf88e29bdb887ddd2ad8391",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:hua-she": {
+      "fingerprintSha256": "79c27d0eb5441ff720e0ec7caa4bd17a487de8a2e947abc98c528ccad31bfa4e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:jing-di": {
+      "fingerprintSha256": "a097f8b5d165ccfcaee7f09e081e26eb149a9c31ea9ea915e73a9dd3c5969694",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:jing-wei": {
+      "fingerprintSha256": "7a0b1508dd5c254cb730a938acbd5151cd090493f888b5c0f54b94eb868e2bbf",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:ke-zhou": {
+      "fingerprintSha256": "f3cfb6ac15d2b914c8d61c527741681b55334d9a756d7f79882d3803f97adcdc",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:lan-yu": {
+      "fingerprintSha256": "be5c4e64cf829ee2c041b906e37928af93975b04d02524d09edcea369ccee6b3",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:mai-du": {
+      "fingerprintSha256": "e4b71cff0f6460f267de9364aa285c1530afd39c651fb3a7cde4c4911fa09928",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:mang-ren": {
+      "fingerprintSha256": "9b6ab6ac24f4b6ec9fceebdf6f1b826a5060abed9613c2067c725ea0629b13d3",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:nan-yuan": {
+      "fingerprintSha256": "9e70e896498ec9bd4f046536a496d1ae05732eafec70632b8f2b4339bee13994",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:qi-ren": {
+      "fingerprintSha256": "3ac29398f0cbb0b91da38cdd44b96854f9164d00cbd1122f0ad29502dbb551cc",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:sai-weng": {
+      "fingerprintSha256": "e827f3dc4db04bfda3b6bce19942ffebca74ef89f29672a3bcf839ccc925ee28",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:shou-zhu": {
+      "fingerprintSha256": "d0df2e6cd462f0848f5a2cb599d7cda44cb9b817ca1529cf8db7f7fd48bc3b93",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:wang-mei": {
+      "fingerprintSha256": "1e8cecece4cdd68254df900a704173bab9134d2ac3de37451c242ff6c1523af7",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:wang-yang": {
+      "fingerprintSha256": "8c5ffa3c9048364aad77fcf05bf563ccf9d396ce6c30ebdf632a08d12b621cc7",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:yan-er": {
+      "fingerprintSha256": "38ebf1f083ac9e98591569b46c1c731e7c17434acfcdded7c0375a357c544af2",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:ye-gong": {
+      "fingerprintSha256": "b3daa8a09ec563e4fe448f721ce0cd371f6cb5278dcf62ae5af8d9f34d2c1e25",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:yi-ming": {
+      "fingerprintSha256": "af68f9fcb6b3f1c85edb6788b6bab723a8518790053017bc79458be1b3042ae3",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:yu-bang": {
+      "fingerprintSha256": "677689621628d302ca2c2fedcaf03d930140210b479de494e07eacb529be6b7e",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:yu-gong": {
+      "fingerprintSha256": "d571eafbdbbd079a62d6914f62e750b87247af898a689ba4cbab1a9cea73436f",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:zhao-san": {
+      "fingerprintSha256": "258d65543febcfce3c4aa65def52e9fe4c22ede7b0d3279c4ef1f582e0711b54",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    },
+    "text:story:zi-xiang": {
+      "fingerprintSha256": "de0418288684e0b7468c078bd606403efa8408eb2c494eb14593b4acadf67092",
+      "origin": {
+        "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+        "path": "src/data/stories.ts",
+        "method": "canonical-source-blob-identity",
+        "gitBlob": "cff1ec1e3d32dd510b8c690651b2c0650f6eadda"
+      }
+    }
+  }
 }
