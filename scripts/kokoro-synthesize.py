@@ -11,8 +11,10 @@ from __future__ import annotations
 
 import argparse
 import array
+import contextlib
 import json
 import os
+import platform as host_platform
 from pathlib import Path
 import sys
 import wave
@@ -39,8 +41,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--assets-dir", required=True)
     parser.add_argument("--kokoro-src-dir", required=True)
     parser.add_argument("--misaki-src-dir", required=True)
-    parser.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
+    parser.add_argument("--device", choices=("cpu",), default="cpu")
     return parser.parse_args()
+
+
+def normalized_arch() -> str:
+    machine = host_platform.machine().lower()
+    return "x64" if machine in {"x86_64", "amd64"} else machine
 
 
 def write_pcm16_wav(path: Path, audio, torch_module) -> int:
@@ -80,9 +87,6 @@ def synthesize() -> dict:
     ZHG2P = runtime["ZHG2P"]
     assert_minimal_runtime_imports()
 
-    if args.device == "cuda" and not torch.cuda.is_available():
-        raise RuntimeError("CUDA was requested but torch.cuda.is_available() is false")
-
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     entries = manifest.get("entries")
     if not isinstance(entries, list) or not entries:
@@ -97,8 +101,6 @@ def synthesize() -> dict:
 
     torch.set_grad_enabled(False)
     torch.manual_seed(0)
-    if args.device == "cuda":
-        torch.cuda.manual_seed_all(0)
 
     model = KModel(
         repo_id=MODEL_REPOSITORY,
@@ -108,7 +110,10 @@ def synthesize() -> dict:
     voice_pack = torch.load(str(voice_path), map_location="cpu", weights_only=True)
     validate_voice_pack(voice_pack, torch)
     voice_pack = voice_pack.to(args.device)
-    g2p = ZHG2P(version="1.1", en_callable=None)
+    # Misaki prints an informational warning when English fallback is disabled.
+    # Keep stdout machine-readable JSON by routing that message to stderr.
+    with contextlib.redirect_stdout(sys.stderr):
+        g2p = ZHG2P(version="1.1", en_callable=None)
     assert_minimal_runtime_imports()
 
     completed = []
@@ -160,6 +165,8 @@ def synthesize() -> dict:
         "engine": ENGINE_ID,
         "pythonVersion": sys.version.split()[0],
         "torchVersion": str(torch.__version__),
+        "platform": sys.platform,
+        "arch": normalized_arch(),
         "device": args.device,
         "sampleRateHz": SAMPLE_RATE,
         "g2p": "misaki.ZHG2P/1.1",
