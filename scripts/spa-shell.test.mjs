@@ -24,9 +24,11 @@ test("runtime is a static Vite + TanStack Router SPA", () => {
   assert.equal(existsSync(join(root, "server")), false);
 });
 
-test("PWA metadata is static and product-owned", () => {
+test("PWA metadata and offline shell are static and product-owned", () => {
   const manifest = JSON.parse(read("public/manifest.webmanifest"));
   const html = read("index.html");
+  const main = read("src/main.tsx");
+  const serviceWorker = read("public/sw.js");
 
   assert.equal(manifest.name, "成语故事");
   assert.equal(manifest.start_url, "/");
@@ -34,5 +36,10 @@ test("PWA metadata is static and product-owned", () => {
   assert.equal(manifest.display, "standalone");
   assert.ok(Array.isArray(manifest.icons) && manifest.icons.length > 0);
   assert.match(html, /href="\/manifest\.webmanifest"/);
+  assert.match(main, /serviceWorker\.register\("\/sw\.js"\)/);
+  assert.match(serviceWorker, /chengyu-storybook-shell-v1/);
+  assert.match(serviceWorker, /request\.headers\.has\("range"\)/);
+  assert.match(serviceWorker, /pathname\.startsWith\("\/audio\/"\)/);
+  assert.equal(existsSync(join(root, "public/sw.js")), true);
   assert.equal(existsSync(join(root, "public/__grok")), false);
 });
