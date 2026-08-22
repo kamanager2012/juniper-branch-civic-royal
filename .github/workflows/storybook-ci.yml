@@ -4,7 +4,6 @@ on:
   push:
     branches: [main, "feat/**", "fix/**", "chore/**"]
   pull_request:
-    branches: [main, "feat/storybook-foundation-cleanup"]
 
 permissions:
   contents: read
