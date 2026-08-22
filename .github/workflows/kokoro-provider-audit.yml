@@ -1,0 +1,45 @@
+name: kokoro narration provider audit
+
+on:
+  pull_request:
+    paths:
+      - "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json"
+      - "scripts/kokoro-provider-profile.mjs"
+      - ".github/workflows/kokoro-provider-audit.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  upstream-assets:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Audit pinned Hugging Face revision without downloading large weights
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROFILE="content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json"
+          REPO="hexgrad/Kokoro-82M-v1.1-zh"
+          REVISION="$(node -p "JSON.parse(require('fs').readFileSync('$PROFILE','utf8')).model.revision")"
+          BASE="https://huggingface.co/${REPO}/raw/${REVISION}"
+
+          curl --fail --silent --show-error --location "${BASE}/config.json" --output /tmp/kokoro-config.json
+          CONFIG_SHA="$(sha256sum /tmp/kokoro-config.json | awk '{print $1}')"
+          CONFIG_BYTES="$(wc -c < /tmp/kokoro-config.json | tr -d ' ')"
+          echo "kokoro pinned config: sha256=${CONFIG_SHA} bytes=${CONFIG_BYTES}"
+
+          curl --fail --silent --show-error --location "${BASE}/kokoro-v1_1-zh.pth" --output /tmp/kokoro-model.pointer
+          grep -Fx "oid sha256:b1d8410fa44dfb5c15471fd6c4225ea6b4e9ac7fa03c98e8bea47a9928476e2b" /tmp/kokoro-model.pointer
+          grep -Fx "size 327247856" /tmp/kokoro-model.pointer
+
+          curl --fail --silent --show-error --location "${BASE}/voices/zf_001.pt" --output /tmp/kokoro-voice.pointer
+          grep -Fx "oid sha256:9bdc9a87e13e9bb1ea3e7803259c2ecbfebaeeb2ff80b5d0c76df1a464c1c962" /tmp/kokoro-voice.pointer
+
+          EXPECTED_CONFIG="$(node -p "JSON.parse(require('fs').readFileSync('$PROFILE','utf8')).model.config.sha256 || ''")"
+          if [[ -n "$EXPECTED_CONFIG" ]]; then
+            test "$CONFIG_SHA" = "$EXPECTED_CONFIG"
+          else
+            echo "CONFIG_SHA256_DISCOVERED=${CONFIG_SHA}"
+          fi
