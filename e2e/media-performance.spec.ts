@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
-const INITIAL_COVER_REQUEST_BUDGET = 8;
+const INITIAL_COVER_REQUEST_BUDGET = 5;
+const EAGER_COVER_COUNT = 2;
 
 test("bookshelf defers below-fold cover media and still decodes it on demand", async ({ page }, testInfo) => {
   const requestedCovers = new Set<string>();
@@ -16,14 +17,14 @@ test("bookshelf defers below-fold cover media and still decodes it on demand", a
   const storyLinks = page.locator('a[href^="/story/"]');
   const coverImages = storyLinks.locator("img");
   const total = await storyLinks.count();
-  expect(total).toBeGreaterThan(4);
+  expect(total).toBeGreaterThan(EAGER_COVER_COUNT);
   expect(await coverImages.count()).toBe(total);
 
   const policies = await coverImages.evaluateAll((images) =>
     images.map((image) => (image instanceof HTMLImageElement ? image.dataset.coverLoading : undefined)),
   );
-  expect(policies.filter((policy) => policy === "eager")).toHaveLength(4);
-  expect(policies.filter((policy) => policy === "deferred")).toHaveLength(total - 4);
+  expect(policies.filter((policy) => policy === "eager")).toHaveLength(EAGER_COVER_COUNT);
+  expect(policies.filter((policy) => policy === "deferred")).toHaveLength(total - EAGER_COVER_COUNT);
 
   const initialRequested = requestedCovers.size;
   console.log(
