@@ -45,5 +45,26 @@ export function buildMediaPerformanceReport() {
 
 if (process.argv[1]?.endsWith("media-performance.mjs")) {
   const report = buildMediaPerformanceReport();
-  console.log(JSON.stringify(report, null, 2));
+  const output = process.argv.includes("--summary")
+    ? {
+        schemaVersion: report.schemaVersion,
+        homepage: {
+          heroBytes: report.homepage.heroBytes,
+          coverCount: report.homepage.coverCount,
+          potentialCoverBytes: report.homepage.potentialCoverBytes,
+          potentialHeroPlusCoverBytes: report.homepage.potentialHeroPlusCoverBytes,
+          averageCoverBytes: report.homepage.averageCoverBytes,
+          largestCoverBytes: report.homepage.largestCoverBytes,
+        },
+        library: {
+          storyImageCount: report.library.storyImages.count,
+          storyImageBytes: report.library.storyImages.totalBytes,
+          largestStoryImageBytes: report.library.storyImages.largestBytes,
+          narrationCount: report.library.narration.count,
+          narrationBytes: report.library.narration.totalBytes,
+          largestNarrationBytes: report.library.narration.largestBytes,
+        },
+      }
+    : report;
+  console.log(JSON.stringify(output, null, 2));
 }
