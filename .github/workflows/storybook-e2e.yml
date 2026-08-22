@@ -1,8 +1,9 @@
 name: storybook product E2E
 
 on:
+  push:
+    branches: [main, "feat/**", "fix/**", "chore/**"]
   pull_request:
-    branches: ["feat/storybook-foundation-cleanup"]
 
 permissions:
   contents: read
