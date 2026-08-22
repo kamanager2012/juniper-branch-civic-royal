@@ -30,7 +30,7 @@ test("narration provenance state is explicit and versioned", () => {
   }
 });
 
-test("obsolete duplicate story-text scripts cannot return", () => {
+test("obsolete duplicate content and direct-state narration generators cannot return", () => {
   for (const path of [
     "scripts/expand-stories.py",
     "scripts/generate-narration.py",
@@ -41,6 +41,18 @@ test("obsolete duplicate story-text scripts cannot return", () => {
 
   const generator = readFileSync(join(repoRoot, "scripts/generate-narration.mjs"), "utf8");
   assert.match(generator, /buildNarrationPlan/);
-  assert.match(generator, /XAI_TTS_VOICE_ID/);
-  assert.equal(generator.includes('voice_id: "luna"'), false);
+  assert.match(generator, /validateApprovedGenerationSet/);
+  assert.match(generator, /buildKokoroNarrationReceipt/);
+  assert.match(generator, /narrationStateUpdated:\s*false/);
+  assert.match(generator, /narration:import/);
+
+  for (const forbidden of [
+    "api.x.ai",
+    "XAI_API_KEY",
+    "XAI_TTS_VOICE_ID",
+    "narrationStatePath",
+    "readNarrationState",
+  ]) {
+    assert.equal(generator.includes(forbidden), false, `retired narration implementation token returned: ${forbidden}`);
+  }
 });
