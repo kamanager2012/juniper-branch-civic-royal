@@ -136,7 +136,7 @@ export function reviewNarrationPilot(options = {}) {
   };
 }
 
-if (process.argv[1]?.endsWith("narration-pilot-review.mjs")) {
+async function cliMain() {
   const decision = argValue("--decision");
   const reviewerRole = argValue("--reviewer-role");
   const decisionNote = argValue("--note");
@@ -148,4 +148,11 @@ if (process.argv[1]?.endsWith("narration-pilot-review.mjs")) {
   const result = reviewNarrationPilot({ decision, reviewerRole, decisionNote, write });
   console.log(JSON.stringify(result, null, 2));
   if (!write) console.error("Dry-run only. Re-run with --write after confirming the human listening/editorial decision.");
+}
+
+if (process.argv[1]?.endsWith("narration-pilot-review.mjs")) {
+  cliMain().catch((error) => {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exitCode = 1;
+  });
 }
