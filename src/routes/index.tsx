@@ -179,6 +179,10 @@ function Home() {
             );
           })}
         </ul>
+
+        <footer data-grok-attribution="true" className="mt-8 text-center text-xs font-medium tracking-wide text-muted">
+          24 本图文插图 · Created with Grok
+        </footer>
       </div>
     </main>
   );

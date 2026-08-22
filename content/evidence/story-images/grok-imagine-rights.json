@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "claim": "owned",
+  "scope": "matched-grok-output-and-optimized-release-derivative",
+  "retrievedAt": "2026-08-22",
+  "releaseSet": {
+    "count": 192,
+    "digestSha256": "812914f2a5d7b5d2e16a0039b5c74a06b302d1bf51e4d455b9d58985cbfa6aa6"
+  },
+  "technicalOrigin": {
+    "evidence": "content/evidence/story-images/grok-imagine-origin-audit.json",
+    "originCommit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+    "workspaceStatusTimestamp": "2026-08-20T12:57:06Z",
+    "historicalImagineArtifacts": 194,
+    "matchedReleaseImages": 192,
+    "uniqueImagineMatches": 192,
+    "collisions": 0,
+    "unusedImagineArtifacts": 2,
+    "mappingDigestSha256": "ca3f410fe320ddb4b443d8089b84a4483de0e13d5731c806c894e865ad1c2cac"
+  },
+  "providerRights": {
+    "provider": "X.AI LLC",
+    "consumerTerms": {
+      "url": "https://x.ai/legal/terms-of-service",
+      "effectiveDate": "2026-06-26",
+      "summary": "The Consumer Terms define Grok Output as User Content and state that, to the extent permitted by applicable law and as between the user and xAI, the user retains ownership rights to User Content."
+    },
+    "consumerFaq": {
+      "url": "https://x.ai/legal/faq",
+      "summary": "The Consumer FAQ states that users own Grok Inputs and Outputs, including generated images, and may use Grok Outputs as they wish, including commercially."
+    },
+    "brandGuidelines": {
+      "url": "https://x.ai/legal/brand-guidelines",
+      "attribution": "Created with Grok",
+      "summary": "xAI asks that Grok-generated images be attributed using the phrase Created with Grok."
+    }
+  },
+  "limitations": {
+    "copyrightability": "This evidence does not assert that every element of an AI-generated image is independently copyrightable in every jurisdiction.",
+    "thirdPartyRights": "xAI states that outputs may not be unique and disclaims warranties including non-infringement. This claim therefore does not represent a warranty against every possible third-party copyright, trademark, likeness, or other rights claim.",
+    "inputRights": "This evidence does not expand rights in any third-party Input. It relies on the repository evidence that these 192 release images are optimized derivatives of the matched Grok Imagine output files preserved in the historical Grok workspace.",
+    "claimMeaning": "The owned claim records the project's rights position as between the user and xAI for the matched Grok Outputs and the byte-pinned optimized release derivatives; it is not a universal non-infringement certification."
+  }
+}

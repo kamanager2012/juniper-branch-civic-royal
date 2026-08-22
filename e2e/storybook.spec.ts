@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("bookshelf, deep link, illustrated assets and viewport stay healthy", async ({ page, request }) => {
+test("bookshelf, deep link, illustrated assets, attribution and viewport stay healthy", async ({ page, request }) => {
   const consoleErrors: string[] = [];
   const failedRequests: string[] = [];
   const badResponses: string[] = [];
@@ -20,6 +20,7 @@ test("bookshelf, deep link, illustrated assets and viewport stay healthy", async
   await page.goto("/", { waitUntil: "networkidle" });
   await expect(page.getByRole("heading", { name: "成语故事", exact: true })).toBeVisible();
   await expect(page.locator('a[href^="/story/"]')).toHaveCount(100);
+  await expect(page.locator('[data-grok-attribution="true"]')).toContainText("Created with Grok");
 
   const bookshelfHero = page.locator('img[src="/ui/bookshelf-paper.svg"]').first();
   await expect(bookshelfHero).toBeVisible();
@@ -39,6 +40,7 @@ test("bookshelf, deep link, illustrated assets and viewport stay healthy", async
   await expect(page.getByRole("heading", { name: title, exact: true })).toBeVisible();
   await expect(page.locator('[data-illustrated-story="true"]')).toBeVisible();
   await expect(page.getByText("图文故事 · 旁白重制中", { exact: true })).toBeVisible();
+  await expect(page.locator('[data-grok-attribution="true"]')).toContainText("Created with Grok");
   await expect(page.locator("audio")).toHaveCount(0);
 
   const heroImage = page.locator(".book-stage img").first();
