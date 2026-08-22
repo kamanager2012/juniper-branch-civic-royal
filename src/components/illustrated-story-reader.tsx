@@ -68,7 +68,11 @@ export function IllustratedStoryReader({ story }: { story: Story }) {
             <p className="page-copy min-h-20 text-center text-[1.35rem] leading-relaxed text-ink sm:text-2xl">{page.text}</p>
           )}
 
-          <div className="mt-5 flex items-center justify-between gap-3">
+          <p data-grok-attribution="true" className="mt-4 text-center text-[11px] font-medium tracking-wide text-muted">
+            插图 · Created with Grok
+          </p>
+
+          <div className="mt-4 flex items-center justify-between gap-3">
             <button
               type="button"
               onClick={() => go(index - 1)}
