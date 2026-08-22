@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="成语故事">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFF8EC"/>
+      <stop offset="1" stop-color="#E7D5B5"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#F4EAD8"/>
+  <circle cx="1040" cy="95" r="170" fill="#C7922B" opacity=".12"/>
+  <circle cx="110" cy="560" r="210" fill="#3F7A5A" opacity=".10"/>
+  <rect x="95" y="95" width="1010" height="440" rx="42" fill="url(#paper)" stroke="#D9C4A4" stroke-width="4"/>
+  <rect x="150" y="155" width="250" height="320" rx="26" fill="#B33828"/>
+  <rect x="178" y="185" width="194" height="260" rx="18" fill="#FFF8EC"/>
+  <path d="M275 200v230" stroke="#D9C4A4" stroke-width="8"/>
+  <circle cx="235" cy="285" r="24" fill="#3F7A5A"/>
+  <circle cx="320" cy="320" r="18" fill="#C7922B"/>
+  <text x="475" y="285" fill="#2C2118" font-size="108" font-weight="700" font-family="serif">成语故事</text>
+  <text x="480" y="370" fill="#5C4A3A" font-size="42" font-family="sans-serif">给小朋友听的中国成语有声绘本</text>
+  <rect x="480" y="410" width="300" height="8" rx="4" fill="#B33828"/>
+</svg>
