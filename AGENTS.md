@@ -13,7 +13,7 @@ Maintain **成语故事** as a small, local-first Chinese idiom audio storybook.
 - Treat `src/data/stories.ts` as the only canonical story manifest. Every content tool must consume it through `scripts/story-model.mjs`; do not copy story text into generators, migrations, fixtures, or one-off scripts.
 - Do not silently rename story IDs, page IDs, or asset paths; these are persistence/content keys.
 - Do not commit generated deployment output, screenshots, local workspace state, secrets, or `.env` files.
-- Do not claim content provenance, copyright clearance, narration freshness, or production readiness merely because files exist.
+- Do not claim content provenance, copyright clearance, narration freshness, release readiness, or production readiness merely because files exist.
 
 ## Content pipeline boundary
 
@@ -25,6 +25,18 @@ Maintain **成语故事** as a small, local-first Chinese idiom audio storybook.
 - Do not restore `expand-stories.py`, `generate-narration.py`, `generate-narration-2.py`, or any other duplicate story-text source.
 - TTS generation must be explicitly scoped with `--story <id>` or `--all` and must use an explicit voice (`--voice` or `XAI_TTS_VOICE_ID`). No silent bulk generation and no hard-coded provider voice assumptions.
 - API credentials stay in environment variables only. Never commit API keys, tokens, or generated secret-bearing logs.
+
+## Release provenance boundary
+
+- `content/release-provenance.json` is an evidence registry for exact content fingerprints; it is not a place to guess legal/rights status.
+- `scripts/release-readiness.mjs` derives the release inventory from canonical story text, referenced story images, narration, fonts, and product artwork.
+- Missing evidence stays `unverified`. Never fill the registry merely to improve a coverage percentage.
+- A provenance entry must contain a current SHA-256 fingerprint, an allowed claim (`owned`, `licensed`, `public-domain`, or `permission`), and durable evidence.
+- Do not use `AI generated`, `downloaded from the internet`, `probably public domain`, repository presence, or another agent's assertion as rights evidence.
+- If an asset changes after evidence was recorded, the old entry becomes `stale`; normal CI must fail until that stale claim is removed or updated with evidence for the new fingerprint.
+- Narration synchronization and narration distribution provenance are separate requirements. A technically current MP3 is not automatically release-cleared.
+- `npm run provenance:check` belongs to normal development CI and fails on malformed/stale/unknown claims. `npm run release:check` is the fail-closed release gate and is allowed to remain red while evidence is incomplete.
+- Do not weaken `release:check` to make the repository appear release-ready. See `content/PROVENANCE.md`.
 
 ## Offline/PWA boundary
 
@@ -43,6 +55,7 @@ npm run deps:inventory
 npm run typecheck
 npm test
 npm run content:check
+npm run provenance:check
 npm run build
 ```
 
@@ -55,12 +68,21 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-For story text, page structure, image, or narration changes, also inspect:
+For story text, page structure, image, narration, font, or product-artwork changes, also inspect:
 
 ```bash
 npm run content:report
 npm run narration:plan
+npm run release:report
 ```
+
+Before any public/content release claim, run:
+
+```bash
+npm run release:check
+```
+
+A failing release gate means the release claim is not supported yet; it is not a reason to bypass the check.
 
 ## Routing and deployment
 
