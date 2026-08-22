@@ -2,9 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { buildStoryImageReleaseSet } from "./story-image-release-set.mjs";
 
+const EXPECTED_DIGEST = "812914f2a5d7b5d2e16a0039b5c74a06b302d1bf51e4d455b9d58985cbfa6aa6";
 const releaseSet = buildStoryImageReleaseSet();
 
-test("story image release set is complete and fingerprinted", () => {
+test("story image release set is complete and byte-pinned", () => {
   assert.equal(releaseSet.schemaVersion, 1);
   assert.equal(releaseSet.count, 192);
   assert.equal(releaseSet.entries.length, 192);
@@ -14,6 +15,5 @@ test("story image release set is complete and fingerprinted", () => {
     assert.match(entry.sha256, /^[a-f0-9]{64}$/);
     assert.ok(entry.bytes > 0);
   }
-  assert.match(releaseSet.digestSha256, /^[a-f0-9]{64}$/);
-  console.log(`[story-image-release-set] count=${releaseSet.count} digest=${releaseSet.digestSha256}`);
+  assert.equal(releaseSet.digestSha256, EXPECTED_DIGEST);
 });
