@@ -2,13 +2,13 @@ import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { buildDraftLineageEntries } from "./draft-story-rights.mjs";
+import { buildPublishedLineageEntries } from "./published-story-rights.mjs";
 import { buildReleaseReadiness, readReleaseAssets } from "./release-readiness.mjs";
 import { repoRoot } from "./story-model.mjs";
 
 const registryPath = join(repoRoot, "content/source-lineage.json");
 const generatedRegistryPath = join(repoRoot, "content/generated-source-lineage.json");
 const DEFAULT_ORIGIN_COMMIT = "88c2080c715a1c37e64916970cbbc4af2ed7727a";
-const STORY_SOURCE_PATH = "src/data/stories.ts";
 const ALLOWED_METHODS = new Set([
   "git-blob-identity",
   "canonical-source-blob-identity",
@@ -38,17 +38,20 @@ function readGeneratedRegistry() {
   return parsed;
 }
 
-function mergedRegistry(historical = readRegistry()) {
+function mergedRegistry(assets, historical = readRegistry()) {
   const generated = readGeneratedRegistry();
   const draft = buildDraftLineageEntries();
+  const publishedAssets = assets.filter((asset) => asset.category === "story-text" && asset.textStatus === "media-ready");
+  const published = buildPublishedLineageEntries(publishedAssets);
   return {
     ...historical,
     entries: {
       ...historical.entries,
       ...generated.entries,
       ...draft.entries,
+      ...published.entries,
     },
-    generatedIssues: draft.issues,
+    generatedIssues: [...draft.issues, ...published.issues],
   };
 }
 
@@ -69,10 +72,6 @@ function git(args) {
 
 function currentBlob(path) {
   return git(["hash-object", "--", path]);
-}
-
-function blobAt(commit, path) {
-  return git(["rev-parse", `${commit}:${path}`]);
 }
 
 function originBlobIndex(commit) {
@@ -158,7 +157,7 @@ export function evaluateLineageRegistry(assets, registry, retiredIds = new Set()
 
   return {
     schemaVersion: 1,
-    registry: "content/source-lineage.json + content/generated-source-lineage.json + project-authored draft evidence",
+    registry: "historical + generated + project-authored published/draft lineage",
     originCommit: registry.originCommit,
     lineage,
     categories,
@@ -169,7 +168,7 @@ export function evaluateLineageRegistry(assets, registry, retiredIds = new Set()
 
 export function buildSourceLineage() {
   const release = buildReleaseReadiness();
-  const registry = mergedRegistry();
+  const registry = mergedRegistry(release.assets);
   return finalizeGeneratedIssues(evaluateLineageRegistry(release.assets, registry, retiredAssetIds()), registry);
 }
 
@@ -179,26 +178,8 @@ export function recoverSourceLineage(originCommit = DEFAULT_ORIGIN_COMMIT) {
   const entries = { ...registry.entries };
   const originIndex = originBlobIndex(originCommit);
 
-  const storyCurrentBlob = currentBlob(STORY_SOURCE_PATH);
-  const storyOriginBlob = blobAt(originCommit, STORY_SOURCE_PATH);
-
   for (const asset of release.assets) {
-    if (asset.category === "story-text") {
-      if (asset.sourcePath) continue;
-      if (storyCurrentBlob === storyOriginBlob) {
-        entries[asset.id] = {
-          fingerprintSha256: asset.fingerprintSha256,
-          origin: {
-            commit: originCommit,
-            path: STORY_SOURCE_PATH,
-            method: "canonical-source-blob-identity",
-            gitBlob: storyCurrentBlob,
-          },
-        };
-      }
-      continue;
-    }
-
+    if (asset.category === "story-text") continue;
     if (!asset.path || asset.category === "product-artwork") continue;
     const blob = currentBlob(asset.path);
     const originPaths = originIndex.get(blob) ?? [];
@@ -216,7 +197,7 @@ export function recoverSourceLineage(originCommit = DEFAULT_ORIGIN_COMMIT) {
   }
 
   const next = { schemaVersion: 1, originCommit, entries };
-  const merged = mergedRegistry(next);
+  const merged = mergedRegistry(release.assets, next);
   return {
     registry: next,
     report: finalizeGeneratedIssues(evaluateLineageRegistry(release.assets, merged, retiredAssetIds()), merged),
