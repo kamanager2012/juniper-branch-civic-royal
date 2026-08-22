@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("bookshelf defers below-fold cover media and still decodes it on demand", async ({ page }) => {
+test("bookshelf defers below-fold cover media and still decodes it on demand", async ({ page }, testInfo) => {
   const requestedCovers = new Set<string>();
   page.on("response", (response) => {
     const url = new URL(response.url());
@@ -17,21 +17,27 @@ test("bookshelf defers below-fold cover media and still decodes it on demand", a
   expect(total).toBeGreaterThan(4);
   expect(await coverImages.count()).toBe(total);
 
-  const lazyCount = await coverImages.evaluateAll((images) =>
-    images.filter((image) => image instanceof HTMLImageElement && image.loading === "lazy").length,
+  const policies = await coverImages.evaluateAll((images) =>
+    images.map((image) => (image instanceof HTMLImageElement ? image.dataset.coverLoading : undefined)),
   );
-  expect(lazyCount).toBe(total - 4);
+  expect(policies.filter((policy) => policy === "eager")).toHaveLength(4);
+  expect(policies.filter((policy) => policy === "deferred")).toHaveLength(total - 4);
 
   const initialRequested = requestedCovers.size;
+  console.log(`[media-baseline] ${testInfo.project.name}: initial cover requests ${initialRequested}/${total}`);
   expect(initialRequested, `initial page requested all ${total} story covers`).toBeLessThan(total);
 
-  // Move through the shelf so every lazy image eventually becomes an on-demand
-  // candidate, then verify the full library can still decode successfully.
-  for (let index = 0; index < total; index += 3) {
+  // Move through the shelf so every deferred image intersects the controlled
+  // loading boundary, then verify the full library can still decode.
+  for (let index = 0; index < total; index += 2) {
     await coverImages.nth(index).scrollIntoViewIfNeeded();
-    await page.waitForTimeout(40);
+    await page.waitForTimeout(60);
   }
   await coverImages.last().scrollIntoViewIfNeeded();
+
+  await expect
+    .poll(() => requestedCovers.size, { timeout: 10_000 })
+    .toBe(total);
 
   await expect
     .poll(
@@ -43,5 +49,5 @@ test("bookshelf defers below-fold cover media and still decodes it on demand", a
     )
     .toBe(total);
 
-  expect(requestedCovers.size).toBe(total);
+  console.log(`[media-baseline] ${testInfo.project.name}: final cover requests ${requestedCovers.size}/${total}`);
 });
