@@ -1,13 +1,16 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { relative, resolve } from "node:path";
+import { repoRoot } from "./story-model.mjs";
 
 const ALLOWED_CLAIMS = new Set(["owned", "licensed", "public-domain", "permission"]);
+const RECEIPT_PREFIX = "content/evidence/narration/receipts/";
 
 function nonEmpty(value) {
   return typeof value === "string" && value.trim() !== "";
 }
 
-function safeRelativePath(value) {
+export function safeRelativePath(value) {
   if (!nonEmpty(value)) return false;
   const normalized = value.replaceAll("\\", "/");
   return !(
@@ -16,6 +19,18 @@ function safeRelativePath(value) {
     normalized.includes("\u0000") ||
     normalized.split("/").some((segment) => segment === ".." || segment === "")
   );
+}
+
+export function resolveRepositoryNarrationReceiptPath(value, root = repoRoot) {
+  if (!safeRelativePath(value)) throw new Error("receipt path must be a safe repository-relative path");
+  const normalized = value.replaceAll("\\", "/");
+  if (!normalized.startsWith(RECEIPT_PREFIX) || !normalized.endsWith(".json")) {
+    throw new Error(`receipt path must be a JSON file under ${RECEIPT_PREFIX}`);
+  }
+  const absolute = resolve(root, normalized);
+  const rel = relative(root, absolute).replaceAll("\\", "/");
+  if (rel.startsWith("../") || rel === "..") throw new Error("receipt path escapes repository root");
+  return { absolute, relative: rel };
 }
 
 export function sha256Buffer(value) {
@@ -76,8 +91,8 @@ export function validateNarrationReceipt(receipt) {
       } else {
         keys.add(item.key);
       }
-      if (!safeRelativePath(item.file) || !/\.mp3$/i.test(item.file)) {
-        problems.push(`${prefix}.file must be a safe relative MP3 path`);
+      if (!safeRelativePath(item.file) || !/^public\/audio\/[a-z0-9-]+\/(?:p[0-7]|moral)\.mp3$/.test(item.file)) {
+        problems.push(`${prefix}.file must be a canonical public/audio narration MP3 path`);
       } else if (files.has(item.file)) {
         problems.push(`${prefix}.file duplicates ${item.file}`);
       } else {
@@ -95,10 +110,12 @@ export function validateNarrationReceipt(receipt) {
   return { valid: problems.length === 0, problems: [...new Set(problems)].sort() };
 }
 
-export function readNarrationReceipt(path) {
-  const bytes = readFileSync(path);
+export function readNarrationReceipt(path, options = {}) {
+  const root = options.root ?? repoRoot;
+  const resolved = resolveRepositoryNarrationReceiptPath(path, root);
+  const bytes = readFileSync(resolved.absolute);
   const parsed = JSON.parse(bytes.toString("utf8"));
   const validation = validateNarrationReceipt(parsed);
   if (!validation.valid) throw new Error(`Invalid narration receipt:\n${validation.problems.join("\n")}`);
-  return { receipt: parsed, receiptSha256: sha256Buffer(bytes) };
+  return { receipt: parsed, receiptSha256: sha256Buffer(bytes), receiptPath: resolved.relative };
 }
