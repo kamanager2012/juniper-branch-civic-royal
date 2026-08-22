@@ -170,6 +170,20 @@ export function readApprovedProviderBinding() {
   };
 }
 
+function validateStagedOutput(output, entry) {
+  if (!output.stagedPath) return;
+  let audio;
+  try {
+    audio = readFileSync(output.stagedPath);
+  } catch (error) {
+    throw new Error(`${entry.key}: staged MP3 cannot be reread while constructing receipt: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  const payload = validateGeneratedMp3(audio);
+  if (!payload.valid) throw new Error(`${entry.key}: staged MP3 failed final payload validation: ${payload.problems.join("; ")}`);
+  if (audio.length !== output.bytes) throw new Error(`${entry.key}: staged MP3 byte size changed after encoding`);
+  if (sha256AudioBuffer(audio) !== output.audioSha256) throw new Error(`${entry.key}: staged MP3 SHA-256 changed after encoding`);
+}
+
 export function buildKokoroNarrationReceipt({
   generationSet,
   outputs,
@@ -192,6 +206,7 @@ export function buildKokoroNarrationReceipt({
     if (output.file !== entry.file) throw new Error(`${entry.key}: generated output path does not match canonical narration path`);
     if (typeof output.audioSha256 !== "string" || !/^[a-f0-9]{64}$/.test(output.audioSha256)) throw new Error(`${entry.key}: generated output audio SHA-256 is invalid`);
     if (!Number.isInteger(output.bytes) || output.bytes < 1000 || output.bytes > KOKORO_MP3_MAX_BYTES) throw new Error(`${entry.key}: generated output byte size is outside release bounds`);
+    validateStagedOutput(output, entry);
     return {
       key: entry.key,
       file: entry.file,
