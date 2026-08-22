@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Star } from "lucide-react";
+import { BookOpen, Star } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Petals } from "@/components/petals";
-import { stories, type Story } from "@/data/stories";
+import { storyCatalog } from "@/data/story-catalog";
+import type { Story } from "@/data/stories";
 import { allProgress, type StoryProgress } from "@/lib/progress";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +19,15 @@ const TONE_RING: Record<Story["tone"], string> = {
   pasture: "ring-pasture/70",
   well: "ring-well/70",
   temple: "ring-temple/70",
+};
+
+const TONE_BG: Record<Story["tone"], string> = {
+  wheat: "from-wheat/35 via-paper to-panel",
+  bamboo: "from-bamboo/30 via-paper to-panel",
+  bell: "from-bell/25 via-paper to-panel",
+  pasture: "from-pasture/30 via-paper to-panel",
+  well: "from-well/25 via-paper to-panel",
+  temple: "from-temple/25 via-paper to-panel",
 };
 
 function DeferredCover({ src }: { src: string }) {
@@ -66,15 +76,17 @@ function Home() {
   }, []);
 
   const heard = Object.values(progress).filter((p) => p.heard).length;
+  const mediaCount = storyCatalog.filter((item) => item.kind === "media").length;
+  const textCount = storyCatalog.length - mediaCount;
 
   return (
     <main className="relative min-h-dvh overflow-hidden">
       <Petals />
       <div className="relative mx-auto w-full max-w-5xl px-4 pb-16 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6">
         <header className="mb-6">
-          <p className="text-sm tracking-[0.35em] text-muted">给小朋友的免费有声绘本</p>
+          <p className="text-sm tracking-[0.35em] text-muted">给小朋友的中国成语故事库</p>
           <h1 className="mt-1 font-display text-5xl text-cinnabar sm:text-6xl">成语故事</h1>
-          <p className="mt-2 text-sm text-ink-soft">不用登录，打开就能听</p>
+          <p className="mt-2 text-sm text-ink-soft">不用登录，100 个故事打开就能读</p>
         </header>
 
         <section className="relative mb-8 overflow-hidden rounded-[32px] book-spine">
@@ -85,27 +97,36 @@ function Home() {
             fetchPriority="high"
             className="h-44 w-full object-cover sm:h-56"
           />
-          <div className="absolute inset-0 bg-linear-to-r from-ink/55 via-ink/20 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-r from-ink/60 via-ink/25 to-transparent" />
           <div className="absolute inset-0 flex flex-col justify-end p-5 sm:p-7">
             <p className="font-display text-2xl text-panel sm:text-3xl">轻轻点开一本</p>
-            <p className="mt-1 text-sm text-panel/85">听故事 · 看图画 · 懂道理 · 共 {stories.length} 本</p>
-            {heard > 0 && (
-              <p className="mt-2 text-xs text-panel/75">已经听过 {heard} 本</p>
-            )}
+            <p className="mt-1 text-sm text-panel/90">共 {storyCatalog.length} 本 · {mediaCount} 本有声绘本 · {textCount} 本文字版</p>
+            {heard > 0 && <p className="mt-2 text-xs text-panel/75">已经听过 {heard} 本有声故事</p>}
           </div>
         </section>
 
-        <h2 className="mb-4 font-display text-2xl text-ink">书架</h2>
+        <div className="mb-4 flex items-end justify-between gap-4">
+          <div>
+            <h2 className="font-display text-2xl text-ink">书架</h2>
+            <p className="mt-1 text-xs text-muted">文字版会继续补齐插图与旁白，不用假素材占位。</p>
+          </div>
+          <span className="shrink-0 rounded-full bg-panel px-3 py-1.5 text-xs text-ink-soft shadow-panel">100 本</span>
+        </div>
+
         <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6">
-          {stories.map((story, i) => {
-            const stars = progress[story.id]?.stars ?? 0;
-            const eager = i < EAGER_COVER_COUNT;
+          {storyCatalog.map((item, i) => {
+            const story = item.story;
+            const stars = item.kind === "media" ? (progress[story.id]?.stars ?? 0) : 0;
+            const mediaIndex = item.kind === "media" ? i : -1;
+            const eager = item.kind === "media" && mediaIndex < EAGER_COVER_COUNT;
+
             return (
-              <li key={story.id} className="rise-in" style={{ animationDelay: `${i * 70}ms` }}>
+              <li key={story.id} className="rise-in" style={{ animationDelay: `${Math.min(i, 12) * 35}ms` }}>
                 <Link
                   to="/story/$id"
                   params={{ id: story.id }}
                   className="group block focus:outline-none"
+                  {...(item.kind === "media" ? { "data-media-story": "true" } : { "data-text-story": "true" })}
                 >
                   <article
                     className={cn(
@@ -114,36 +135,55 @@ function Home() {
                     )}
                   >
                     <div className="relative aspect-book overflow-hidden">
-                      {eager ? (
-                        <img
-                          src={story.cover}
-                          alt=""
-                          decoding="async"
-                          fetchPriority="high"
-                          data-cover-loading="eager"
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                        />
-                      ) : (
-                        <DeferredCover src={story.cover} />
-                      )}
-                      <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-ink/70 to-transparent p-3 pt-10">
-                        <h3 className="font-display text-2xl text-panel">{story.title}</h3>
-                        <p className="text-[11px] tracking-widest text-panel/80">{story.pinyin}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between px-3 py-2.5">
-                      <p className="truncate text-sm text-ink-soft">{story.tagline}</p>
-                      <span className="flex gap-0.5" aria-label={`${stars} 颗星`}>
-                        {[0, 1, 2].map((s) => (
-                          <Star
-                            key={s}
-                            className={cn(
-                              "size-3.5",
-                              s < stars ? "fill-star text-star" : "text-line",
-                            )}
+                      {item.kind === "media" ? (
+                        eager ? (
+                          <img
+                            src={item.story.cover}
+                            alt=""
+                            decoding="async"
+                            fetchPriority="high"
+                            data-cover-loading="eager"
+                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                           />
-                        ))}
-                      </span>
+                        ) : (
+                          <DeferredCover src={item.story.cover} />
+                        )
+                      ) : (
+                        <div className={cn("absolute inset-0 grid place-items-center bg-linear-to-br", TONE_BG[story.tone])}>
+                          <div className="absolute left-[12%] top-[12%] size-20 rounded-full border border-ink/5" />
+                          <div className="absolute bottom-[14%] right-[10%] size-24 rounded-full bg-panel/45" />
+                          <div className="relative px-4 text-center">
+                            <BookOpen className="mx-auto mb-3 size-9 text-cinnabar/75" aria-hidden="true" />
+                            <p className="font-display text-3xl leading-tight text-ink">{story.title}</p>
+                            <p className="mt-2 text-[10px] tracking-[0.16em] text-muted">{story.pinyin}</p>
+                            <span className="mt-4 inline-flex rounded-full bg-panel/80 px-2.5 py-1 text-[10px] font-medium text-cinnabar ring-1 ring-line/70">
+                              文字版
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {item.kind === "media" && (
+                        <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-ink/70 to-transparent p-3 pt-10">
+                          <h3 className="font-display text-2xl text-panel">{story.title}</h3>
+                          <p className="text-[11px] tracking-widest text-panel/80">{story.pinyin}</p>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between gap-2 px-3 py-2.5">
+                      <p className="truncate text-sm text-ink-soft">{story.tagline}</p>
+                      {item.kind === "media" ? (
+                        <span className="flex gap-0.5" aria-label={`${stars} 颗星`}>
+                          {[0, 1, 2].map((s) => (
+                            <Star
+                              key={s}
+                              className={cn("size-3.5", s < stars ? "fill-star text-star" : "text-line")}
+                            />
+                          ))}
+                        </span>
+                      ) : (
+                        <span className="shrink-0 text-[10px] text-muted">待配音</span>
+                      )}
                     </div>
                   </article>
                 </Link>

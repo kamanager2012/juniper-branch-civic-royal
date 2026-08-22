@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { buildDraftLineageEntries } from "./draft-story-rights.mjs";
 import { buildReleaseReadiness, readReleaseAssets } from "./release-readiness.mjs";
 import { repoRoot } from "./story-model.mjs";
 
@@ -39,12 +40,22 @@ function readGeneratedRegistry() {
 
 function mergedRegistry(historical = readRegistry()) {
   const generated = readGeneratedRegistry();
+  const draft = buildDraftLineageEntries();
   return {
     ...historical,
     entries: {
       ...historical.entries,
       ...generated.entries,
+      ...draft.entries,
     },
+    generatedIssues: draft.issues,
+  };
+}
+
+function finalizeGeneratedIssues(report, registry) {
+  return {
+    ...report,
+    issues: [...new Set([...report.issues, ...(registry.generatedIssues ?? [])])].sort(),
   };
 }
 
@@ -147,7 +158,7 @@ export function evaluateLineageRegistry(assets, registry, retiredIds = new Set()
 
   return {
     schemaVersion: 1,
-    registry: "content/source-lineage.json + content/generated-source-lineage.json",
+    registry: "content/source-lineage.json + content/generated-source-lineage.json + project-authored draft evidence",
     originCommit: registry.originCommit,
     lineage,
     categories,
@@ -158,7 +169,8 @@ export function evaluateLineageRegistry(assets, registry, retiredIds = new Set()
 
 export function buildSourceLineage() {
   const release = buildReleaseReadiness();
-  return evaluateLineageRegistry(release.assets, mergedRegistry(), retiredAssetIds());
+  const registry = mergedRegistry();
+  return finalizeGeneratedIssues(evaluateLineageRegistry(release.assets, registry, retiredAssetIds()), registry);
 }
 
 export function recoverSourceLineage(originCommit = DEFAULT_ORIGIN_COMMIT) {
@@ -172,6 +184,7 @@ export function recoverSourceLineage(originCommit = DEFAULT_ORIGIN_COMMIT) {
 
   for (const asset of release.assets) {
     if (asset.category === "story-text") {
+      if (asset.sourcePath) continue;
       if (storyCurrentBlob === storyOriginBlob) {
         entries[asset.id] = {
           fingerprintSha256: asset.fingerprintSha256,
@@ -203,9 +216,10 @@ export function recoverSourceLineage(originCommit = DEFAULT_ORIGIN_COMMIT) {
   }
 
   const next = { schemaVersion: 1, originCommit, entries };
+  const merged = mergedRegistry(next);
   return {
     registry: next,
-    report: evaluateLineageRegistry(release.assets, mergedRegistry(next), retiredAssetIds()),
+    report: finalizeGeneratedIssues(evaluateLineageRegistry(release.assets, merged, retiredAssetIds()), merged),
   };
 }
 
