@@ -1,4 +1,14 @@
 {
   "schemaVersion": 1,
-  "entries": {}
+  "entries": {
+    "font:public/fonts/MaShanZheng.woff2": {
+      "fingerprintSha256": "11e2c8cbcd09ac08fa38066a2e9699e57fda40a8e2880fbf7cbf101f5926a595",
+      "claim": "licensed",
+      "evidence": [
+        "content/evidence/fonts/MaShanZheng.json",
+        "licenses/fonts/MaShanZheng/OFL.txt",
+        "https://github.com/googlefonts/mashanzheng/blob/master/OFL.txt"
+      ]
+    }
+  }
 }
