@@ -15,6 +15,7 @@
 - 成语释义与儿童友好的“小道理”总结
 - 移动端安全区和触控体验
 - 标准静态 Web App Manifest
+- 产品自有离线 app shell；已访问故事图片可在断网后继续显示
 
 ## 架构
 
@@ -47,20 +48,31 @@ npm run dev
 
 默认开发地址为 `http://localhost:8080`，构建产物位于 `dist/`。
 
-涉及路由、阅读器 UI、媒体加载、响应式布局或静态部署行为时，再运行产品级浏览器回归：
+涉及路由、阅读器 UI、媒体加载、响应式布局、PWA/offline 或静态部署行为时，再运行产品级浏览器回归：
 
 ```bash
 npx playwright install chromium
 npm run test:e2e
 ```
 
-E2E 会在桌面与移动 Chromium 上验证真实书架链接、故事深链、封面/旁白资源、浏览器错误以及基础横向溢出。Playwright 只属于开发与 CI，不进入产品运行时。
+E2E 会在桌面与移动 Chromium 上验证真实书架链接、故事深链、封面/旁白资源、阅读状态持久化、离线 shell、浏览器错误以及基础横向溢出。Playwright 只属于开发与 CI，不进入产品运行时。
 
 ## 静态部署
 
 可部署到任何能够托管静态文件的服务。因为 `/story/$id` 是客户端路由，生产环境必须把未知页面请求回退到 `index.html`，否则直接打开故事深链会得到 404。
 
-PWA 元数据位于 `public/manifest.webmanifest`，不依赖服务端动态注入。
+PWA 元数据位于 `public/manifest.webmanifest`，离线 shell 位于 `public/sw.js`，都不依赖服务端动态注入。
+
+### 离线边界
+
+当前离线能力刻意保持克制：
+
+- 安装后的 app shell 与构建静态资源会缓存；
+- 在线访问过的故事图片会按需进入运行时缓存；
+- 断网后仍可打开首页和已经访问过、图片已缓存的故事页面；
+- `/audio/*` 与 HTTP Range 请求不会自动缓存，因此当前不承诺断网旁白播放。
+
+音频体积较大，而且浏览器可能使用分段 Range 请求。未来如果要提供“整本下载后离线听”，应单独设计下载、容量、更新和清理机制，而不是偷偷把所有 MP3 塞进 service-worker cache。
 
 ## 内容结构
 
@@ -85,7 +97,8 @@ CI 使用 TypeScript AST 读取真实 `page()` 调用，并检查每页图片/�
 - 不提交 Vercel 构建输出、临时 artifacts、截图目录或本地 Builder 状态；
 - 保留真正服务于绘本体验的图片、音频和字体；
 - import inventory、typecheck、tests、build、dependency audit 都属于交付 gate；
-- 路由/阅读器/媒体/响应式/部署改动还必须通过产品级浏览器 E2E；
+- 路由/阅读器/媒体/响应式/PWA/部署改动还必须通过产品级浏览器 E2E；
+- service-worker cache 只能清理本项目自己的 `chengyu-storybook-*` key；
 - 大体积历史生成物若要清理，单独做经过审计的 Git history rewrite，不和产品开发混在一起。
 
 ## 内容与资产来源

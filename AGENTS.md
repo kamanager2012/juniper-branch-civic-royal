@@ -15,6 +15,14 @@ Maintain **成语故事** as a small, local-first Chinese idiom audio storybook.
 - Do not commit generated deployment output, screenshots, local workspace state, secrets, or `.env` files.
 - Do not claim content provenance, copyright clearance, or production readiness merely because files exist.
 
+## Offline/PWA boundary
+
+- `public/sw.js` is a small product-owned service worker, not a framework runtime.
+- Offline support covers the app shell, built static assets, and story images that were previously visited while online.
+- Do not automatically cache `/audio/*` or HTTP Range responses. Narration files can be large and browsers may request byte ranges; full offline narration needs an explicit user-facing download/storage design.
+- Cache cleanup must only delete keys owned by this application (`chengyu-storybook-*`), never every Cache Storage entry on the origin.
+- Service-worker registration is progressive enhancement: a registration failure must not prevent online reading.
+
 ## Required verification
 
 Before claiming a change is complete, run:
@@ -28,7 +36,7 @@ npm run build
 
 CI must pass on Node 20 and Node 22. Dependency audit must not report high/critical findings.
 
-For changes that affect routing, the reader UI, media loading, responsive layout, or deployment behavior, also run:
+For changes that affect routing, the reader UI, media loading, responsive layout, PWA/offline behavior, or deployment behavior, also run:
 
 ```bash
 npx playwright install chromium
