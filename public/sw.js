@@ -1,4 +1,5 @@
 const CACHE_NAME = "chengyu-storybook-shell-v1";
+const CACHE_PREFIX = "chengyu-storybook-";
 const STATIC_PATHS = ["/manifest.webmanifest", "/favicon.svg"];
 
 async function cacheShell() {
@@ -22,16 +23,18 @@ async function cacheShell() {
 }
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    cacheShell().then(() => self.skipWaiting()),
-  );
+  event.waitUntil(cacheShell().then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     Promise.all([
       caches.keys().then((keys) =>
-        Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))),
+        Promise.all(
+          keys
+            .filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
+            .map((key) => caches.delete(key)),
+        ),
       ),
       self.clients.claim(),
     ]),
@@ -60,7 +63,14 @@ self.addEventListener("fetch", (event) => {
           }
           return response;
         } catch {
-          return (await caches.match("/index.html")) || (await caches.match("/"));
+          const cachedShell = (await caches.match("/index.html")) || (await caches.match("/"));
+          return (
+            cachedShell ||
+            new Response("Offline shell unavailable", {
+              status: 503,
+              headers: { "Content-Type": "text/plain; charset=utf-8" },
+            })
+          );
         }
       })(),
     );
