@@ -28,6 +28,13 @@ npm run build
 
 CI must pass on Node 20 and Node 22. Dependency audit must not report high/critical findings.
 
+For changes that affect routing, the reader UI, media loading, responsive layout, or deployment behavior, also run:
+
+```bash
+npx playwright install chromium
+npm run test:e2e
+```
+
 ## Routing and deployment
 
 Routes are file-based under `src/routes/` and generated through `@tanstack/router-plugin`. Static hosts must use an SPA fallback to `index.html` so direct navigation to `/story/<id>` works.
