@@ -4,6 +4,7 @@ import { join, relative } from "node:path";
 import { buildDraftProvenanceEntries } from "./draft-story-rights.mjs";
 import { loadDraftStoryCatalog } from "./draft-story-catalog.mjs";
 import { buildNarrationPlan } from "./narration-plan.mjs";
+import { buildPublishedProvenanceEntries } from "./published-story-rights.mjs";
 import { loadStoryModel, repoRoot } from "./story-model.mjs";
 
 const registryPath = join(repoRoot, "content/release-provenance.json");
@@ -185,11 +186,13 @@ function validateEntry(asset, entry) {
 
 export function buildReleaseReadiness() {
   const registry = readRegistry();
-  const generatedDrafts = buildDraftProvenanceEntries();
-  const entries = { ...registry.entries, ...generatedDrafts.entries };
   const assets = buildAssetInventory();
+  const publishedStoryAssets = assets.filter((asset) => asset.category === "story-text" && asset.textStatus === "media-ready");
+  const generatedPublished = buildPublishedProvenanceEntries(publishedStoryAssets);
+  const generatedDrafts = buildDraftProvenanceEntries();
+  const entries = { ...registry.entries, ...generatedDrafts.entries, ...generatedPublished.entries };
   const inventoryIds = new Set(assets.map((asset) => asset.id));
-  const issues = [...generatedDrafts.issues];
+  const issues = [...generatedDrafts.issues, ...generatedPublished.issues];
 
   for (const key of Object.keys(entries)) {
     if (!inventoryIds.has(key)) issues.push(`provenance entry points to an unknown asset: ${key}`);
@@ -240,7 +243,7 @@ export function buildReleaseReadiness() {
 
   return {
     schemaVersion: 1,
-    registry: "content/release-provenance.json + project-authored draft evidence",
+    registry: "content/release-provenance.json + project-authored published/draft evidence",
     provenance,
     narration,
     categories,
