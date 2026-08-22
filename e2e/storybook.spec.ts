@@ -3,14 +3,25 @@ import { expect, test } from "@playwright/test";
 test("bookshelf, deep link, media assets and viewport stay healthy", async ({ page, request }) => {
   const consoleErrors: string[] = [];
   const failedRequests: string[] = [];
+  const badResponses: string[] = [];
 
   page.on("console", (message) => {
     if (message.type() === "error") consoleErrors.push(message.text());
   });
   page.on("requestfailed", (req) => failedRequests.push(`${req.method()} ${req.url()}`));
+  page.on("response", (response) => {
+    if (response.status() >= 400) badResponses.push(`${response.status()} ${response.request().method()} ${response.url()}`);
+  });
 
   await page.goto("/", { waitUntil: "networkidle" });
   await expect(page.getByRole("heading", { name: "成语故事", exact: true })).toBeVisible();
+
+  const bookshelfHero = page.locator('img[src="/ui/bookshelf-paper.jpg"]').first();
+  await expect(bookshelfHero).toBeVisible();
+  expect(
+    await bookshelfHero.evaluate((image) => image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0),
+    "bookshelf hero did not decode",
+  ).toBeTruthy();
 
   const firstStory = page.locator('a[href^="/story/"]').first();
   await expect(firstStory).toBeVisible();
@@ -40,5 +51,6 @@ test("bookshelf, deep link, media assets and viewport stay healthy", async ({ pa
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow, `horizontal overflow: ${overflow}px`).toBeLessThanOrEqual(1);
   expect(failedRequests, `failed requests: ${failedRequests.join(", ")}`).toEqual([]);
+  expect(badResponses, `HTTP errors: ${badResponses.join(", ")}`).toEqual([]);
   expect(consoleErrors, `console errors: ${consoleErrors.join(" | ")}`).toEqual([]);
 });
