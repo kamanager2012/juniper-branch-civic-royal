@@ -65,7 +65,7 @@ test("reading state survives pause, page turns, reload and completion", async ({
     .toEqual({ stars: 3, heard: true });
 
   await page.getByRole("link", { name: "回书架", exact: true }).click();
-  await expect(page.getByText("已经听过 1 本", { exact: true })).toBeVisible();
+  await expect(page.getByText("已经听过 1 本有声故事", { exact: true })).toBeVisible();
   await expect(page.locator(`a[href="/story/${storyId}"]`).getByLabel("3 颗星")).toBeVisible();
 });
 
