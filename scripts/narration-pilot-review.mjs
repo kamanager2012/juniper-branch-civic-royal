@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { randomUUID } from "node:crypto";
-import { dirname, join } from "node:path";
 import { existsSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import {
   NARRATION_PILOT_EVIDENCE_PATH,
   readNarrationPilotEvidence,
@@ -68,19 +68,24 @@ export function prepareNarrationPilotReview({
   return { before, after, validation: afterValidation };
 }
 
-export function writeJsonAtomically(path, value) {
+export function writeJsonAtomically(path, value, options = {}) {
   const tempPath = join(dirname(path), `.${path.split(/[\\/]/).at(-1)}.tmp-${process.pid}-${randomUUID()}`);
   const backupPath = `${path}.bak-${process.pid}-${randomUUID()}`;
+  const verify = options.verify ?? (() => {});
   let backedUp = false;
   let installed = false;
   try {
     writeFileSync(tempPath, `${JSON.stringify(value, null, 2)}\n`, { flag: "wx" });
+    verify(JSON.parse(readFileSync(tempPath, "utf8")));
+
     if (existsSync(path)) {
       renameSync(path, backupPath);
       backedUp = true;
     }
     renameSync(tempPath, path);
     installed = true;
+    verify(JSON.parse(readFileSync(path, "utf8")));
+
     if (backedUp) rmSync(backupPath, { force: true });
   } catch (error) {
     try {
@@ -107,12 +112,15 @@ export function reviewNarrationPilot(options = {}) {
   });
 
   if (options.write === true) {
-    writeJsonAtomically(evidencePath, prepared.after);
-    const reread = readNarrationPilotEvidence({ path: evidencePath });
-    const persisted = validateNarrationPilotEvidence(reread, options.validationOptions);
-    if (!persisted.valid || persisted.listeningStatus !== prepared.validation.listeningStatus || persisted.expansionApproved !== prepared.validation.expansionApproved) {
-      throw new Error(`Persisted pilot review failed post-write validation:\n${persisted.problems.join("\n")}`);
-    }
+    writeJsonAtomically(evidencePath, prepared.after, {
+      verify: (candidate) => {
+        const persisted = validateNarrationPilotEvidence(candidate, options.validationOptions);
+        if (!persisted.valid || persisted.listeningStatus !== prepared.validation.listeningStatus || persisted.expansionApproved !== prepared.validation.expansionApproved) {
+          throw new Error(`Persisted pilot review failed validation:\n${persisted.problems.join("\n")}`);
+        }
+      },
+    });
+    readNarrationPilotEvidence({ path: evidencePath });
   }
 
   return {
