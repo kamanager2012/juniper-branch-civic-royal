@@ -21,8 +21,10 @@ import {
 } from "./narration-encoder-profile.mjs";
 import {
   buildNarrationGenerationSet,
+  canonicalNarrationInputEntries,
   computeNarrationInputDigest,
 } from "./narration-generation-set.mjs";
+import { buildNarrationPlan } from "./narration-plan.mjs";
 import {
   KOKORO_GENERATOR_ID,
   KOKORO_PROVIDER_PROFILE_PATH,
@@ -53,6 +55,24 @@ function validateSetSelfConsistency(set, label, problems) {
   if (set.inputDigestSha256 !== computed) problems.push(`${label} input digest does not match its entries`);
 }
 
+function sameCanonicalInputs(left, right) {
+  return JSON.stringify(canonicalNarrationInputEntries(left)) === JSON.stringify(canonicalNarrationInputEntries(right));
+}
+
+function validateApprovedSubset(generationSet, fullSet, label, problems) {
+  const approvedByKey = new Map(fullSet.entries.map((entry) => [entry.key, entry]));
+  for (const entry of generationSet.entries) {
+    const approved = approvedByKey.get(entry.key);
+    if (!approved) {
+      problems.push(`${entry.key}: ${label} item is not present in the approved full set`);
+      continue;
+    }
+    if (approved.file !== entry.file || approved.textSha256 !== entry.textSha256) {
+      problems.push(`${entry.key}: ${label} path/text hash no longer matches approved full set`);
+    }
+  }
+}
+
 export function validateApprovedGenerationSet(generationSet, options = {}) {
   const problems = [];
   const evidence = options.evidence ?? readApprovedGenerationSetEvidence();
@@ -76,19 +96,30 @@ export function validateApprovedGenerationSet(generationSet, options = {}) {
     if (generationSet.inputDigestSha256 !== evidence?.inputDigestSha256) problems.push("all-scope generation digest must match approved full set");
   } else if (generationSet.scope?.type === "story") {
     if (generationSet.count !== 9) problems.push("story-scope narration generation must contain exactly 9 items");
-    const approvedByKey = new Map(fullSet.entries.map((entry) => [entry.key, entry]));
+    validateApprovedSubset(generationSet, fullSet, "story-scope", problems);
+  } else if (generationSet.scope?.type === "pending") {
+    let expectedPending = options.pendingSet ?? null;
+    try {
+      expectedPending ??= buildNarrationGenerationSet({ pending: true, plan: options.plan ?? buildNarrationPlan() });
+    } catch (error) {
+      problems.push(`current pending narration set cannot be constructed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+
+    if (expectedPending) {
+      validateSetSelfConsistency(expectedPending, "current pending narration set", problems);
+      if (generationSet.count !== expectedPending.count) problems.push("pending-scope generation count must exactly match the current non-current narration set");
+      if (generationSet.inputDigestSha256 !== expectedPending.inputDigestSha256) problems.push("pending-scope generation digest must exactly match the current non-current narration set");
+      if (!sameCanonicalInputs(generationSet.entries, expectedPending.entries)) problems.push("pending-scope generation entries must exactly match the current non-current narration set");
+    }
+
+    validateApprovedSubset(generationSet, fullSet, "pending-scope", problems);
+    const plan = options.plan ?? buildNarrationPlan();
+    const statusByKey = new Map(plan.items.map((item) => [item.key, item.status]));
     for (const entry of generationSet.entries) {
-      const approved = approvedByKey.get(entry.key);
-      if (!approved) {
-        problems.push(`${entry.key}: story-scope item is not present in the approved full set`);
-        continue;
-      }
-      if (approved.file !== entry.file || approved.textSha256 !== entry.textSha256) {
-        problems.push(`${entry.key}: story-scope path/text hash no longer matches approved full set`);
-      }
+      if (statusByKey.get(entry.key) === "current") problems.push(`${entry.key}: pending-scope must never include current narration`);
     }
   } else {
-    problems.push("generation scope must be all or story");
+    problems.push("generation scope must be all, story, or pending");
   }
 
   return { valid: problems.length === 0, problems: [...new Set(problems)].sort(), evidence };
@@ -160,7 +191,7 @@ export function validateGeneratedMp3(buffer, maxBytes = KOKORO_MP3_MAX_BYTES) {
 
 export function buildNarrationBatchId(createdAt, inputDigestSha256, scope) {
   const stamp = createdAt.toISOString().replace(/[-:.]/g, "").toLowerCase();
-  const scopePart = scope?.type === "story" ? `-${scope.storyId}` : "-all";
+  const scopePart = scope?.type === "story" ? `-${scope.storyId}` : scope?.type === "pending" ? "-pending" : "-all";
   return `kokoro-${stamp}${scopePart}-${inputDigestSha256.slice(0, 12)}`;
 }
 
@@ -258,39 +289,45 @@ export function buildKokoroNarrationReceipt({
   if (!hostValidation.valid) {
     throw new Error(`Narration runtime host is not approved:\n${hostValidation.issues.join("\n")}`);
   }
-
-  const outputByKey = new Map(outputs.map((output) => [output.key, output]));
-  if (outputByKey.size !== generationSet.entries.length || outputs.length !== generationSet.entries.length) {
-    throw new Error("Generated output set does not exactly cover the requested narration input set");
+  const providerValidation = validateKokoroProviderProfile(providerBinding.profile);
+  if (!providerValidation.valid) {
+    throw new Error(`Narration provider profile is not approved:\n${providerValidation.issues.join("\n")}`);
+  }
+  if (providerBinding.path !== KOKORO_PROVIDER_PROFILE_PATH) {
+    throw new Error(`Narration provider profile path must remain ${KOKORO_PROVIDER_PROFILE_PATH}`);
+  }
+  if (providerBinding.sha256 !== sha256Buffer(readFileSync(resolve(repoRoot, providerBinding.path)))) {
+    throw new Error("Narration provider profile SHA-256 no longer matches its committed bytes");
   }
 
-  const items = generationSet.entries.map((entry) => {
-    const output = outputByKey.get(entry.key);
-    if (!output) throw new Error(`${entry.key}: generated output is missing`);
-    if (output.file !== entry.file) throw new Error(`${entry.key}: generated output path does not match canonical narration path`);
-    if (typeof output.audioSha256 !== "string" || !/^[a-f0-9]{64}$/.test(output.audioSha256)) throw new Error(`${entry.key}: generated output audio SHA-256 is invalid`);
-    if (!Number.isInteger(output.bytes) || output.bytes < 1000 || output.bytes > KOKORO_MP3_MAX_BYTES) throw new Error(`${entry.key}: generated output byte size is outside release bounds`);
+  if (!Array.isArray(outputs) || outputs.length !== generationSet.count) {
+    throw new Error("Narration outputs must exactly cover the approved generation set");
+  }
+  const entryByKey = new Map(generationSet.entries.map((entry) => [entry.key, entry]));
+  const outputKeys = new Set();
+  for (const output of outputs) {
+    if (outputKeys.has(output.key)) throw new Error(`Duplicate narration output key: ${output.key}`);
+    outputKeys.add(output.key);
+    const entry = entryByKey.get(output.key);
+    if (!entry) throw new Error(`Narration output is outside the approved generation set: ${output.key}`);
+    if (output.file !== entry.file) throw new Error(`${output.key}: narration output path drifted from approved generation set`);
+    if (typeof output.audioSha256 !== "string" || !/^[a-f0-9]{64}$/.test(output.audioSha256)) throw new Error(`${output.key}: narration output SHA-256 is invalid`);
+    if (!Number.isInteger(output.bytes) || output.bytes < 1000) throw new Error(`${output.key}: narration output byte size is invalid`);
     validateStagedOutput(output, entry);
-    return {
-      key: entry.key,
-      file: entry.file,
-      textSha256: entry.textSha256,
-      audioSha256: output.audioSha256,
-    };
-  });
+  }
 
-  const batchId = buildNarrationBatchId(createdAt, generationSet.inputDigestSha256, generationSet.scope);
-  const receipt = {
+  const executionEncoder = approvedEncoderExecution(encoder, { binding: encoderBinding, snapshot: encoderSnapshot });
+  return {
     schemaVersion: 1,
-    batchId,
+    batchId: buildNarrationBatchId(createdAt, generationSet.inputDigestSha256, generationSet.scope),
     canonicalSource: generationSet.canonicalSource,
     createdAt: createdAt.toISOString(),
     inputItemCount: generationSet.count,
     inputDigestSha256: generationSet.inputDigestSha256,
     provider: {
       name: KOKORO_PROVIDER_NAME,
-      voice: APPROVED_KOKORO.voiceId,
-      language: "zh",
+      voice: providerBinding.profile.model.voice.id,
+      language: providerBinding.profile.language,
       generator: KOKORO_GENERATOR_ID,
       profile: {
         id: providerBinding.profile.profileId,
@@ -298,38 +335,31 @@ export function buildKokoroNarrationReceipt({
         sha256: providerBinding.sha256,
       },
     },
-    rights: {
-      claim: providerBinding.profile.rights.claimForGeneratedNarration,
-      evidence: [providerBinding.path],
-    },
     execution: {
-      model: {
-        repository: APPROVED_KOKORO.modelRepository,
-        revision: APPROVED_KOKORO.modelRevision,
-        configSha256: APPROVED_KOKORO.configSha256,
-        weightsSha256: APPROVED_KOKORO.weightsSha256,
-        voiceSha256: APPROVED_KOKORO.voiceSha256,
-      },
       runtime: {
-        inferenceRepository: APPROVED_KOKORO.inferenceRepository,
-        inferenceCommit: APPROVED_KOKORO.inferenceCommit,
-        g2pRepository: APPROVED_KOKORO.g2pRepository,
-        g2pCommit: APPROVED_KOKORO.g2pCommit,
         platform: runtime.platform,
         arch: runtime.arch,
         pythonVersion: runtime.pythonVersion,
         torchVersion: runtime.torchVersion,
         device: runtime.device,
-        environment: runtimeEnvironment,
+        environment: currentRuntimeEnvironment,
       },
-      encoder: approvedEncoderExecution(encoder, { binding: encoderBinding, snapshot: encoderSnapshot }),
+      encoder: executionEncoder,
     },
-    items,
+    rights: {
+      claim: providerBinding.profile.rights.claim,
+      evidence: [...providerBinding.profile.rights.evidence],
+    },
+    items: generationSet.entries.map((entry) => {
+      const output = outputs.find((candidate) => candidate.key === entry.key);
+      return {
+        key: entry.key,
+        file: entry.file,
+        textSha256: entry.textSha256,
+        audioSha256: output.audioSha256,
+      };
+    }),
   };
-
-  const validation = validateNarrationReceipt(receipt);
-  if (!validation.valid) throw new Error(`Generated narration receipt is invalid:\n${validation.problems.join("\n")}`);
-  return receipt;
 }
 
 export function sha256AudioBuffer(buffer) {
