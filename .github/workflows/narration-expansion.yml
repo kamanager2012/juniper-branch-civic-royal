@@ -1,0 +1,289 @@
+name: controlled narration expansion
+
+on:
+  push:
+    branches:
+      - "generated/narration-expansion-*"
+    paths:
+      - "content/evidence/narration/requests/pending-expansion-v1.json"
+
+permissions:
+  contents: write
+  statuses: write
+
+concurrency:
+  group: narration-expansion-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  expand-pending-narration:
+    if: ${{ github.event.head_commit.message != 'generated: complete pending narration expansion' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "22"
+          cache: npm
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Validate expansion request, durable quality gate, and exact 207-item plan
+        shell: bash
+        run: |
+          set -euo pipefail
+          REQUEST="content/evidence/narration/requests/pending-expansion-v1.json"
+          test -f "$REQUEST"
+          node - <<'NODE'
+          const request = require('./content/evidence/narration/requests/pending-expansion-v1.json');
+          const ok = request.schemaVersion === 1 &&
+            request.requestType === 'pending-narration-expansion' &&
+            request.expectedCurrentItems === 9 &&
+            request.expectedPendingItems === 207 &&
+            request.expectedPendingStories === 23 &&
+            request.pilotId === 'shou-zhu-kokoro-v1';
+          if (!ok) throw new Error('Narration expansion request contract is invalid');
+          NODE
+
+          node scripts/narration-pilot-approval.mjs | tee pilot-gate.json
+          node - <<'NODE'
+          const gate = require('./pilot-gate.json');
+          if (!gate.valid || !gate.expansionApproved || !['approved', 'waived'].includes(gate.listeningStatus)) {
+            throw new Error(`Narration expansion gate is not authorized: ${JSON.stringify(gate)}`);
+          }
+          NODE
+
+          npm run narration:expand:plan --silent | tee expansion-plan.json
+          node - <<'NODE'
+          const plan = require('./expansion-plan.json');
+          const currentIds = plan.currentStories.map((item) => item.storyId);
+          if (plan.totalStories !== 24 || plan.currentStoryCount !== 1 || plan.currentItemCount !== 9 ||
+              plan.pendingStoryCount !== 23 || plan.pendingItemCount !== 207 ||
+              JSON.stringify(currentIds) !== JSON.stringify(['shou-zhu'])) {
+            throw new Error(`Narration expansion plan drifted: ${JSON.stringify(plan)}`);
+          }
+          NODE
+
+      - name: Snapshot protected pilot bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha256sum content/evidence/narration/pilots/shou-zhu-v1.json > /tmp/pilot-evidence.sha256
+          find public/audio/shou-zhu -maxdepth 1 -type f -name '*.mp3' -print0 | sort -z | xargs -0 sha256sum > /tmp/pilot-audio.sha256
+          test "$(wc -l < /tmp/pilot-audio.sha256 | tr -d ' ')" = "9"
+
+      - name: Install pinned uv
+        run: |
+          python -m pip install --disable-pip-version-check uv==0.10.0
+          test "$(uv cache dir)" = "$HOME/.cache/uv"
+
+      - name: Restore locked narration uv package cache
+        id: narration-uv-cache
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ~/.cache/uv
+          key: kokoro-uv-packages-v1-${{ runner.os }}-${{ runner.arch }}-py312-uv0.10.0-${{ hashFiles('scripts/narration-runtime/pyproject.toml', 'scripts/narration-runtime/uv.lock') }}
+
+      - name: Sync locked CPU narration toolchain from lockfile
+        run: |
+          rm -rf scripts/narration-runtime/.venv
+          uv sync --locked --project scripts/narration-runtime
+          node scripts/kokoro-runtime-environment.mjs
+
+      - name: Install exact approved MP3 encoder/probe tooling
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ffmpeg=7:6.1.1-3ubuntu5 \
+            libavcodec60=7:6.1.1-3ubuntu5 \
+            libavformat60=7:6.1.1-3ubuntu5 \
+            libavutil58=7:6.1.1-3ubuntu5 \
+            libswresample4=7:6.1.1-3ubuntu5 \
+            libmp3lame0=3.100-6build1
+          node scripts/narration-encoder-profile.mjs --local
+
+      - name: Checkout exact Kokoro and Misaki source commits
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .runtime-src/kokoro .runtime-src/misaki
+
+          git -C .runtime-src/kokoro init
+          git -C .runtime-src/kokoro remote add origin https://github.com/hexgrad/kokoro.git
+          git -C .runtime-src/kokoro fetch --depth 1 origin dfb907a02bba8152ca444717ca5d78747ccb4bec
+          git -C .runtime-src/kokoro checkout --detach FETCH_HEAD
+          test "$(git -C .runtime-src/kokoro rev-parse HEAD)" = "dfb907a02bba8152ca444717ca5d78747ccb4bec"
+          test -z "$(git -C .runtime-src/kokoro status --porcelain --untracked-files=all)"
+
+          git -C .runtime-src/misaki init
+          git -C .runtime-src/misaki remote add origin https://github.com/hexgrad/misaki.git
+          git -C .runtime-src/misaki fetch --depth 1 origin fba1236595f2d2bf21d414ba6e57d25256afada3
+          git -C .runtime-src/misaki checkout --detach FETCH_HEAD
+          test "$(git -C .runtime-src/misaki rev-parse HEAD)" = "fba1236595f2d2bf21d414ba6e57d25256afada3"
+          test -z "$(git -C .runtime-src/misaki status --porcelain --untracked-files=all)"
+
+      - name: Restore exact pinned model asset cache
+        id: kokoro-assets-cache
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: .runtime-assets
+          key: kokoro-local-assets-v1-${{ hashFiles('content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json') }}
+
+      - name: Download exact pinned local model assets on cache miss
+        if: steps.kokoro-assets-cache.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          REVISION="a51e9e2a069a198cbda1f021f3805af3603ba92d"
+          BASE="https://huggingface.co/hexgrad/Kokoro-82M-v1.1-zh/resolve/${REVISION}"
+          mkdir -p .runtime-assets/voices
+          curl --fail --location --retry 4 --retry-delay 3 "${BASE}/config.json?download=true" --output .runtime-assets/config.json
+          curl --fail --location --retry 4 --retry-delay 3 "${BASE}/kokoro-v1_1-zh.pth?download=true" --output .runtime-assets/kokoro-v1_1-zh.pth
+          curl --fail --location --retry 4 --retry-delay 3 "${BASE}/voices/zf_001.pt?download=true" --output .runtime-assets/voices/zf_001.pt
+
+      - name: Verify exact pinned local model assets after restore or download
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t ASSET_FILES < <(find .runtime-assets -type f -printf '%P\n' | sort)
+          test "${#ASSET_FILES[@]}" = "3"
+          test "${ASSET_FILES[0]}" = "config.json"
+          test "${ASSET_FILES[1]}" = "kokoro-v1_1-zh.pth"
+          test "${ASSET_FILES[2]}" = "voices/zf_001.pt"
+          test "$(sha256sum .runtime-assets/config.json | awk '{print $1}')" = "bc333efa5ce4ceff433c8c8e5d027a1eca0166001e4e4a62bea2d26ff7a46890"
+          test "$(wc -c < .runtime-assets/config.json | tr -d ' ')" = "3228"
+          test "$(sha256sum .runtime-assets/kokoro-v1_1-zh.pth | awk '{print $1}')" = "b1d8410fa44dfb5c15471fd6c4225ea6b4e9ac7fa03c98e8bea47a9928476e2b"
+          test "$(wc -c < .runtime-assets/kokoro-v1_1-zh.pth | tr -d ' ')" = "327247856"
+          test "$(sha256sum .runtime-assets/voices/zf_001.pt | awk '{print $1}')" = "9bdc9a87e13e9bb1ea3e7803259c2ecbfebaeeb2ff80b5d0c76df1a464c1c962"
+          node scripts/kokoro-provider-profile.mjs --check --assets-dir .runtime-assets
+
+      - name: Generate and import the 23 pending story batches
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run narration:expand -- \
+            --assets-dir .runtime-assets \
+            --kokoro-src-dir .runtime-src/kokoro \
+            --misaki-src-dir .runtime-src/misaki \
+            --python scripts/narration-runtime/.venv/bin/python \
+            --ffmpeg /usr/bin/ffmpeg | tee narration-expansion.log
+
+      - name: Require complete current narration and unchanged pilot bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/narration-plan.mjs --summary | tee final-narration-plan.json
+          node - <<'NODE'
+          const plan = require('./final-narration-plan.json');
+          if (plan.total !== 216 || plan.counts.current !== 216 || plan.counts.stale !== 0 ||
+              plan.counts.unverified !== 0 || plan.counts.missing !== 0) {
+            throw new Error(`Narration did not converge to 216 current items: ${JSON.stringify(plan)}`);
+          }
+          NODE
+          sha256sum -c /tmp/pilot-evidence.sha256
+          sha256sum -c /tmp/pilot-audio.sha256
+          node scripts/narration-pilot-approval.mjs | tee post-expansion-pilot-gate.json
+          node - <<'NODE'
+          const gate = require('./post-expansion-pilot-gate.json');
+          if (!gate.valid || !gate.expansionApproved) throw new Error('Pilot gate became invalid after expansion');
+          NODE
+
+      - name: Run full release gates before creating generated commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run check
+          npm run release:check
+          npm run build
+          if grep -R -E 'api\.openai\.com|api\.anthropic\.com|api\.x\.ai|huggingface\.co|KPipeline|onnxruntime|kokoro-local-waveform' dist >/tmp/runtime-model-leak.txt; then
+            cat /tmp/runtime-model-leak.txt
+            echo "Model or remote-inference token leaked into production bundle" >&2
+            exit 1
+          fi
+
+      - name: Stage and audit the generated release delta
+        shell: bash
+        run: |
+          set -euo pipefail
+          REQUEST="content/evidence/narration/requests/pending-expansion-v1.json"
+          git rm "$REQUEST"
+          git add content/narration-state.json content/evidence/narration/receipts public/audio
+
+          test -z "$(git diff --name-only)"
+          git diff --cached --check
+          git diff --cached --name-status > generated-candidate.txt
+
+          TOTAL_COUNT="$(wc -l < generated-candidate.txt | tr -d ' ')"
+          AUDIO_COUNT="$(awk '$2 ~ /^public\/audio\/.*\.mp3$/ {n++} END {print n+0}' generated-candidate.txt)"
+          RECEIPT_COUNT="$(awk '$1 == "A" && $2 ~ /^content\/evidence\/narration\/receipts\/.*\.json$/ {n++} END {print n+0}' generated-candidate.txt)"
+          STATE_COUNT="$(awk '$2 == "content/narration-state.json" {n++} END {print n+0}' generated-candidate.txt)"
+          REQUEST_COUNT="$(awk '$1 == "D" && $2 == "content/evidence/narration/requests/pending-expansion-v1.json" {n++} END {print n+0}' generated-candidate.txt)"
+
+          test "$TOTAL_COUNT" = "232"
+          test "$AUDIO_COUNT" = "207"
+          test "$RECEIPT_COUNT" = "23"
+          test "$STATE_COUNT" = "1"
+          test "$REQUEST_COUNT" = "1"
+          if grep -E 'public/audio/shou-zhu/' generated-candidate.txt; then
+            echo "Protected shou-zhu audio entered generated delta" >&2
+            exit 1
+          fi
+          if grep -Ev '^[AMD][[:space:]]+(content/narration-state\.json|content/evidence/narration/receipts/[A-Za-z0-9._-]+\.json|content/evidence/narration/requests/pending-expansion-v1\.json|public/audio/[a-z0-9-]+/(p[0-7]|moral)\.mp3)$' generated-candidate.txt; then
+            echo "Unexpected path entered generated narration delta" >&2
+            exit 1
+          fi
+          git diff --cached --exit-code -- content/evidence/narration/pilots/shou-zhu-v1.json
+          sha256sum -c /tmp/pilot-evidence.sha256
+          sha256sum -c /tmp/pilot-audio.sha256
+
+      - name: Commit and push only to the generated request branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "generated: complete pending narration expansion"
+          GENERATED_SHA="$(git rev-parse HEAD)"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          echo "GENERATED_SHA=$GENERATED_SHA" >> "$GITHUB_ENV"
+
+      - name: Publish generated narration success status
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${GENERATED_SHA:-}"
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GENERATED_SHA}" \
+            -f state=success \
+            -f context="narration-expansion" \
+            -f description="207 narration items generated/imported; 9 pilot items protected" \
+            -f target_url="$RUN_URL"
+
+      - name: Publish request failure status
+        if: ${{ failure() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
+            -f state=failure \
+            -f context="narration-expansion" \
+            -f description="Narration expansion failed; no generated branch candidate is approved" \
+            -f target_url="$RUN_URL"
