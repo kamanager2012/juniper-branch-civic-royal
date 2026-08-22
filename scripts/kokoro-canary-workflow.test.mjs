@@ -4,12 +4,33 @@ import { join } from "node:path";
 import test from "node:test";
 import { repoRoot } from "./story-model.mjs";
 
-const WORKFLOW_PATH = join(repoRoot, ".github/workflows/kokoro-canary.yml");
-const workflow = readFileSync(WORKFLOW_PATH, "utf8");
+const NARRATION_WORKFLOW_FILES = [
+  "kokoro-adapter.yml",
+  "kokoro-canary.yml",
+  "kokoro-provider-audit.yml",
+  "kokoro-runtime.yml",
+  "narration-encoder.yml",
+];
+
+const APPROVED_ACTIONS = new Map([
+  ["actions/checkout", { sha: "3d3c42e5aac5ba805825da76410c181273ba90b1", major: "v7" }],
+  ["actions/setup-node", { sha: "820762786026740c76f36085b0efc47a31fe5020", major: "v7" }],
+  ["actions/setup-python", { sha: "ece7cb06caefa5fff74198d8649806c4678c61a1", major: "v6" }],
+  ["actions/cache", { sha: "caa296126883cff596d87d8935842f9db880ef25", major: "v5" }],
+  ["actions/upload-artifact", { sha: "b7c566a772e6b6bfb58ed0dc250532a479d7789f", major: "v6" }],
+]);
+
+const workflowPath = (file) => join(repoRoot, ".github/workflows", file);
+const narrationWorkflows = new Map(
+  NARRATION_WORKFLOW_FILES.map((file) => [file, readFileSync(workflowPath(file), "utf8")]),
+);
+const workflow = narrationWorkflows.get("kokoro-canary.yml");
 
 const CONFIG_SHA = "bc333efa5ce4ceff433c8c8e5d027a1eca0166001e4e4a62bea2d26ff7a46890";
 const WEIGHTS_SHA = "b1d8410fa44dfb5c15471fd6c4225ea6b4e9ac7fa03c98e8bea47a9928476e2b";
 const VOICE_SHA = "9bdc9a87e13e9bb1ea3e7803259c2ecbfebaeeb2ff80b5d0c76df1a464c1c962";
+const CACHE_REF = `actions/cache@${APPROVED_ACTIONS.get("actions/cache").sha}`;
+const UPLOAD_REF = `actions/upload-artifact@${APPROVED_ACTIONS.get("actions/upload-artifact").sha}`;
 
 function indexOfRequired(text, label) {
   const index = workflow.indexOf(text);
@@ -24,6 +45,25 @@ function eventPaths(eventName, nextEventName) {
   return [...workflow.slice(start, end).matchAll(/^\s{6}- "([^"]+)"$/gm)].map((match) => match[1]);
 }
 
+test("narration maintenance workflows pin every GitHub Action to the approved immutable commit", () => {
+  for (const [file, content] of narrationWorkflows) {
+    const usesLines = [...content.matchAll(/^\s*-\s+uses:\s+([^\s#]+)(?:\s+#\s+(v\d+))?\s*$/gm)];
+    assert.ok(usesLines.length > 0, `${file} must contain at least one action use`);
+
+    for (const [, reference, majorComment] of usesLines) {
+      const match = reference.match(/^([^@]+)@([0-9a-f]{40})$/);
+      assert.ok(match, `${file}: action reference must use a lowercase 40-hex commit SHA: ${reference}`);
+      const [, action, sha] = match;
+      const approved = APPROVED_ACTIONS.get(action);
+      assert.ok(approved, `${file}: unapproved GitHub Action: ${action}`);
+      assert.equal(sha, approved.sha, `${file}: ${action} must use the approved immutable commit`);
+      assert.equal(majorComment, approved.major, `${file}: ${action} must retain the approved major comment`);
+    }
+
+    assert.equal(/uses:\s+[^\s#]+@(?![0-9a-f]{40}(?:\s|#|$))/.test(content), false, `${file}: floating action reference detected`);
+  }
+});
+
 test("pull-request and main-push canary sensitivity stay exactly aligned", () => {
   const pullRequestPaths = eventPaths("pull_request", "push");
   const pushPaths = eventPaths("push", "workflow_dispatch");
@@ -31,10 +71,10 @@ test("pull-request and main-push canary sensitivity stay exactly aligned", () =>
   assert.deepEqual(pushPaths, pullRequestPaths);
 });
 
-test("canary cache and artifact actions use Node 24 majors", () => {
-  const cacheUses = [...workflow.matchAll(/uses:\s*actions\/cache@(v\d+)/g)].map((match) => match[1]);
-  assert.deepEqual(cacheUses, ["v5", "v5"]);
-  assert.match(workflow, /uses:\s*actions\/upload-artifact@v6/);
+test("canary cache and artifact actions stay on approved Node 24 action commits", () => {
+  const cacheUses = [...workflow.matchAll(new RegExp(`uses:\\s*${CACHE_REF}\\s+#\\s+v5`, "g"))];
+  assert.equal(cacheUses.length, 2);
+  assert.ok(workflow.includes(`uses: ${UPLOAD_REF} # v6`));
   assert.equal(workflow.includes("actions/cache@v4"), false);
   assert.equal(workflow.includes("actions/upload-artifact@v4"), false);
 });
@@ -51,7 +91,7 @@ test("uv cache accelerates package downloads without caching the locked runtime 
   assert.match(installBlock, /test "\$\(uv cache dir\)" = "\$HOME\/\.cache\/uv"/);
 
   const cacheBlock = workflow.slice(cache, sync);
-  assert.match(cacheBlock, /uses:\s*actions\/cache@v5/);
+  assert.ok(cacheBlock.includes(`uses: ${CACHE_REF} # v5`));
   assert.match(cacheBlock, /path:\s*~\/\.cache\/uv/);
   assert.match(
     cacheBlock,
@@ -67,7 +107,7 @@ test("uv cache accelerates package downloads without caching the locked runtime 
 });
 
 test("Kokoro asset cache is keyed by the exact durable provider profile without broad restore fallback", () => {
-  assert.match(workflow, /uses:\s*actions\/cache@v5/);
+  assert.ok(workflow.includes(`uses: ${CACHE_REF} # v5`));
   assert.match(workflow, /path:\s*\.runtime-assets/);
   assert.match(
     workflow,
