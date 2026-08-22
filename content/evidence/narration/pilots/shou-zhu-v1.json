@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "pilotId": "shou-zhu-kokoro-v1",
+  "storyId": "shou-zhu",
+  "installedBatch": {
+    "batchId": "kokoro-20260822t113547510z-shou-zhu-106ebc53267a",
+    "receiptPath": "content/evidence/narration/receipts/kokoro-20260822t113547510z-shou-zhu-106ebc53267a.json",
+    "receiptSha256": "dc7aaac72a0754e4436715cd5e97b8fb059422be09048f31f5faed828566c563",
+    "inputItemCount": 9,
+    "inputDigestSha256": "106ebc53267a9e52a254663dcff7d2e79017b4e26b30eb7d3a16c20257c8598c"
+  },
+  "technicalQc": {
+    "status": "passed",
+    "itemCount": 9,
+    "sampleRateHz": 24000,
+    "channels": 1,
+    "bitrateKbps": 40,
+    "totalDurationSeconds": 71.496,
+    "averageDurationSeconds": 7.944,
+    "minimumDurationSeconds": 7.104,
+    "maximumDurationSeconds": 9.24,
+    "totalBytes": 359613,
+    "averageBytes": 39957,
+    "minimumBytes": 35757,
+    "maximumBytes": 46437,
+    "nonSilenceCheck": "passed",
+    "productionBundleModelLeakCheck": "passed"
+  },
+  "audioSha256": {
+    "shou-zhu/moral": "090e2a7140d70f6427856cee052b4ac0feeda049a59ce1152f2a32e1a4e3a500",
+    "shou-zhu/p0": "3bd87f3b86e44dd95fc4a66ff75703e8eee4db116499d3ff697219de731931cd",
+    "shou-zhu/p1": "0ea97efbcafdabbcd6e6144dcb1e5aeb147904e9d6b7ae9b69379fb6f1ebd20e",
+    "shou-zhu/p2": "4dd9851e434e0b843fdbcde5bfcdf25eaae1ee62d5120427e714d63ac1822bd6",
+    "shou-zhu/p3": "441491f6293c1f56ee3d759701661ab89a55f3937611bc9386909d19dbdc4258",
+    "shou-zhu/p4": "b5d7707888e57195422d963a043fb2e364651f6b1979718fb3fa865551b33950",
+    "shou-zhu/p5": "eba1be68a53a4e10e89d76c717575180a09404c48e7e7236cf0c390274ca7851",
+    "shou-zhu/p6": "57d2775627a65759cb7d755c0a04d5b57836ad931a2bd63ac21d4de097cf6355",
+    "shou-zhu/p7": "dc5647ce1f93076b18c428d1ac575c3420266c2dad5206380eaabda8aa2d1ecc"
+  },
+  "qualityReview": {
+    "listeningStatus": "pending",
+    "expansionApproved": false,
+    "reviewedAt": null,
+    "reviewerRole": null,
+    "decisionNote": "Technical QC passed. Human listening/editorial quality approval is still required before expanding narration generation beyond this pilot story."
+  }
+}
