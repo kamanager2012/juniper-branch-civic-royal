@@ -69,7 +69,7 @@ test("review HTML is offline-only and exposes exact text plus local audio contro
     assert.ok(html.includes(item.text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;")));
   }
   assert.equal((html.match(/<audio controls/g) ?? []).length, 9);
-  assert.equal((html.match(/data-check="pass"/g) ?? []).length, 9);
+  assert.equal((html.match(/<input type="checkbox" data-check="pass">/g) ?? []).length, 9);
 });
 
 test("review package copies installed evidence-bound audio without mutating controlled release files", () => {
