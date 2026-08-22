@@ -22,17 +22,9 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22
-      - name: Show image audit runtime
-        run: |
-          if command -v magick >/dev/null 2>&1; then
-            magick -version | head -n 1
-          elif command -v convert >/dev/null 2>&1; then
-            convert -version | head -n 1
-          elif command -v ffmpeg >/dev/null 2>&1; then
-            ffmpeg -version | head -n 1
-          else
-            echo "No supported JPEG decoder is available" >&2
-            exit 1
-          fi
+      - name: Install pinned audit-only JPEG decoder
+        run: npm install --prefix /tmp/story-image-audit-deps --ignore-scripts --no-audit --no-fund jpeg-js@0.4.4
       - name: Match release story images to historical Imagine artifacts
+        env:
+          STORY_IMAGE_JPEG_DECODER: /tmp/story-image-audit-deps/node_modules/jpeg-js/index.js
         run: node scripts/story-image-origin-audit.mjs --output=/tmp/story-image-origin-audit.json
