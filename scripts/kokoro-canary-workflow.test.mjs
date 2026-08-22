@@ -31,6 +31,14 @@ test("pull-request and main-push canary sensitivity stay exactly aligned", () =>
   assert.deepEqual(pushPaths, pullRequestPaths);
 });
 
+test("canary cache and artifact actions use Node 24 majors", () => {
+  const cacheUses = [...workflow.matchAll(/uses:\s*actions\/cache@(v\d+)/g)].map((match) => match[1]);
+  assert.deepEqual(cacheUses, ["v5", "v5"]);
+  assert.match(workflow, /uses:\s*actions\/upload-artifact@v6/);
+  assert.equal(workflow.includes("actions/cache@v4"), false);
+  assert.equal(workflow.includes("actions/upload-artifact@v4"), false);
+});
+
 test("uv cache accelerates package downloads without caching the locked runtime environment", () => {
   const installUv = indexOfRequired("name: Install pinned uv", "pinned uv install step");
   const cache = indexOfRequired("name: Restore locked narration uv package cache", "uv package cache step");
@@ -43,7 +51,7 @@ test("uv cache accelerates package downloads without caching the locked runtime 
   assert.match(installBlock, /test "\$\(uv cache dir\)" = "\$HOME\/\.cache\/uv"/);
 
   const cacheBlock = workflow.slice(cache, sync);
-  assert.match(cacheBlock, /uses:\s*actions\/cache@v4/);
+  assert.match(cacheBlock, /uses:\s*actions\/cache@v5/);
   assert.match(cacheBlock, /path:\s*~\/\.cache\/uv/);
   assert.match(
     cacheBlock,
@@ -59,7 +67,7 @@ test("uv cache accelerates package downloads without caching the locked runtime 
 });
 
 test("Kokoro asset cache is keyed by the exact durable provider profile without broad restore fallback", () => {
-  assert.match(workflow, /uses:\s*actions\/cache@v4/);
+  assert.match(workflow, /uses:\s*actions\/cache@v5/);
   assert.match(workflow, /path:\s*\.runtime-assets/);
   assert.match(
     workflow,
