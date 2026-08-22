@@ -1,0 +1,161 @@
+name: kokoro one-story narration canary
+
+on:
+  pull_request:
+    paths:
+      - "scripts/kokoro-canary-qc.mjs"
+      - "scripts/kokoro-canary-qc.test.mjs"
+      - "scripts/generate-narration.mjs"
+      - "scripts/kokoro-synthesize.py"
+      - "scripts/kokoro_runtime.py"
+      - "scripts/kokoro-runtime-smoke.py"
+      - "scripts/kokoro-runtime-environment.mjs"
+      - "scripts/narration-runtime/**"
+      - "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json"
+      - ".github/workflows/kokoro-canary.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  one-story-canary:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Enforce model-free offline browser runtime
+        run: node --test scripts/spa-shell.test.mjs scripts/kokoro-canary-qc.test.mjs
+
+      - name: Install pinned uv and sync locked CPU narration toolchain
+        run: |
+          python -m pip install --disable-pip-version-check uv==0.10.0
+          uv sync --locked --project scripts/narration-runtime
+          node scripts/kokoro-runtime-environment.mjs
+
+      - name: Checkout exact Kokoro and Misaki source commits
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .runtime-src/kokoro .runtime-src/misaki
+
+          git -C .runtime-src/kokoro init
+          git -C .runtime-src/kokoro remote add origin https://github.com/hexgrad/kokoro.git
+          git -C .runtime-src/kokoro fetch --depth 1 origin dfb907a02bba8152ca444717ca5d78747ccb4bec
+          git -C .runtime-src/kokoro checkout --detach FETCH_HEAD
+          test "$(git -C .runtime-src/kokoro rev-parse HEAD)" = "dfb907a02bba8152ca444717ca5d78747ccb4bec"
+          test -z "$(git -C .runtime-src/kokoro status --porcelain --untracked-files=all)"
+
+          git -C .runtime-src/misaki init
+          git -C .runtime-src/misaki remote add origin https://github.com/hexgrad/misaki.git
+          git -C .runtime-src/misaki fetch --depth 1 origin fba1236595f2d2bf21d414ba6e57d25256afada3
+          git -C .runtime-src/misaki checkout --detach FETCH_HEAD
+          test "$(git -C .runtime-src/misaki rev-parse HEAD)" = "fba1236595f2d2bf21d414ba6e57d25256afada3"
+          test -z "$(git -C .runtime-src/misaki status --porcelain --untracked-files=all)"
+
+      - name: Download exact pinned local model assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          REVISION="a51e9e2a069a198cbda1f021f3805af3603ba92d"
+          BASE="https://huggingface.co/hexgrad/Kokoro-82M-v1.1-zh/resolve/${REVISION}"
+          mkdir -p .runtime-assets/voices
+
+          curl --fail --location --retry 4 --retry-delay 3 "${BASE}/config.json?download=true" --output .runtime-assets/config.json
+          curl --fail --location --retry 4 --retry-delay 3 "${BASE}/kokoro-v1_1-zh.pth?download=true" --output .runtime-assets/kokoro-v1_1-zh.pth
+          curl --fail --location --retry 4 --retry-delay 3 "${BASE}/voices/zf_001.pt?download=true" --output .runtime-assets/voices/zf_001.pt
+
+          test "$(sha256sum .runtime-assets/config.json | awk '{print $1}')" = "bc333efa5ce4ceff433c8c8e5d027a1eca0166001e4e4a62bea2d26ff7a46890"
+          test "$(wc -c < .runtime-assets/config.json | tr -d ' ')" = "3228"
+          test "$(sha256sum .runtime-assets/kokoro-v1_1-zh.pth | awk '{print $1}')" = "b1d8410fa44dfb5c15471fd6c4225ea6b4e9ac7fa03c98e8bea47a9928476e2b"
+          test "$(wc -c < .runtime-assets/kokoro-v1_1-zh.pth | tr -d ' ')" = "327247856"
+          test "$(sha256sum .runtime-assets/voices/zf_001.pt | awk '{print $1}')" = "9bdc9a87e13e9bb1ea3e7803259c2ecbfebaeeb2ff80b5d0c76df1a464c1c962"
+          node scripts/kokoro-provider-profile.mjs --check --assets-dir .runtime-assets
+
+      - name: Record immutable application state before canary
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "STATE_BEFORE=$(sha256sum content/narration-state.json | awk '{print $1}')" >> "$GITHUB_ENV"
+          git status --porcelain --untracked-files=all > /tmp/status-before.txt
+          test ! -s /tmp/status-before.txt
+
+      - name: Generate one real story batch in disposable CI workspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/generate-narration.mjs \
+            --story shou-zhu \
+            --assets-dir .runtime-assets \
+            --kokoro-src-dir .runtime-src/kokoro \
+            --misaki-src-dir .runtime-src/misaki \
+            --python scripts/narration-runtime/.venv/bin/python \
+            --ffmpeg ffmpeg \
+            --keep-work | tee canary-generation.log
+
+          RECEIPT="$(grep -oE 'content/evidence/narration/receipts/[A-Za-z0-9._-]+\.json' canary-generation.log | tail -1)"
+          test -n "$RECEIPT"
+          test -f "$RECEIPT"
+          echo "CANARY_RECEIPT=$RECEIPT" >> "$GITHUB_ENV"
+
+      - name: Validate receipt and importer without mutating narration state
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/import-narration-receipt.mjs --receipt "$CANARY_RECEIPT" | tee canary-import-dry-run.json
+          test "$(sha256sum content/narration-state.json | awk '{print $1}')" = "$STATE_BEFORE"
+          git diff --exit-code -- content/narration-state.json
+
+      - name: Probe real MP3 structure and non-silence
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/kokoro-canary-qc.mjs --receipt "$CANARY_RECEIPT" | tee canary-qc.json
+          node -e 'const r=require("./canary-qc.json"); if(!r.valid||r.itemCount!==9) process.exit(1); console.log(JSON.stringify({storyId:r.storyId,itemCount:r.itemCount,durationSeconds:r.durationSeconds,bytes:r.bytes},null,2))'
+
+      - name: Prove canary remains a maintenance-only asset-production run
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(sha256sum content/narration-state.json | awk '{print $1}')" = "$STATE_BEFORE"
+          test ! -d public/models
+          npm run build
+          if grep -R -E 'api\.openai\.com|api\.anthropic\.com|api\.x\.ai|huggingface\.co|KPipeline|onnxruntime|kokoro-local-waveform' dist >/tmp/runtime-model-leak.txt; then
+            cat /tmp/runtime-model-leak.txt
+            echo "Model or remote-inference token leaked into production bundle" >&2
+            exit 1
+          fi
+
+      - name: Package canary listening/QC artifact only
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p canary-artifact/audio canary-artifact/evidence
+          if compgen -G 'public/audio/shou-zhu/*.mp3' > /dev/null; then cp public/audio/shou-zhu/*.mp3 canary-artifact/audio/; fi
+          if [[ -n "${CANARY_RECEIPT:-}" && -f "$CANARY_RECEIPT" ]]; then cp "$CANARY_RECEIPT" canary-artifact/evidence/receipt.json; fi
+          for file in canary-generation.log canary-import-dry-run.json canary-qc.json; do
+            if [[ -f "$file" ]]; then cp "$file" canary-artifact/; fi
+          done
+          find canary-artifact -type f -maxdepth 3 -print
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kokoro-shou-zhu-canary
+          path: canary-artifact/
+          if-no-files-found: error
+          retention-days: 3
