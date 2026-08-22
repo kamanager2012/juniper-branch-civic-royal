@@ -77,7 +77,7 @@ test("receipt schema rejects ambiguous paths and duplicate narration entries", (
   assert.ok(result.problems.some((problem) => problem.includes("canonical public/audio")));
 });
 
-test("receipt import binds exact canonical text/audio pair and durable rights evidence", () => {
+test("receipt contract binds exact canonical text/audio pair and durable rights evidence", () => {
   const fixture = makeFixture();
   try {
     const durable = readNarrationReceipt(RECEIPT_PATH, { root: fixture.root });
@@ -111,7 +111,7 @@ test("receipt import binds exact canonical text/audio pair and durable rights ev
   }
 });
 
-test("text or audio mismatch prevents narration state import", () => {
+test("text or audio mismatch prevents narration state update", () => {
   const fixture = makeFixture();
   try {
     const durable = readNarrationReceipt(RECEIPT_PATH, { root: fixture.root });
