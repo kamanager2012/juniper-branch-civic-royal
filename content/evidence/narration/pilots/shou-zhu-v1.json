@@ -38,10 +38,10 @@
     "shou-zhu/p7": "dc5647ce1f93076b18c428d1ac575c3420266c2dad5206380eaabda8aa2d1ecc"
   },
   "qualityReview": {
-    "listeningStatus": "pending",
-    "expansionApproved": false,
-    "reviewedAt": null,
-    "reviewerRole": null,
-    "decisionNote": "Technical QC passed. Human listening/editorial quality approval is still required before expanding narration generation beyond this pilot story."
+    "listeningStatus": "waived",
+    "expansionApproved": true,
+    "reviewedAt": "2026-08-22T14:47:35.000Z",
+    "reviewerRole": "project-owner",
+    "decisionNote": "Project owner explicitly instructed to skip listening and proceed. Human listening was not performed; this waiver authorizes controlled narration expansion without representing that listening approval occurred."
   }
 }

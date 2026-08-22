@@ -11,14 +11,27 @@ import {
 } from "./narration-pilot-review.mjs";
 import { repoRoot } from "./story-model.mjs";
 
-const REVIEWED_AT = "2026-08-22T12:30:00.000Z";
+const REVIEWED_AT = "2026-08-22T14:39:00.000Z";
 const APPROVE_NOTE = "Human listening review confirmed pronunciation, pacing, intelligibility, and overall narration quality for controlled expansion.";
 const REJECT_NOTE = "Human listening review found pronunciation or pacing issues that must be corrected before narration generation is expanded.";
+const WAIVE_NOTE = "Project owner explicitly waived human listening and authorized controlled narration expansion without representing that listening occurred.";
+
+function pendingEvidence() {
+  const evidence = readNarrationPilotEvidence();
+  evidence.qualityReview = {
+    listeningStatus: "pending",
+    expansionApproved: false,
+    reviewedAt: null,
+    reviewerRole: null,
+    decisionNote: "Technical QC passed. Human quality-gate decision is still pending before narration expansion.",
+  };
+  return evidence;
+}
 
 function withEvidenceFile(run) {
   const dir = mkdtempSync(join(tmpdir(), "narration-pilot-review-"));
   const path = join(dir, "pilot.json");
-  const evidence = readNarrationPilotEvidence();
+  const evidence = pendingEvidence();
   writeFileSync(path, `${JSON.stringify(evidence, null, 2)}\n`);
   try {
     return run({ dir, path, evidence });
@@ -28,7 +41,7 @@ function withEvidenceFile(run) {
 }
 
 test("review decision builder requires explicit human decision metadata", () => {
-  assert.throws(() => buildNarrationPilotReviewDecision({ decision: "pending", reviewerRole: "project-owner", decisionNote: APPROVE_NOTE, reviewedAt: REVIEWED_AT }), /approve or reject/);
+  assert.throws(() => buildNarrationPilotReviewDecision({ decision: "pending", reviewerRole: "project-owner", decisionNote: APPROVE_NOTE, reviewedAt: REVIEWED_AT }), /approve, reject, or waive/);
   assert.throws(() => buildNarrationPilotReviewDecision({ decision: "approve", reviewerRole: "", decisionNote: APPROVE_NOTE, reviewedAt: REVIEWED_AT }), /reviewerRole/);
   assert.throws(() => buildNarrationPilotReviewDecision({ decision: "reject", reviewerRole: "project-owner", decisionNote: "too short", reviewedAt: REVIEWED_AT }), /at least 20/);
 });
@@ -78,6 +91,28 @@ test("approved write changes only qualityReview and persists a fully valid decis
   assert.equal(validation.expansionApproved, true);
 }));
 
+test("explicit waiver records no-listening authorization without pretending approval", () => withEvidenceFile(({ path }) => {
+  const result = reviewNarrationPilot({
+    evidencePath: path,
+    decision: "waive",
+    reviewerRole: "project-owner",
+    decisionNote: WAIVE_NOTE,
+    reviewedAt: REVIEWED_AT,
+    write: true,
+  });
+  assert.equal(result.listeningStatus, "waived");
+  assert.equal(result.expansionApproved, true);
+  const persisted = JSON.parse(readFileSync(path, "utf8"));
+  assert.deepEqual(persisted.qualityReview, {
+    listeningStatus: "waived",
+    expansionApproved: true,
+    reviewedAt: REVIEWED_AT,
+    reviewerRole: "project-owner",
+    decisionNote: WAIVE_NOTE,
+  });
+  assert.equal(validateNarrationPilotEvidence(persisted).valid, true);
+}));
+
 test("rejected write is durable, non-expanding, and cannot be overwritten in place", () => withEvidenceFile(({ path }) => {
   reviewNarrationPilot({
     evidencePath: path,
@@ -97,19 +132,19 @@ test("rejected write is durable, non-expanding, and cannot be overwritten in pla
     decision: "approve",
     reviewerRole: "project-owner",
     decisionNote: APPROVE_NOTE,
-    reviewedAt: "2026-08-22T13:00:00.000Z",
+    reviewedAt: "2026-08-22T15:00:00.000Z",
     write: true,
   }), /already finalized as rejected/);
   assert.equal(JSON.parse(readFileSync(path, "utf8")).qualityReview.listeningStatus, "rejected");
 }));
 
-test("review timestamp cannot predate the installed pilot receipt", () => {
-  const evidence = readNarrationPilotEvidence();
+test("decision timestamp cannot predate the installed pilot receipt", () => {
+  const evidence = pendingEvidence();
   assert.throws(() => prepareNarrationPilotReview({
     evidence,
-    decision: "approve",
+    decision: "waive",
     reviewerRole: "project-owner",
-    decisionNote: APPROVE_NOTE,
+    decisionNote: WAIVE_NOTE,
     reviewedAt: "2026-08-22T11:00:00.000Z",
   }), /cannot predate the installed pilot receipt/);
 });
@@ -122,9 +157,9 @@ test("durable evidence drift blocks review writes and leaves bytes untouched", (
 
   assert.throws(() => reviewNarrationPilot({
     evidencePath: path,
-    decision: "approve",
+    decision: "waive",
     reviewerRole: "project-owner",
-    decisionNote: APPROVE_NOTE,
+    decisionNote: WAIVE_NOTE,
     reviewedAt: REVIEWED_AT,
     write: true,
   }), /current evidence is invalid/);

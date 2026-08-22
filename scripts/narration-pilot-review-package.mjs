@@ -90,10 +90,12 @@ export function buildPilotReviewManifest(options = {}) {
     itemCount: items.length,
     items,
     reviewPolicy: {
-      humanListeningRequired: true,
+      humanListeningRecommended: true,
+      humanListeningMayBeExplicitlyWaived: true,
       packageCannotApproveExpansion: true,
       approvalCommand: "npm run narration:pilot:review -- --decision approve --reviewer-role <ROLE> --note <20+ CHAR NOTE> --write",
       rejectionCommand: "npm run narration:pilot:review -- --decision reject --reviewer-role <ROLE> --note <20+ CHAR NOTE> --write",
+      waiverCommand: "npm run narration:pilot:review -- --decision waive --reviewer-role <ROLE> --note <20+ CHAR NOTE> --write",
     },
   };
 }
@@ -139,7 +141,7 @@ export function renderPilotReviewHtml(manifest) {
 </head>
 <body>
 <header>
-  <div>Installed release audio · human listening gate</div>
+  <div>Installed release audio · human quality gate</div>
   <h1>${escapeHtml(manifest.storyTitle)}（${escapeHtml(manifest.pilotId)}）</h1>
   <div class="meta">
     <div>Batch: <code>${escapeHtml(manifest.installedBatch.batchId)}</code></div>
@@ -153,11 +155,13 @@ export function renderPilotReviewHtml(manifest) {
 ${itemCards}
 <section class="decision">
   <h2>最终人工决定</h2>
-  <p>只有你完成试听后，才在仓库执行下面其中一个命令。HTML 本身不会写 evidence。</p>
-  <strong>通过并允许扩容：</strong>
+  <p>HTML 本身不会写 evidence。试听后可通过或拒绝；项目负责人也可以明确记录“未试听但授权扩容”的 waiver，三种状态不能混写。</p>
+  <strong>试听通过并允许扩容：</strong>
   <code>${escapeHtml(manifest.reviewPolicy.approvalCommand)}</code>
   <strong>拒绝并保持扩容锁：</strong>
   <code>${escapeHtml(manifest.reviewPolicy.rejectionCommand)}</code>
+  <strong>明确跳过试听并授权扩容：</strong>
+  <code>${escapeHtml(manifest.reviewPolicy.waiverCommand)}</code>
 </section>
 <div class="progress" id="progress">0 / ${manifest.itemCount} 条标记通过</div>
 <script>
@@ -223,11 +227,11 @@ export function writePilotReviewPackage(options = {}) {
   writeFileSync(
     join(outDir, "README.txt"),
     [
-      `${manifest.storyTitle} narration pilot listening review`,
+      `${manifest.storyTitle} narration pilot quality-gate review`,
       "",
-      "Open review.html in a browser and listen to all 9 installed release MP3 files.",
+      "Open review.html in a browser to listen to the 9 installed release MP3 files if performing listening review.",
       "The package generator verifies every MP3 against durable pilot evidence before copying it.",
-      "This package never generates audio and never approves expansion.",
+      "This package never generates audio and never approves or waives expansion by itself.",
       "",
       `manifest sha256: ${sha256File(manifestPath)}`,
       `pilot receipt sha256: ${manifest.installedBatch.receiptSha256}`,

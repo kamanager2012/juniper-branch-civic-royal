@@ -20,8 +20,8 @@ function requiredText(value, label) {
 }
 
 export function buildNarrationPilotReviewDecision({ decision, reviewerRole, decisionNote, reviewedAt }) {
-  if (decision !== "approve" && decision !== "reject") {
-    throw new Error("Review decision must be exactly approve or reject");
+  if (!["approve", "reject", "waive"].includes(decision)) {
+    throw new Error("Review decision must be exactly approve, reject, or waive");
   }
   const role = requiredText(reviewerRole, "reviewerRole");
   const note = requiredText(decisionNote, "decisionNote");
@@ -32,9 +32,10 @@ export function buildNarrationPilotReviewDecision({ decision, reviewerRole, deci
     throw new Error("reviewedAt must be a valid timestamp");
   }
 
+  const listeningStatus = decision === "approve" ? "approved" : decision === "reject" ? "rejected" : "waived";
   return {
-    listeningStatus: decision === "approve" ? "approved" : "rejected",
-    expansionApproved: decision === "approve",
+    listeningStatus,
+    expansionApproved: decision !== "reject",
     reviewedAt: new Date(timestamp).toISOString(),
     reviewerRole: role,
     decisionNote: note,
@@ -142,12 +143,12 @@ async function cliMain() {
   const decisionNote = argValue("--note");
   const write = process.argv.includes("--write");
   if (process.argv.includes("--reviewed-at")) {
-    throw new Error("--reviewed-at is not supported; review time is generated when the human decision is recorded");
+    throw new Error("--reviewed-at is not supported; decision time is generated when the human decision is recorded");
   }
 
   const result = reviewNarrationPilot({ decision, reviewerRole, decisionNote, write });
   console.log(JSON.stringify(result, null, 2));
-  if (!write) console.error("Dry-run only. Re-run with --write after confirming the human listening/editorial decision.");
+  if (!write) console.error("Dry-run only. Re-run with --write after confirming the human quality-gate decision (approve, reject, or waive).");
 }
 
 if (process.argv[1]?.endsWith("narration-pilot-review.mjs")) {

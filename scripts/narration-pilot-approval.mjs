@@ -141,8 +141,8 @@ export function validateNarrationPilotEvidence(evidence, options = {}) {
   if (!review || typeof review !== "object" || Array.isArray(review)) {
     problems.push("qualityReview must be an object");
   } else {
-    const allowedStatus = new Set(["pending", "approved", "rejected"]);
-    if (!allowedStatus.has(review.listeningStatus)) problems.push("qualityReview.listeningStatus must be pending/approved/rejected");
+    const allowedStatus = new Set(["pending", "approved", "rejected", "waived"]);
+    if (!allowedStatus.has(review.listeningStatus)) problems.push("qualityReview.listeningStatus must be pending/approved/rejected/waived");
     if (typeof review.expansionApproved !== "boolean") problems.push("qualityReview.expansionApproved must be boolean");
 
     if (review.listeningStatus === "pending") {
@@ -151,16 +151,16 @@ export function validateNarrationPilotEvidence(evidence, options = {}) {
       if (review.reviewerRole !== null) problems.push("pending listening review must keep reviewerRole null");
     }
 
-    if (review.listeningStatus === "approved" || review.listeningStatus === "rejected") {
+    if (["approved", "rejected", "waived"].includes(review.listeningStatus)) {
       const label = review.listeningStatus;
       const reviewedAtMs = nonEmpty(review.reviewedAt) ? Date.parse(review.reviewedAt) : Number.NaN;
-      if (Number.isNaN(reviewedAtMs)) problems.push(`${label} review requires a valid reviewedAt timestamp`);
+      if (Number.isNaN(reviewedAtMs)) problems.push(`${label} decision requires a valid reviewedAt timestamp`);
       if (receiptCreatedAt && !Number.isNaN(reviewedAtMs) && reviewedAtMs < Date.parse(receiptCreatedAt)) {
-        problems.push(`${label} review cannot predate the installed pilot receipt`);
+        problems.push(`${label} decision cannot predate the installed pilot receipt`);
       }
-      if (!nonEmpty(review.reviewerRole)) problems.push(`${label} review requires reviewerRole`);
+      if (!nonEmpty(review.reviewerRole)) problems.push(`${label} decision requires reviewerRole`);
       if (!nonEmpty(review.decisionNote) || review.decisionNote.trim().length < 20) {
-        problems.push(`${label} review requires a substantive decisionNote`);
+        problems.push(`${label} decision requires a substantive decisionNote`);
       }
     }
 
@@ -170,8 +170,11 @@ export function validateNarrationPilotEvidence(evidence, options = {}) {
     if (review.listeningStatus === "rejected" && review.expansionApproved !== false) {
       problems.push("rejected listening review cannot approve expansion");
     }
-    if (review.expansionApproved === true && review.listeningStatus !== "approved") {
-      problems.push("expansionApproved requires listeningStatus=approved");
+    if (review.listeningStatus === "waived" && review.expansionApproved !== true) {
+      problems.push("explicit owner waiver must explicitly approve expansion");
+    }
+    if (review.expansionApproved === true && !["approved", "waived"].includes(review.listeningStatus)) {
+      problems.push("expansionApproved requires listeningStatus=approved or waived");
     }
   }
 
@@ -199,7 +202,7 @@ export function assertNarrationExpansionAllowed(scope, options = {}) {
   const result = validateCurrentNarrationPilot(options);
   if (!result.valid) throw new Error(`Narration expansion is blocked because pilot evidence is invalid:\n${result.problems.join("\n")}`);
   if (!result.expansionApproved) {
-    throw new Error(`Narration expansion is blocked: ${NARRATION_PILOT_ID} listening/editorial quality review is ${result.listeningStatus ?? "unknown"}. Approve the durable pilot evidence before generating other stories or --all.`);
+    throw new Error(`Narration expansion is blocked: ${NARRATION_PILOT_ID} quality gate decision is ${result.listeningStatus ?? "unknown"}. Approve or explicitly waive the durable pilot gate before generating other stories or --all.`);
   }
   return { allowed: true, pilotOnly: false, expansionApproved: true };
 }

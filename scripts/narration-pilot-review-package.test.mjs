@@ -29,18 +29,19 @@ function controlledHashes() {
 }
 
 test("installed pilot review manifest binds exactly nine current release MP3 files to durable evidence", () => {
-  const manifest = buildPilotReviewManifest();
+  const validation = validateCurrentNarrationPilot();
+  assert.equal(validation.valid, true, validation.problems.join("; "));
+  const manifest = buildPilotReviewManifest({ validation });
   assert.equal(manifest.packageType, "installed-narration-pilot-listening-review");
   assert.equal(manifest.pilotId, "shou-zhu-kokoro-v1");
   assert.equal(manifest.storyId, "shou-zhu");
   assert.equal(manifest.itemCount, 9);
-  assert.equal(manifest.qualityReview.listeningStatus, "pending");
-  assert.equal(manifest.qualityReview.expansionApproved, false);
-  assert.equal(manifest.reviewPolicy.humanListeningRequired, true);
+  assert.deepEqual(manifest.qualityReview, validation.evidence.qualityReview);
+  assert.equal(manifest.reviewPolicy.humanListeningRecommended, true);
+  assert.equal(manifest.reviewPolicy.humanListeningMayBeExplicitlyWaived, true);
   assert.equal(manifest.reviewPolicy.packageCannotApproveExpansion, true);
+  assert.match(manifest.reviewPolicy.waiverCommand, /--decision waive/);
 
-  const validation = validateCurrentNarrationPilot();
-  assert.equal(validation.valid, true);
   const evidenceShas = validation.evidence.audioSha256;
   assert.deepEqual(
     manifest.items.map((item) => item.key).sort(),
@@ -63,6 +64,7 @@ test("review HTML is offline-only and exposes exact text plus local audio contro
   assert.match(html, /本包只复制仓库当前已安装的 release MP3/);
   assert.match(html, /它不会调用 Kokoro/);
   assert.match(html, /HTML 本身不会写 evidence/);
+  assert.match(html, /未试听但授权扩容/);
 
   for (const item of manifest.items) {
     assert.ok(html.includes(`src="${item.reviewFile}"`));
@@ -76,11 +78,12 @@ test("review package copies installed evidence-bound audio without mutating cont
   const outDir = join(repoRoot, ".tmp-pilot-review-package-test");
   rmSync(outDir, { recursive: true, force: true });
   const before = controlledHashes();
+  const validation = validateCurrentNarrationPilot();
   try {
     const result = writePilotReviewPackage({ outDir });
     assert.equal(result.itemCount, 9);
-    assert.equal(result.listeningStatus, "pending");
-    assert.equal(result.expansionApproved, false);
+    assert.equal(result.listeningStatus, validation.listeningStatus);
+    assert.equal(result.expansionApproved, validation.expansionApproved);
 
     for (const name of ["manifest.json", "review.html", "README.txt", "evidence/pilot.json", "evidence/receipt.json"]) {
       assert.equal(existsSync(join(outDir, name)), true, `${name} must exist`);

@@ -1,0 +1,297 @@
+name: narration production expansion
+
+on:
+  push:
+    branches:
+      - feat/narration-story-batch-expansion
+
+permissions:
+  contents: write
+
+concurrency:
+  group: narration-production-expansion
+  cancel-in-progress: false
+
+jobs:
+  expand:
+    if: >-
+      github.repository == 'kamanager2012/juniper-branch-civic-royal' &&
+      github.actor == 'kamanager2012' &&
+      github.event.before == '9198e04346eeee8a6265cb98f4da67cb3c2f4874' &&
+      contains(github.event.head_commit.message, '[run-narration-production]')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 1
+
+      - name: Prove this is the one authorized branch transition
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/feat/narration-story-batch-expansion"
+          test "$GITHUB_ACTOR" = "kamanager2012"
+          test "${{ github.event.before }}" = "9198e04346eeee8a6265cb98f4da67cb3c2f4874"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          REMOTE_HEAD="$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)"
+          test "$REMOTE_HEAD" = "$GITHUB_SHA"
+          git diff --exit-code
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install Node dependencies for Node 20 gate
+        run: npm ci
+
+      - name: Full candidate gate on Node 20
+        run: npm run check
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Reinstall Node dependencies for Node 22 gate
+        run: npm ci
+
+      - name: Full candidate gate on Node 22
+        run: npm run check
+
+      - name: Dependency audit
+        run: npm audit --audit-level=high
+
+      - name: Install Chromium and run desktop/mobile E2E
+        run: |
+          npx playwright install --with-deps chromium
+          npm run test:e2e
+
+      - name: Verify approved 23-story production plan and protect the installed pilot
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run narration:pilot:check
+          node scripts/generate-narration-pending-stories.mjs --summary > /tmp/narration-pre-plan.json
+          node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+          const plan = JSON.parse(readFileSync("/tmp/narration-pre-plan.json", "utf8"));
+          if (plan.totalStories !== 24) throw new Error(`expected 24 total stories, got ${plan.totalStories}`);
+          if (plan.currentStoryCount !== 1 || plan.currentItemCount !== 9) throw new Error("expected exactly one protected current story / 9 items");
+          if (plan.pendingStoryCount !== 23 || plan.pendingItemCount !== 207) throw new Error("expected exactly 23 pending stories / 207 items");
+          if (plan.currentStories.length !== 1 || plan.currentStories[0].storyId !== "shou-zhu") throw new Error("shou-zhu must be the sole protected current story");
+          if (plan.pendingStories.some((story) => story.storyId === "shou-zhu" || story.itemCount !== 9)) throw new Error("pending scope contains an unsafe story batch");
+          NODE
+
+          find public/audio/shou-zhu -maxdepth 1 -type f -name '*.mp3' -print0 | sort -z | xargs -0 sha256sum > /tmp/shou-zhu-before.sha256
+          test "$(wc -l < /tmp/shou-zhu-before.sha256 | tr -d ' ')" = "9"
+          sha256sum content/evidence/narration/pilots/shou-zhu-v1.json > /tmp/shou-zhu-evidence-before.sha256
+          find content/evidence/narration/receipts -maxdepth 1 -type f -name '*.json' -printf '%f\n' | sort > /tmp/receipts-before.txt
+          git diff --exit-code
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Install pinned uv
+        run: |
+          python -m pip install --disable-pip-version-check uv==0.10.0
+          test "$(uv cache dir)" = "$HOME/.cache/uv"
+
+      - name: Restore locked narration uv package cache
+        id: narration-uv-cache
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ~/.cache/uv
+          key: kokoro-uv-packages-v1-${{ runner.os }}-${{ runner.arch }}-py312-uv0.10.0-${{ hashFiles('scripts/narration-runtime/pyproject.toml', 'scripts/narration-runtime/uv.lock') }}
+
+      - name: Sync locked CPU narration toolchain from lockfile
+        run: |
+          rm -rf scripts/narration-runtime/.venv
+          uv sync --locked --project scripts/narration-runtime
+          node scripts/kokoro-runtime-environment.mjs
+
+      - name: Install exact approved MP3 encoder/probe tooling
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ffmpeg=7:6.1.1-3ubuntu5 \
+            libavcodec60=7:6.1.1-3ubuntu5 \
+            libavformat60=7:6.1.1-3ubuntu5 \
+            libavutil58=7:6.1.1-3ubuntu5 \
+            libswresample4=7:6.1.1-3ubuntu5 \
+            libmp3lame0=3.100-6build1
+          node scripts/narration-encoder-profile.mjs --local
+
+      - name: Checkout exact Kokoro and Misaki source commits
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .runtime-src/kokoro .runtime-src/misaki
+
+          git -C .runtime-src/kokoro init
+          git -C .runtime-src/kokoro remote add origin https://github.com/hexgrad/kokoro.git
+          git -C .runtime-src/kokoro fetch --depth 1 origin dfb907a02bba8152ca444717ca5d78747ccb4bec
+          git -C .runtime-src/kokoro checkout --detach FETCH_HEAD
+          test "$(git -C .runtime-src/kokoro rev-parse HEAD)" = "dfb907a02bba8152ca444717ca5d78747ccb4bec"
+          test -z "$(git -C .runtime-src/kokoro status --porcelain --untracked-files=all)"
+
+          git -C .runtime-src/misaki init
+          git -C .runtime-src/misaki remote add origin https://github.com/hexgrad/misaki.git
+          git -C .runtime-src/misaki fetch --depth 1 origin fba1236595f2d2bf21d414ba6e57d25256afada3
+          git -C .runtime-src/misaki checkout --detach FETCH_HEAD
+          test "$(git -C .runtime-src/misaki rev-parse HEAD)" = "fba1236595f2d2bf21d414ba6e57d25256afada3"
+          test -z "$(git -C .runtime-src/misaki status --porcelain --untracked-files=all)"
+
+      - name: Restore exact pinned model asset cache
+        id: kokoro-assets-cache
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: .runtime-assets
+          key: kokoro-local-assets-v1-${{ hashFiles('content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json') }}
+
+      - name: Download exact pinned local model assets on cache miss
+        if: steps.kokoro-assets-cache.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          REVISION="a51e9e2a069a198cbda1f021f3805af3603ba92d"
+          BASE="https://huggingface.co/hexgrad/Kokoro-82M-v1.1-zh/resolve/${REVISION}"
+          mkdir -p .runtime-assets/voices
+          curl --fail --location --retry 4 --retry-delay 3 "${BASE}/config.json?download=true" --output .runtime-assets/config.json
+          curl --fail --location --retry 4 --retry-delay 3 "${BASE}/kokoro-v1_1-zh.pth?download=true" --output .runtime-assets/kokoro-v1_1-zh.pth
+          curl --fail --location --retry 4 --retry-delay 3 "${BASE}/voices/zf_001.pt?download=true" --output .runtime-assets/voices/zf_001.pt
+
+      - name: Verify exact pinned model assets after restore or download
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t ASSET_FILES < <(find .runtime-assets -type f -printf '%P\n' | sort)
+          test "${#ASSET_FILES[@]}" = "3"
+          test "${ASSET_FILES[0]}" = "config.json"
+          test "${ASSET_FILES[1]}" = "kokoro-v1_1-zh.pth"
+          test "${ASSET_FILES[2]}" = "voices/zf_001.pt"
+          test "$(sha256sum .runtime-assets/config.json | awk '{print $1}')" = "bc333efa5ce4ceff433c8c8e5d027a1eca0166001e4e4a62bea2d26ff7a46890"
+          test "$(wc -c < .runtime-assets/config.json | tr -d ' ')" = "3228"
+          test "$(sha256sum .runtime-assets/kokoro-v1_1-zh.pth | awk '{print $1}')" = "b1d8410fa44dfb5c15471fd6c4225ea6b4e9ac7fa03c98e8bea47a9928476e2b"
+          test "$(wc -c < .runtime-assets/kokoro-v1_1-zh.pth | tr -d ' ')" = "327247856"
+          test "$(sha256sum .runtime-assets/voices/zf_001.pt | awk '{print $1}')" = "9bdc9a87e13e9bb1ea3e7803259c2ecbfebaeeb2ff80b5d0c76df1a464c1c962"
+          node scripts/kokoro-provider-profile.mjs --check --assets-dir .runtime-assets
+
+      - name: Generate and import the 23 approved story batches exactly once
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/generate-narration-pending-stories.mjs \
+            --execute \
+            --assets-dir .runtime-assets \
+            --kokoro-src-dir .runtime-src/kokoro \
+            --misaki-src-dir .runtime-src/misaki \
+            --python scripts/narration-runtime/.venv/bin/python \
+            --ffmpeg /usr/bin/ffmpeg \
+            | tee /tmp/narration-production.log
+
+      - name: Prove protected pilot stayed byte-identical and expansion is complete
+        shell: bash
+        run: |
+          set -euo pipefail
+          find public/audio/shou-zhu -maxdepth 1 -type f -name '*.mp3' -print0 | sort -z | xargs -0 sha256sum > /tmp/shou-zhu-after.sha256
+          cmp /tmp/shou-zhu-before.sha256 /tmp/shou-zhu-after.sha256
+          sha256sum content/evidence/narration/pilots/shou-zhu-v1.json > /tmp/shou-zhu-evidence-after.sha256
+          cmp /tmp/shou-zhu-evidence-before.sha256 /tmp/shou-zhu-evidence-after.sha256
+
+          node scripts/generate-narration-pending-stories.mjs --summary > /tmp/narration-post-plan.json
+          node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+          const plan = JSON.parse(readFileSync("/tmp/narration-post-plan.json", "utf8"));
+          if (plan.totalStories !== 24) throw new Error(`expected 24 total stories, got ${plan.totalStories}`);
+          if (plan.currentStoryCount !== 24 || plan.currentItemCount !== 216) throw new Error("expected all 24 stories / 216 narration items to be current");
+          if (plan.pendingStoryCount !== 0 || plan.pendingItemCount !== 0) throw new Error("pending narration remains after production expansion");
+          NODE
+
+          find content/evidence/narration/receipts -maxdepth 1 -type f -name '*.json' -printf '%f\n' | sort > /tmp/receipts-after.txt
+          comm -13 /tmp/receipts-before.txt /tmp/receipts-after.txt > /tmp/receipts-new.txt
+          test "$(wc -l < /tmp/receipts-new.txt | tr -d ' ')" = "23"
+
+      - name: Run structural and non-silence QC for every new receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .narration-work/production-qc
+          while IFS= read -r receipt; do
+            test -n "$receipt"
+            node scripts/kokoro-canary-qc.mjs \
+              --receipt "content/evidence/narration/receipts/$receipt" \
+              --ffprobe /usr/bin/ffprobe \
+              --ffmpeg /usr/bin/ffmpeg \
+              > ".narration-work/production-qc/${receipt%.json}.json"
+          done < /tmp/receipts-new.txt
+          test "$(find .narration-work/production-qc -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')" = "23"
+
+      - name: Stage and exact-account the 231 production files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add content/narration-state.json content/evidence/narration/receipts public/audio
+          git diff --exit-code
+          git diff --cached --name-only > /tmp/staged-paths.txt
+          git diff --cached --name-status > /tmp/staged-status.txt
+
+          node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+          const lines = (path) => readFileSync(path, "utf8").trim().split("\n").filter(Boolean);
+          const paths = lines("/tmp/staged-paths.txt");
+          const statusRows = lines("/tmp/staged-status.txt");
+          const newReceipts = lines("/tmp/receipts-new.txt").sort();
+
+          if (paths.length !== 231) throw new Error(`expected exactly 231 staged production files, got ${paths.length}`);
+          if (statusRows.length !== 231) throw new Error(`expected exactly 231 staged status rows, got ${statusRows.length}`);
+          for (const row of statusRows) {
+            const status = row.split(/\s+/)[0];
+            if (status !== "A" && status !== "M") throw new Error(`unexpected staged status ${status}: ${row}`);
+          }
+
+          const state = paths.filter((path) => path === "content/narration-state.json");
+          const receipts = paths.filter((path) => path.startsWith("content/evidence/narration/receipts/") && path.endsWith(".json"));
+          const audio = paths.filter((path) => /^public\/audio\/[^/]+\/(?:moral|p[0-7])\.mp3$/.test(path));
+          if (state.length !== 1) throw new Error(`expected one narration state file, got ${state.length}`);
+          if (receipts.length !== 23) throw new Error(`expected 23 new receipt files, got ${receipts.length}`);
+          if (audio.length !== 207) throw new Error(`expected 207 narration MP3 files, got ${audio.length}`);
+          if (audio.some((path) => path.startsWith("public/audio/shou-zhu/"))) throw new Error("protected shou-zhu audio entered production diff");
+          if (state.length + receipts.length + audio.length !== paths.length) throw new Error("unexpected staged production path exists");
+
+          const receiptNames = receipts.map((path) => path.split("/").at(-1)).sort();
+          if (JSON.stringify(receiptNames) !== JSON.stringify(newReceipts)) throw new Error("staged receipt set differs from the 23 receipts created by this run");
+
+          const byStory = new Map();
+          for (const path of audio) {
+            const story = path.split("/")[2];
+            byStory.set(story, (byStory.get(story) ?? 0) + 1);
+          }
+          if (byStory.size !== 23) throw new Error(`expected MP3 changes for 23 stories, got ${byStory.size}`);
+          for (const [story, count] of byStory) {
+            if (count !== 9) throw new Error(`${story}: expected exactly 9 changed MP3 files, got ${count}`);
+          }
+          NODE
+
+      - name: Final release checks on the staged production tree
+        run: |
+          npm run check
+          npm run release:check
+
+      - name: Commit only the verified production assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          REMOTE_HEAD="$(git ls-remote origin "refs/heads/${GITHUB_REF_NAME}" | cut -f1)"
+          test "$REMOTE_HEAD" = "$GITHUB_SHA"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "assets: install verified narration expansion"
+          test "$(git rev-parse HEAD^)" = "$GITHUB_SHA"
+          git status --porcelain --untracked-files=no | test ! -s /dev/stdin
+          git push origin "HEAD:${GITHUB_REF_NAME}"
