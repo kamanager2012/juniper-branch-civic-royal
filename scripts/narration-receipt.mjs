@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { relative, resolve } from "node:path";
+import { computeNarrationInputDigest } from "./narration-generation-set.mjs";
 import { repoRoot } from "./story-model.mjs";
 
 const ALLOWED_CLAIMS = new Set(["owned", "licensed", "public-domain", "permission"]);
@@ -51,6 +52,12 @@ export function validateNarrationReceipt(receipt) {
   }
   if (!nonEmpty(receipt.createdAt) || Number.isNaN(Date.parse(receipt.createdAt))) {
     problems.push("createdAt must be an ISO-compatible timestamp");
+  }
+  if (!Number.isInteger(receipt.inputItemCount) || receipt.inputItemCount < 1 || receipt.inputItemCount > 216) {
+    problems.push("inputItemCount must be an integer between 1 and 216");
+  }
+  if (typeof receipt.inputDigestSha256 !== "string" || !/^[a-f0-9]{64}$/.test(receipt.inputDigestSha256)) {
+    problems.push("inputDigestSha256 must be lowercase SHA-256");
   }
 
   const provider = receipt.provider;
@@ -104,6 +111,14 @@ export function validateNarrationReceipt(receipt) {
       if (typeof item.audioSha256 !== "string" || !/^[a-f0-9]{64}$/.test(item.audioSha256)) {
         problems.push(`${prefix}.audioSha256 must be lowercase SHA-256`);
       }
+    }
+
+    if (receipt.inputItemCount !== receipt.items.length) {
+      problems.push("inputItemCount must exactly match items.length");
+    }
+    const computedInputDigest = computeNarrationInputDigest(receipt.items);
+    if (receipt.inputDigestSha256 !== computedInputDigest) {
+      problems.push("inputDigestSha256 does not match the receipt narration input set");
     }
   }
 
