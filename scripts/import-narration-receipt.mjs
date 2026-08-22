@@ -15,13 +15,13 @@ function looksLikeMp3(buffer) {
   return buffer.length >= 2 && buffer[0] === 0xff && (buffer[1] & 0xe0) === 0xe0;
 }
 
-function validateEvidenceReference(value) {
+function validateEvidenceReference(value, root = repoRoot) {
   if (typeof value !== "string" || value.trim() === "") return "rights evidence must be a non-empty string";
   const reference = value.trim();
   if (/^https:\/\//i.test(reference)) return null;
   if (/^[a-z][a-z0-9+.-]*:\/\//i.test(reference)) return "external rights evidence URLs must use HTTPS";
   if (!safeRelativePath(reference)) return "local rights evidence must be a safe repository-relative path";
-  const absolute = join(repoRoot, reference);
+  const absolute = join(root, reference);
   if (!existsSync(absolute)) return `local rights evidence does not exist: ${reference}`;
   const stat = statSync(absolute);
   if (!stat.isFile()) return `local rights evidence is not a file: ${reference}`;
@@ -29,13 +29,13 @@ function validateEvidenceReference(value) {
   return null;
 }
 
-export function buildNarrationStateFromReceipt({ receipt, receiptPath, receiptSha256, plan, state, replace = false }) {
+export function buildNarrationStateFromReceipt({ receipt, receiptPath, receiptSha256, plan, state, replace = false, root = repoRoot }) {
   const problems = [];
   const byKey = new Map(plan.items.map((item) => [item.key, item]));
   const nextEntries = { ...state.entries };
 
   for (const evidence of receipt.rights.evidence) {
-    const problem = validateEvidenceReference(evidence);
+    const problem = validateEvidenceReference(evidence, root);
     if (problem) problems.push(problem);
   }
 
@@ -57,7 +57,7 @@ export function buildNarrationStateFromReceipt({ receipt, receiptPath, receiptSh
       problems.push(`${receiptItem.key}: receipt audio SHA-256 does not match release MP3`);
     }
 
-    const audioPath = join(repoRoot, canonical.output);
+    const audioPath = join(root, canonical.output);
     if (existsSync(audioPath)) {
       const audio = readFileSync(audioPath);
       if (audio.length < 1000 || !looksLikeMp3(audio)) {
