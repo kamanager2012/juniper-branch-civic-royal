@@ -26,8 +26,6 @@ export function buildNarrationProvenanceEntries(narrationAssets, plan = buildNar
       continue;
     }
 
-    // Current is necessary but not sufficient: the exact text/audio pair must
-    // also be backed by a durable repository receipt carrying rights metadata.
     if (item.status !== "current") continue;
     const state = item.provenance;
     if (!state || !state.rightsClaim) continue;
@@ -37,6 +35,8 @@ export function buildNarrationProvenanceEntries(narrationAssets, plan = buildNar
     if (!Array.isArray(state.rightsEvidence) || state.rightsEvidence.length === 0 || state.rightsEvidence.some((value) => typeof value !== "string" || value.trim() === "")) {
       problems.push("rightsEvidence must be a non-empty string array");
     }
+    if (!Number.isInteger(state.inputItemCount) || state.inputItemCount < 1 || state.inputItemCount > 216) problems.push("inputItemCount must be an integer between 1 and 216");
+    if (typeof state.inputDigestSha256 !== "string" || !/^[a-f0-9]{64}$/.test(state.inputDigestSha256)) problems.push("inputDigestSha256 must be lowercase SHA-256");
     if (typeof state.receiptPath !== "string" || state.receiptPath.trim() === "") problems.push("receiptPath must be non-empty");
     if (typeof state.receiptSha256 !== "string" || !/^[a-f0-9]{64}$/.test(state.receiptSha256)) problems.push("receiptSha256 must be lowercase SHA-256");
     if (state.textSha256 !== item.textSha256) problems.push("receipt-backed text hash no longer matches canonical narration text");
@@ -58,6 +58,8 @@ export function buildNarrationProvenanceEntries(narrationAssets, plan = buildNar
       if (receiptSha256 !== state.receiptSha256) problems.push("receipt SHA-256 no longer matches narration state");
       if (receiptPath !== state.receiptPath) problems.push("receipt path normalization changed");
       if (receipt.batchId !== state.batchId) problems.push("receipt batchId no longer matches narration state");
+      if (receipt.inputItemCount !== state.inputItemCount) problems.push("receipt input item count no longer matches narration state");
+      if (receipt.inputDigestSha256 !== state.inputDigestSha256) problems.push("receipt input digest no longer matches narration state");
       if (receipt.provider.name !== state.provider) problems.push("receipt provider no longer matches narration state");
       if (receipt.provider.voice !== state.voice) problems.push("receipt voice no longer matches narration state");
       if (receipt.provider.language !== state.language) problems.push("receipt language no longer matches narration state");

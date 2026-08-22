@@ -84,6 +84,8 @@ export function buildNarrationStateFromReceipt({ receipt, receiptPath, receiptSh
       audioSha256: receiptItem.audioSha256,
       generatedAt: receipt.createdAt,
       batchId: receipt.batchId,
+      inputItemCount: receipt.inputItemCount,
+      inputDigestSha256: receipt.inputDigestSha256,
       receiptPath,
       receiptSha256,
       rightsClaim: receipt.rights.claim,
@@ -138,6 +140,8 @@ if (process.argv[1]?.endsWith("import-narration-receipt.mjs")) {
     receiptPath: result.receiptPath,
     receiptSha256: result.receiptSha256,
     batchId: result.receipt.batchId,
+    inputItemCount: result.receipt.inputItemCount,
+    inputDigestSha256: result.receipt.inputDigestSha256,
     imported: result.imported,
     mode: write ? "write" : "dry-run",
   }, null, 2));

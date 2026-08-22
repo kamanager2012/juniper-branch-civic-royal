@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "evidenceType": "narration-generation-input-set",
+  "canonicalSource": "content/published-stories.json",
+  "scope": "all-published-story-pages",
+  "inputItemCount": 216,
+  "inputDigestSha256": "a17d000ac3d82fa53576fc83f0e4653e00aba6573c1209557d3f9c2925262828",
+  "digestProjection": [
+    "key",
+    "file",
+    "textSha256"
+  ],
+  "ordering": "ascending key via localeCompare",
+  "generatedBy": "scripts/narration-generation-set.mjs",
+  "purpose": "Pin the exact canonical narration inputs before any replacement audio is generated. A canonical text/path change requires a new reviewed input-set identity before narration receipts can be accepted."
+}
