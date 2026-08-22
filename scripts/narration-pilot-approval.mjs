@@ -77,6 +77,7 @@ export function validateNarrationPilotEvidence(evidence, options = {}) {
   }
 
   let durable = null;
+  let receiptCreatedAt = null;
   if (installed?.receiptPath) {
     try {
       const readReceipt = options.readReceipt ?? ((path) => readNarrationReceipt(path, { root: options.root ?? repoRoot }));
@@ -96,6 +97,11 @@ export function validateNarrationPilotEvidence(evidence, options = {}) {
     if (receipt.provider?.name !== "kokoro-local") problems.push("pilot receipt provider must remain kokoro-local");
     if (receipt.provider?.voice !== "zf_001") problems.push("pilot receipt voice must remain zf_001");
     if (receipt.rights?.claim !== "permission") problems.push("pilot receipt rights claim must remain permission");
+    if (!nonEmpty(receipt.createdAt) || Number.isNaN(Date.parse(receipt.createdAt))) {
+      problems.push("pilot receipt createdAt must remain a valid timestamp");
+    } else {
+      receiptCreatedAt = receipt.createdAt;
+    }
     if (!Array.isArray(receipt.items) || receipt.items.length !== 9) {
       problems.push("pilot receipt must contain exactly 9 items");
     } else {
@@ -138,19 +144,34 @@ export function validateNarrationPilotEvidence(evidence, options = {}) {
     const allowedStatus = new Set(["pending", "approved", "rejected"]);
     if (!allowedStatus.has(review.listeningStatus)) problems.push("qualityReview.listeningStatus must be pending/approved/rejected");
     if (typeof review.expansionApproved !== "boolean") problems.push("qualityReview.expansionApproved must be boolean");
-    if (review.expansionApproved === true) {
-      if (review.listeningStatus !== "approved") problems.push("expansionApproved requires listeningStatus=approved");
-      if (!nonEmpty(review.reviewedAt) || Number.isNaN(Date.parse(review.reviewedAt))) problems.push("approved expansion requires a valid reviewedAt timestamp");
-      if (!nonEmpty(review.reviewerRole)) problems.push("approved expansion requires reviewerRole");
-      if (!nonEmpty(review.decisionNote) || review.decisionNote.trim().length < 20) problems.push("approved expansion requires a substantive decisionNote");
-    }
+
     if (review.listeningStatus === "pending") {
       if (review.expansionApproved !== false) problems.push("pending listening review cannot approve expansion");
       if (review.reviewedAt !== null) problems.push("pending listening review must keep reviewedAt null");
       if (review.reviewerRole !== null) problems.push("pending listening review must keep reviewerRole null");
     }
+
+    if (review.listeningStatus === "approved" || review.listeningStatus === "rejected") {
+      const label = review.listeningStatus;
+      const reviewedAtMs = nonEmpty(review.reviewedAt) ? Date.parse(review.reviewedAt) : Number.NaN;
+      if (Number.isNaN(reviewedAtMs)) problems.push(`${label} review requires a valid reviewedAt timestamp`);
+      if (receiptCreatedAt && !Number.isNaN(reviewedAtMs) && reviewedAtMs < Date.parse(receiptCreatedAt)) {
+        problems.push(`${label} review cannot predate the installed pilot receipt`);
+      }
+      if (!nonEmpty(review.reviewerRole)) problems.push(`${label} review requires reviewerRole`);
+      if (!nonEmpty(review.decisionNote) || review.decisionNote.trim().length < 20) {
+        problems.push(`${label} review requires a substantive decisionNote`);
+      }
+    }
+
+    if (review.listeningStatus === "approved" && review.expansionApproved !== true) {
+      problems.push("approved listening review must explicitly approve expansion");
+    }
     if (review.listeningStatus === "rejected" && review.expansionApproved !== false) {
       problems.push("rejected listening review cannot approve expansion");
+    }
+    if (review.expansionApproved === true && review.listeningStatus !== "approved") {
+      problems.push("expansionApproved requires listeningStatus=approved");
     }
   }
 
