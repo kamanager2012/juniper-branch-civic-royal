@@ -1,10 +1,19 @@
-const CACHE_NAME = "chengyu-storybook-shell-v1";
+const CACHE_NAME = "chengyu-storybook-shell-v2";
 const CACHE_PREFIX = "chengyu-storybook-";
-const STATIC_PATHS = ["/manifest.webmanifest", "/favicon.svg"];
+const STATIC_PATHS = [
+  "/manifest.webmanifest",
+  "/favicon.svg",
+  "/icon-180.png",
+  "/ui/bookshelf-paper.jpg",
+];
 
 async function cacheShell() {
   const cache = await caches.open(CACHE_NAME);
-  const shell = await fetch("/", { cache: "no-store" });
+
+  // Reuse the browser HTTP cache when possible. `no-store` here forced the
+  // service-worker install path to redownload resources the first page had
+  // often just fetched.
+  const shell = await fetch("/");
   if (!shell.ok) throw new Error(`Unable to cache app shell: ${shell.status}`);
 
   const html = await shell.clone().text();
@@ -16,8 +25,9 @@ async function cacheShell() {
 
   await Promise.all(
     paths.map(async (path) => {
-      const response = await fetch(path, { cache: "no-store" });
-      if (response.ok) await cache.put(path, response);
+      const response = await fetch(path);
+      if (!response.ok) throw new Error(`Unable to cache shell asset ${path}: ${response.status}`);
+      await cache.put(path, response);
     }),
   );
 }
@@ -81,6 +91,7 @@ self.addEventListener("fetch", (event) => {
     url.pathname.startsWith("/assets/") ||
     url.pathname.startsWith("/stories/") ||
     url.pathname.startsWith("/fonts/") ||
+    url.pathname.startsWith("/ui/") ||
     STATIC_PATHS.includes(url.pathname);
 
   if (!cacheable) return;
