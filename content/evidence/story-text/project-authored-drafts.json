@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "claim": "owned",
+  "scope": "project-use-and-distribution",
+  "description": "These 76 child-friendly idiom story adaptations were authored specifically for this project and are tracked as project-controlled text. This record establishes the project's use/distribution claim; it does not make a jurisdiction-specific assertion about copyrightability of AI-assisted text.",
+  "sourceBundles": [
+    {
+      "path": "content/story-drafts/01.json",
+      "gitBlob": "531b4bd757f4109a4ee590baf473e33963cf3e32",
+      "stories": 19
+    },
+    {
+      "path": "content/story-drafts/02.json",
+      "gitBlob": "b989d267fca4457d41a4dcee41f1c795bd8fbf8f",
+      "stories": 19
+    },
+    {
+      "path": "content/story-drafts/03.json",
+      "gitBlob": "f72bab0b2ec7d1a9c87b8e4fcfc89dc7d2c66e5f",
+      "stories": 19
+    },
+    {
+      "path": "content/story-drafts/04.json",
+      "gitBlob": "8cf5ca3b23870ffd20e488e3c0760daa4abaafc1",
+      "stories": 19
+    }
+  ],
+  "externalTextSources": [],
+  "copiedPassages": false,
+  "mediaRightsIncluded": false
+}
