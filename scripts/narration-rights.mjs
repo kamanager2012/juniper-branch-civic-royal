@@ -1,5 +1,14 @@
-import { readNarrationReceipt } from "./narration-receipt.mjs";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { validateKokoroProviderProfile } from "./kokoro-provider-profile.mjs";
+import {
+  KOKORO_PROVIDER_PROFILE_PATH,
+  readNarrationReceipt,
+  safeRelativePath,
+  sha256Buffer,
+} from "./narration-receipt.mjs";
 import { buildNarrationPlan } from "./narration-plan.mjs";
+import { repoRoot } from "./story-model.mjs";
 
 const ALLOWED_CLAIMS = new Set(["owned", "licensed", "public-domain", "permission"]);
 
@@ -8,11 +17,30 @@ function sameStringArray(left, right) {
     left.length === right.length && left.every((value, index) => value === right[index]);
 }
 
+function readDurableProviderProfile(path, root = repoRoot) {
+  if (!safeRelativePath(path)) throw new Error("provider profile path must be repository-relative");
+  const bytes = readFileSync(join(root, path));
+  return {
+    path,
+    sha256: sha256Buffer(bytes),
+    profile: JSON.parse(bytes.toString("utf8")),
+  };
+}
+
 export function buildNarrationProvenanceEntries(narrationAssets, plan = buildNarrationPlan(), options = {}) {
   const entries = {};
   const issues = [];
   const byOutput = new Map(plan.items.map((item) => [item.output, item]));
   const readReceipt = options.readReceipt ?? readNarrationReceipt;
+  const readProviderProfile = options.readProviderProfile ?? readDurableProviderProfile;
+  const providerProfileCache = new Map();
+
+  function durableProviderProfile(path) {
+    if (!providerProfileCache.has(path)) {
+      providerProfileCache.set(path, readProviderProfile(path));
+    }
+    return providerProfileCache.get(path);
+  }
 
   for (const asset of narrationAssets) {
     if (asset.category !== "narration") {
@@ -66,6 +94,32 @@ export function buildNarrationProvenanceEntries(narrationAssets, plan = buildNar
       if (receipt.provider.generator !== state.generator) problems.push("receipt generator no longer matches narration state");
       if (receipt.rights.claim !== state.rightsClaim) problems.push("receipt rights claim no longer matches narration state");
       if (!sameStringArray(receipt.rights.evidence, state.rightsEvidence)) problems.push("receipt rights evidence no longer matches narration state");
+
+      const profile = receipt.provider.profile ?? null;
+      if ((profile?.id ?? null) !== (state.providerProfileId ?? null)) problems.push("receipt provider profile id no longer matches narration state");
+      if ((profile?.evidence ?? null) !== (state.providerProfilePath ?? null)) problems.push("receipt provider profile path no longer matches narration state");
+      if ((profile?.sha256 ?? null) !== (state.providerProfileSha256 ?? null)) problems.push("receipt provider profile SHA-256 no longer matches narration state");
+
+      if (receipt.provider.name === "kokoro-local") {
+        if (!profile) {
+          problems.push("kokoro-local receipt lost its provider profile binding");
+        } else {
+          if (profile.id !== "kokoro-v1.1-zh-zf001") problems.push("kokoro-local provider profile id is not approved");
+          if (profile.evidence !== KOKORO_PROVIDER_PROFILE_PATH) problems.push("kokoro-local provider profile path is not approved");
+          if (receipt.rights.claim !== "permission") problems.push("kokoro-local narration rights claim must remain permission");
+          if (!receipt.rights.evidence.includes(KOKORO_PROVIDER_PROFILE_PATH)) problems.push("kokoro-local rights evidence lost the approved provider profile");
+          try {
+            const currentProfile = durableProviderProfile(profile.evidence);
+            if (currentProfile.path !== profile.evidence) problems.push("provider profile path normalization changed");
+            if (currentProfile.sha256 !== profile.sha256) problems.push("provider profile SHA-256 no longer matches receipt");
+            if (currentProfile.sha256 !== state.providerProfileSha256) problems.push("provider profile SHA-256 no longer matches narration state");
+            const validation = validateKokoroProviderProfile(currentProfile.profile);
+            for (const issue of validation.issues) problems.push(`provider profile is no longer approved: ${issue}`);
+          } catch (error) {
+            problems.push(`provider profile cannot be revalidated: ${error instanceof Error ? error.message : String(error)}`);
+          }
+        }
+      }
 
       const receiptItem = receipt.items.find((candidate) => candidate.key === item.key);
       if (!receiptItem) {
