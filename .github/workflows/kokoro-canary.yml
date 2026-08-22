@@ -16,7 +16,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   one-story-canary:
@@ -24,6 +24,9 @@ jobs:
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: feat/narration-pilot-shou-zhu-dai-tu
+          fetch-depth: 0
 
       - uses: actions/setup-node@v7
         with:
@@ -46,14 +49,19 @@ jobs:
           uv sync --locked --project scripts/narration-runtime
           node scripts/kokoro-runtime-environment.mjs
 
-      - name: Install local MP3 encoder/probe tooling
+      - name: Install exact approved MP3 encoder/probe tooling
         shell: bash
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends ffmpeg
-          ffmpeg -version | head -1
-          ffprobe -version | head -1
+          sudo apt-get install -y --no-install-recommends \
+            ffmpeg=7:6.1.1-3ubuntu5 \
+            libavcodec60=7:6.1.1-3ubuntu5 \
+            libavformat60=7:6.1.1-3ubuntu5 \
+            libavutil58=7:6.1.1-3ubuntu5 \
+            libswresample4=7:6.1.1-3ubuntu5 \
+            libmp3lame0=3.100-6build1
+          node scripts/narration-encoder-profile.mjs --local
 
       - name: Checkout exact Kokoro and Misaki source commits
         shell: bash
@@ -94,14 +102,14 @@ jobs:
           test "$(sha256sum .runtime-assets/voices/zf_001.pt | awk '{print $1}')" = "9bdc9a87e13e9bb1ea3e7803259c2ecbfebaeeb2ff80b5d0c76df1a464c1c962"
           node scripts/kokoro-provider-profile.mjs --check --assets-dir .runtime-assets
 
-      - name: Record immutable application state before canary
+      - name: Record immutable application state before pilot generation
         shell: bash
         run: |
           set -euo pipefail
           echo "STATE_BEFORE=$(sha256sum content/narration-state.json | awk '{print $1}')" >> "$GITHUB_ENV"
           git diff --exit-code
 
-      - name: Generate one real story batch in disposable CI workspace
+      - name: Generate one real story batch
         shell: bash
         run: |
           set -euo pipefail
@@ -111,7 +119,7 @@ jobs:
             --kokoro-src-dir .runtime-src/kokoro \
             --misaki-src-dir .runtime-src/misaki \
             --python scripts/narration-runtime/.venv/bin/python \
-            --ffmpeg ffmpeg \
+            --ffmpeg /usr/bin/ffmpeg \
             --keep-work | tee canary-generation.log
 
           RECEIPT="$(grep -oE 'content/evidence/narration/receipts/[A-Za-z0-9._-]+\.json' canary-generation.log | tail -1)"
@@ -134,7 +142,7 @@ jobs:
           node scripts/kokoro-canary-qc.mjs --receipt "$CANARY_RECEIPT" | tee canary-qc.json
           node -e 'const r=require("./canary-qc.json"); if(!r.valid||r.itemCount!==9) process.exit(1); console.log(JSON.stringify({storyId:r.storyId,itemCount:r.itemCount,durationSeconds:r.durationSeconds,bytes:r.bytes},null,2))'
 
-      - name: Prove canary remains a maintenance-only asset-production run
+      - name: Prove generation remains maintenance-only before state import
         shell: bash
         run: |
           set -euo pipefail
@@ -147,7 +155,50 @@ jobs:
             exit 1
           fi
 
-      - name: Package canary listening/QC artifact only
+      - name: Import exactly nine pilot items and verify release accounting
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/import-narration-receipt.mjs --receipt "$CANARY_RECEIPT" --write | tee pilot-import-write.json
+          npm run check
+          node scripts/content-report.mjs --check --summary > pilot-content.json
+          node scripts/release-readiness.mjs --check --summary > pilot-release.json
+          node scripts/source-lineage.mjs --check --summary > pilot-lineage.json
+          node - <<'NODE'
+          const content = require('./pilot-content.json');
+          const release = require('./pilot-release.json');
+          const lineage = require('./pilot-lineage.json');
+          const fail = (message) => { console.error(message); process.exit(1); };
+          if (content.narration.current !== 9 || content.narration.unverified !== 207 || content.narration.stale !== 0 || content.narration.missing !== 0) fail('content narration accounting drifted');
+          if (release.provenance.total !== 513 || release.provenance.verified !== 306 || release.provenance.unverified !== 207 || release.provenance.stale !== 0 || release.provenance.invalid !== 0) fail('release provenance accounting drifted');
+          if (release.narration.current !== 9 || release.narration.unverified !== 207) fail('release narration accounting drifted');
+          if (release.releaseReady !== false) fail('pilot must not mark full release ready');
+          if (lineage.lineage.total !== 513 || lineage.lineage.known !== 513 || lineage.lineage.unknown !== 0 || lineage.lineage.stale !== 0 || lineage.lineage.invalid !== 0) fail('source lineage accounting drifted');
+          console.log(JSON.stringify({verified: release.provenance.verified, unverified: release.provenance.unverified, narration: release.narration, lineage: lineage.lineage}, null, 2));
+          NODE
+
+      - name: Stage only the exact pilot release set and push bot commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add content/narration-state.json public/audio/shou-zhu content/evidence/narration/receipts
+          STAGED="$(git diff --cached --name-only)"
+          printf '%s\n' "$STAGED"
+          test "$(printf '%s\n' "$STAGED" | grep -c '^public/audio/shou-zhu/.*\.mp3$')" -eq 9
+          test "$(printf '%s\n' "$STAGED" | grep -c '^content/evidence/narration/receipts/.*\.json$')" -eq 1
+          test "$(printf '%s\n' "$STAGED" | grep -c '^content/narration-state\.json$')" -eq 1
+          test "$(printf '%s\n' "$STAGED" | sed '/^$/d' | wc -l | tr -d ' ')" -eq 11
+          printf '%s\n' "$STAGED" | grep -Fx "$CANARY_RECEIPT"
+          if printf '%s\n' "$STAGED" | grep -E '^\.github/|^src/|^package(-lock)?\.json$'; then
+            echo "Unexpected application/workflow file staged in narration pilot" >&2
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "feat: install nine-item Kokoro narration pilot"
+          git push origin HEAD:feat/narration-pilot-shou-zhu-dai-tu
+
+      - name: Package pilot listening/QC artifact
         if: always()
         shell: bash
         run: |
@@ -157,7 +208,7 @@ jobs:
             cp "$CANARY_RECEIPT" canary-artifact/evidence/receipt.json
             cp public/audio/shou-zhu/*.mp3 canary-artifact/audio/
           fi
-          for file in canary-generation.log canary-import-dry-run.json canary-qc.json; do
+          for file in canary-generation.log canary-import-dry-run.json canary-qc.json pilot-import-write.json pilot-content.json pilot-release.json pilot-lineage.json; do
             if [[ -f "$file" ]]; then cp "$file" canary-artifact/; fi
           done
           find canary-artifact -maxdepth 3 -type f -print
@@ -165,7 +216,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: kokoro-shou-zhu-canary
+          name: kokoro-shou-zhu-pilot
           path: canary-artifact/
           if-no-files-found: error
           retention-days: 3
