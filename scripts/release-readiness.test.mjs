@@ -2,18 +2,26 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
+import { loadDraftStoryCatalog } from "./draft-story-catalog.mjs";
 import { buildReleaseReadiness, validateEvidenceReference } from "./release-readiness.mjs";
 import { loadStoryModel, repoRoot } from "./story-model.mjs";
 
 const model = loadStoryModel();
+const draftCatalog = loadDraftStoryCatalog();
 const report = buildReleaseReadiness();
 
-test("release inventory covers canonical text, imagery and narration", () => {
-  assert.equal(report.categories["story-text"]?.total, model.stories.length);
+test("release inventory covers 100 story texts while media remains scoped to 24 stories", () => {
+  assert.equal(report.categories["story-text"]?.total, model.stories.length + draftCatalog.stories.length);
+  assert.equal(report.categories["story-text"]?.total, 100);
   assert.equal(report.categories.narration?.total, model.pages.length);
   assert.ok((report.categories["story-image"]?.total ?? 0) > 0);
   assert.ok((report.categories.font?.total ?? 0) > 0);
   assert.ok((report.categories["product-artwork"]?.total ?? 0) > 0);
+
+  const draftAssets = report.assets.filter((asset) => asset.category === "story-text" && asset.textStatus === "text-ready-media-pending");
+  assert.equal(draftAssets.length, 76);
+  assert.ok(draftAssets.every((asset) => asset.provenanceStatus === "verified"));
+  assert.ok(draftAssets.every((asset) => asset.claim === "owned"));
 
   const ids = report.assets.map((asset) => asset.id);
   assert.equal(new Set(ids).size, ids.length, "release asset ids must be unique");
@@ -33,6 +41,7 @@ test("provenance accounting is complete and fail-closed", () => {
     p.invalid === 0 &&
     report.narration.current === report.narration.total;
   assert.equal(report.releaseReady, expectedReady);
+  assert.equal(report.releaseReady, false, "100-story catalog must not bypass unresolved media rights/narration gates");
 });
 
 test("narration synchronization remains a separate release condition", () => {
@@ -52,12 +61,17 @@ test("provenance evidence references must be durable and resolvable", () => {
     kind: "https",
     problem: null,
   });
+  assert.deepEqual(validateEvidenceReference("content/evidence/story-text/project-authored-drafts.json"), {
+    valid: true,
+    kind: "local",
+    problem: null,
+  });
   assert.equal(validateEvidenceReference("http://example.com/license").valid, false);
   assert.equal(validateEvidenceReference("../outside-repo.txt").valid, false);
   assert.equal(validateEvidenceReference("content/evidence/does-not-exist.json").valid, false);
 });
 
-test("Ma Shan Zheng is the first fingerprint-backed licensed release asset", () => {
+test("Ma Shan Zheng remains fingerprint-backed and licensed", () => {
   const asset = report.assets.find((item) => item.id === "font:public/fonts/MaShanZheng.woff2");
   assert.ok(asset, "Ma Shan Zheng release asset missing");
   assert.equal(asset.fingerprintSha256, "11e2c8cbcd09ac08fa38066a2e9699e57fda40a8e2880fbf7cbf101f5926a595");
