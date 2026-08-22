@@ -1,5 +1,24 @@
 node_modules/
-.project_id
-.github_repo
+dist/
+.output/
+coverage/
+.tanstack/
+
+# Local environment
 .env
 .env.*
+!.env.example
+
+# Builder / deployment workspace state
+.grok/
+.vercel/
+artifacts/
+screenshots/
+.node_modules.lock
+.project_id
+.github_repo
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+*.log
