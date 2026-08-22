@@ -1,20 +1,20 @@
 name: refresh pruned lockfile
 
 on:
-  push:
-    branches: ["feat/storybook-foundation-cleanup"]
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: write
 
 jobs:
   refresh:
-    if: github.actor != 'github-actions[bot]'
+    if: github.head_ref == 'feat/storybook-foundation-cleanup' && github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: feat/storybook-foundation-cleanup
+          ref: ${{ github.head_ref }}
       - uses: actions/setup-node@v7
         with:
           node-version: 22
