@@ -8,7 +8,10 @@ import {
   readKokoroProviderProfile,
   validateKokoroProviderProfile,
 } from "./kokoro-provider-profile.mjs";
-import { buildNarrationGenerationSet } from "./narration-generation-set.mjs";
+import {
+  buildNarrationGenerationSet,
+  computeNarrationInputDigest,
+} from "./narration-generation-set.mjs";
 import {
   KOKORO_PROVIDER_PROFILE_PATH,
   sha256Buffer,
@@ -24,12 +27,18 @@ export const KOKORO_SAMPLE_RATE_HZ = 24000;
 export const KOKORO_CHANNELS = 1;
 export const GENERATION_SET_EVIDENCE_PATH = "content/evidence/narration/generation-set-v1.json";
 
-function sha256File(path) {
-  return sha256Buffer(readFileSync(path));
-}
-
 export function readApprovedGenerationSetEvidence(path = resolve(repoRoot, GENERATION_SET_EVIDENCE_PATH)) {
   return JSON.parse(readFileSync(path, "utf8"));
+}
+
+function validateSetSelfConsistency(set, label, problems) {
+  if (!set || typeof set !== "object" || !Array.isArray(set.entries)) {
+    problems.push(`${label} must contain an entries array`);
+    return;
+  }
+  if (set.count !== set.entries.length) problems.push(`${label} count must exactly match entries.length`);
+  const computed = computeNarrationInputDigest(set.entries);
+  if (set.inputDigestSha256 !== computed) problems.push(`${label} input digest does not match its entries`);
 }
 
 export function validateApprovedGenerationSet(generationSet, options = {}) {
@@ -43,6 +52,10 @@ export function validateApprovedGenerationSet(generationSet, options = {}) {
   if (typeof evidence?.inputDigestSha256 !== "string" || !/^[a-f0-9]{64}$/.test(evidence.inputDigestSha256)) {
     problems.push("generation-set evidence digest must be lowercase SHA-256");
   }
+
+  validateSetSelfConsistency(fullSet, "current full narration set", problems);
+  validateSetSelfConsistency(generationSet, "requested narration set", problems);
+
   if (fullSet.count !== evidence?.inputItemCount) problems.push("current full narration input count no longer matches approved generation-set evidence");
   if (fullSet.inputDigestSha256 !== evidence?.inputDigestSha256) problems.push("current full narration input digest no longer matches approved generation-set evidence");
 
@@ -89,11 +102,12 @@ function gitOutput(directory, args) {
 
 export function readRuntimeCheckoutSnapshot(directory) {
   const absolute = resolve(directory);
+  const origin = gitOutput(absolute, ["remote", "get-url", "origin"]);
   return {
     directory: absolute,
     head: gitOutput(absolute, ["rev-parse", "HEAD"]),
-    origin: gitOutput(absolute, ["remote", "get-url", "origin"]),
-    repository: canonicalRepositoryFromOrigin(gitOutput(absolute, ["remote", "get-url", "origin"])),
+    origin,
+    repository: canonicalRepositoryFromOrigin(origin),
     clean: gitOutput(absolute, ["status", "--porcelain", "--untracked-files=all"]) === "",
   };
 }
@@ -168,7 +182,9 @@ export function buildKokoroNarrationReceipt({
   if (!approvedSet.valid) throw new Error(`Narration generation set is not approved:\n${approvedSet.problems.join("\n")}`);
 
   const outputByKey = new Map(outputs.map((output) => [output.key, output]));
-  if (outputByKey.size !== generationSet.entries.length) throw new Error("Generated output set does not exactly cover the requested narration input set");
+  if (outputByKey.size !== generationSet.entries.length || outputs.length !== generationSet.entries.length) {
+    throw new Error("Generated output set does not exactly cover the requested narration input set");
+  }
 
   const items = generationSet.entries.map((entry) => {
     const output = outputByKey.get(entry.key);
