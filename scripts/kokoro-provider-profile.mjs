@@ -21,6 +21,13 @@ export const APPROVED_KOKORO = Object.freeze({
   inferenceCommit: "dfb907a02bba8152ca444717ca5d78747ccb4bec",
   g2pRepository: "hexgrad/misaki",
   g2pCommit: "fba1236595f2d2bf21d414ba6e57d25256afada3",
+  rightsEvidence: Object.freeze([
+    "https://huggingface.co/hexgrad/Kokoro-82M-v1.1-zh",
+    "https://huggingface.co/hexgrad/Kokoro-82M-v1.1-zh/blob/a51e9e2a069a198cbda1f021f3805af3603ba92d/kokoro-v1_1-zh.pth",
+    "https://huggingface.co/hexgrad/Kokoro-82M-v1.1-zh/blob/a51e9e2a069a198cbda1f021f3805af3603ba92d/voices/zf_001.pt",
+    "https://github.com/hexgrad/kokoro/blob/dfb907a02bba8152ca444717ca5d78747ccb4bec/LICENSE",
+    "https://github.com/hexgrad/misaki/blob/fba1236595f2d2bf21d414ba6e57d25256afada3/LICENSE",
+  ]),
 });
 
 function isSha256(value) {
@@ -44,9 +51,13 @@ function safeAssetPath(root, value) {
   return rel === ".." || rel.startsWith("../") ? null : absolute;
 }
 
+function sameStringArray(left, right) {
+  return Array.isArray(left) && Array.isArray(right) &&
+    left.length === right.length && left.every((value, index) => value === right[index]);
+}
+
 export function readKokoroProviderProfile(path = KOKORO_PROFILE_PATH) {
-  const parsed = JSON.parse(readFileSync(path, "utf8"));
-  return parsed;
+  return JSON.parse(readFileSync(path, "utf8"));
 }
 
 export function validateKokoroProviderProfile(profile) {
@@ -111,15 +122,24 @@ export function validateKokoroProviderProfile(profile) {
     issues.push("rights.basis must contain at least four non-empty evidence statements");
   }
   if (typeof profile?.rights?.boundary !== "string" || profile.rights.boundary.trim() === "") issues.push("rights.boundary must be non-empty");
-  if (!Array.isArray(profile?.rights?.evidence) || profile.rights.evidence.length < 5) {
-    issues.push("rights.evidence must contain the pinned model/runtime evidence URLs");
-  } else if (profile.rights.evidence.some((value) => typeof value !== "string" || !/^https:\/\//.test(value))) {
-    issues.push("rights.evidence entries must be HTTPS URLs");
+  if (!sameStringArray(profile?.rights?.evidence, APPROVED_KOKORO.rightsEvidence)) {
+    issues.push("rights.evidence must exactly match the approved pinned model/runtime evidence URLs");
   }
 
   expect(profile?.approval?.approved, true, "approval.approved");
-  if (!Array.isArray(profile?.approval?.approvedByEvidence) || profile.approval.approvedByEvidence.length < 3) {
-    issues.push("approval.approvedByEvidence must record all three pinned asset checks");
+  const approval = profile?.approval?.approvedByEvidence;
+  if (!Array.isArray(approval) || approval.length !== 3 || approval.some((value) => typeof value !== "string" || value.trim() === "")) {
+    issues.push("approval.approvedByEvidence must contain exactly three non-empty pinned asset audit records");
+  } else {
+    if (!approval[0].includes(APPROVED_KOKORO.configSha256) || !approval[0].includes(String(APPROVED_KOKORO.configBytes))) {
+      issues.push("approval config audit must contain the exact config SHA-256 and byte size");
+    }
+    if (!approval[1].includes(APPROVED_KOKORO.weightsSha256) || !approval[1].includes(String(APPROVED_KOKORO.weightsBytes))) {
+      issues.push("approval weights audit must contain the exact weights SHA-256 and byte size");
+    }
+    if (!approval[2].includes(APPROVED_KOKORO.voiceSha256)) {
+      issues.push("approval voice audit must contain the exact voice SHA-256");
+    }
   }
 
   return { valid: issues.length === 0, issues: [...new Set(issues)].sort() };
