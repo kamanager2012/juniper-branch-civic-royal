@@ -37,8 +37,10 @@ test("installed pilot review manifest binds exactly nine current release MP3 fil
   assert.equal(manifest.storyId, "shou-zhu");
   assert.equal(manifest.itemCount, 9);
   assert.deepEqual(manifest.qualityReview, validation.evidence.qualityReview);
-  assert.equal(manifest.reviewPolicy.humanListeningRequired, true);
+  assert.equal(manifest.reviewPolicy.humanListeningRecommended, true);
+  assert.equal(manifest.reviewPolicy.humanListeningMayBeExplicitlyWaived, true);
   assert.equal(manifest.reviewPolicy.packageCannotApproveExpansion, true);
+  assert.match(manifest.reviewPolicy.waiverCommand, /--decision waive/);
 
   const evidenceShas = validation.evidence.audioSha256;
   assert.deepEqual(
@@ -62,6 +64,7 @@ test("review HTML is offline-only and exposes exact text plus local audio contro
   assert.match(html, /本包只复制仓库当前已安装的 release MP3/);
   assert.match(html, /它不会调用 Kokoro/);
   assert.match(html, /HTML 本身不会写 evidence/);
+  assert.match(html, /未试听但授权扩容/);
 
   for (const item of manifest.items) {
     assert.ok(html.includes(`src="${item.reviewFile}"`));
