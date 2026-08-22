@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { validateKokoroProviderProfile } from "./kokoro-provider-profile.mjs";
+import { readKokoroRuntimeEnvironmentBinding } from "./kokoro-runtime-environment.mjs";
 import {
   KOKORO_PROVIDER_PROFILE_PATH,
   readNarrationReceipt,
@@ -15,6 +16,10 @@ const ALLOWED_CLAIMS = new Set(["owned", "licensed", "public-domain", "permissio
 function sameStringArray(left, right) {
   return Array.isArray(left) && Array.isArray(right) &&
     left.length === right.length && left.every((value, index) => value === right[index]);
+}
+
+function sameJson(left, right) {
+  return JSON.stringify(left ?? null) === JSON.stringify(right ?? null);
 }
 
 function readDurableProviderProfile(path, root = repoRoot) {
@@ -33,13 +38,20 @@ export function buildNarrationProvenanceEntries(narrationAssets, plan = buildNar
   const byOutput = new Map(plan.items.map((item) => [item.output, item]));
   const readReceipt = options.readReceipt ?? readNarrationReceipt;
   const readProviderProfile = options.readProviderProfile ?? readDurableProviderProfile;
+  const readRuntimeEnvironment = options.readRuntimeEnvironment ?? readKokoroRuntimeEnvironmentBinding;
   const providerProfileCache = new Map();
+  let currentRuntimeEnvironment;
 
   function durableProviderProfile(path) {
     if (!providerProfileCache.has(path)) {
       providerProfileCache.set(path, readProviderProfile(path));
     }
     return providerProfileCache.get(path);
+  }
+
+  function durableRuntimeEnvironment() {
+    if (currentRuntimeEnvironment === undefined) currentRuntimeEnvironment = readRuntimeEnvironment();
+    return currentRuntimeEnvironment;
   }
 
   for (const asset of narrationAssets) {
@@ -118,6 +130,18 @@ export function buildNarrationProvenanceEntries(narrationAssets, plan = buildNar
           } catch (error) {
             problems.push(`provider profile cannot be revalidated: ${error instanceof Error ? error.message : String(error)}`);
           }
+        }
+
+        const receiptEnvironment = receipt.execution?.runtime?.environment ?? null;
+        if (!state.runtimeEnvironment) problems.push("kokoro-local narration state lost its runtime environment binding");
+        if (!receiptEnvironment) problems.push("kokoro-local receipt lost its runtime environment binding");
+        if (!sameJson(receiptEnvironment, state.runtimeEnvironment)) problems.push("receipt runtime environment no longer matches narration state");
+        try {
+          const currentEnvironment = durableRuntimeEnvironment();
+          if (!sameJson(receiptEnvironment, currentEnvironment)) problems.push("runtime project/lock bytes no longer match receipt environment");
+          if (!sameJson(state.runtimeEnvironment, currentEnvironment)) problems.push("runtime project/lock bytes no longer match narration state");
+        } catch (error) {
+          problems.push(`runtime environment cannot be revalidated: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
 
