@@ -16,10 +16,18 @@
       "provider profile bytes are SHA-256 bound into the generation receipt",
       "reference-speaker audio and voice cloning are forbidden by the approved Kokoro profile"
     ],
+    "runtime": [
+      "Kokoro generation uses the repository-pinned Python 3.12 Linux x64 CPU runtime project and uv.lock",
+      "runtime project and uv.lock bytes are SHA-256 bound into each Kokoro generation receipt and narration state",
+      "approved runtime uses torch 2.6.0+cpu and the explicit PyTorch CPU index",
+      "KPipeline, Misaki English G2P, spaCy, CUDA/NVIDIA packages, and triton are outside the approved Mandarin runtime",
+      "a locked runtime smoke must load pinned KModel and ZHG2P source, preserve lossless long-text chunking, and fail closed on unsupported text before model synthesis"
+    ],
     "receipt": [
       "inputItemCount exactly matches receipt items",
       "inputDigestSha256 exactly matches the receipt key/path/text-hash input set",
-      "Kokoro receipt binds the exact approved provider profile path/id/SHA-256"
+      "Kokoro receipt binds the exact approved provider profile path/id/SHA-256",
+      "Kokoro receipt binds the exact approved runtime environment id/project SHA-256/uv.lock SHA-256"
     ],
     "current": [
       "exact canonical text SHA-256",
@@ -33,6 +41,7 @@
       "receipt item key/path/text/audio hashes match the canonical release asset",
       "receipt provider/voice/language/generator metadata matches narration state",
       "provider profile bytes and approval status still match the receipt/state binding",
+      "runtime project/uv.lock bytes still match the receipt/state environment binding",
       "allowed rights claim with durable evidence references"
     ],
     "sourceLineage": [
@@ -42,6 +51,6 @@
   },
   "generationPolicy": "The generator may install audio plus a contemporaneous receipt, but it must not write content/narration-state.json. State changes occur only through the explicit receipt importer.",
   "legacyPolicy": "Existing narration without contemporaneous generation receipts remains unverified. Do not create retrospective receipts merely to raise release coverage.",
-  "driftPolicy": "Generation input, text, audio, receipt, provider profile, model/runtime identity, rights claim, or rights evidence drift revokes the relevant generated narration verification until a new valid receipt is imported.",
+  "driftPolicy": "Generation input, text, audio, receipt, provider profile, pinned Python runtime project/uv.lock, model/runtime identity, rights claim, or rights evidence drift revokes the relevant generated narration verification until a new valid receipt is imported.",
   "importMode": "dry-run by default; explicit --write required to mutate content/narration-state.json"
 }

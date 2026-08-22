@@ -29,6 +29,10 @@ function validateEvidenceReference(value, root = repoRoot) {
   return null;
 }
 
+function cloneJson(value) {
+  return value == null ? null : JSON.parse(JSON.stringify(value));
+}
+
 export function buildNarrationStateFromReceipt({ receipt, receiptPath, receiptSha256, plan, state, replace = false, root = repoRoot }) {
   const problems = [];
   const byKey = new Map(plan.items.map((item) => [item.key, item]));
@@ -88,6 +92,7 @@ export function buildNarrationStateFromReceipt({ receipt, receiptPath, receiptSh
       providerProfileId: receipt.provider.profile?.id ?? null,
       providerProfilePath: receipt.provider.profile?.evidence ?? null,
       providerProfileSha256: receipt.provider.profile?.sha256 ?? null,
+      runtimeEnvironment: cloneJson(receipt.execution?.runtime?.environment ?? null),
       textSha256: receiptItem.textSha256,
       audioSha256: receiptItem.audioSha256,
       generatedAt: receipt.createdAt,
@@ -152,6 +157,8 @@ if (process.argv[1]?.endsWith("import-narration-receipt.mjs")) {
     inputDigestSha256: result.receipt.inputDigestSha256,
     providerProfileId: result.receipt.provider.profile?.id ?? null,
     providerProfileSha256: result.receipt.provider.profile?.sha256 ?? null,
+    runtimeEnvironmentId: result.receipt.execution?.runtime?.environment?.id ?? null,
+    runtimeLockSha256: result.receipt.execution?.runtime?.environment?.lock?.sha256 ?? null,
     imported: result.imported,
     mode: write ? "write" : "dry-run",
   }, null, 2));

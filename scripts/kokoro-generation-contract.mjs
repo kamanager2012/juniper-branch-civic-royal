@@ -9,10 +9,15 @@ import {
   validateKokoroProviderProfile,
 } from "./kokoro-provider-profile.mjs";
 import {
+  readKokoroRuntimeEnvironmentBinding,
+  validateKokoroRuntimeHost,
+} from "./kokoro-runtime-environment.mjs";
+import {
   buildNarrationGenerationSet,
   computeNarrationInputDigest,
 } from "./narration-generation-set.mjs";
 import {
+  KOKORO_GENERATOR_ID,
   KOKORO_PROVIDER_PROFILE_PATH,
   sha256Buffer,
   validateNarrationReceipt,
@@ -20,7 +25,7 @@ import {
 import { repoRoot } from "./story-model.mjs";
 
 export const KOKORO_PROVIDER_NAME = "kokoro-local";
-export const KOKORO_GENERATOR_ID = "kokoro-local-adapter-v1";
+export { KOKORO_GENERATOR_ID };
 export const KOKORO_MP3_BITRATE_KBPS = 40;
 export const KOKORO_MP3_MAX_BYTES = 180000;
 export const KOKORO_SAMPLE_RATE_HZ = 24000;
@@ -184,6 +189,10 @@ function validateStagedOutput(output, entry) {
   if (sha256AudioBuffer(audio) !== output.audioSha256) throw new Error(`${entry.key}: staged MP3 SHA-256 changed after encoding`);
 }
 
+function sameRuntimeEnvironment(left, right) {
+  return JSON.stringify(left) === JSON.stringify(right);
+}
+
 export function buildKokoroNarrationReceipt({
   generationSet,
   outputs,
@@ -191,9 +200,25 @@ export function buildKokoroNarrationReceipt({
   runtime,
   encoder,
   providerBinding = readApprovedProviderBinding(),
+  runtimeEnvironment = readKokoroRuntimeEnvironmentBinding(),
 }) {
   const approvedSet = validateApprovedGenerationSet(generationSet);
   if (!approvedSet.valid) throw new Error(`Narration generation set is not approved:\n${approvedSet.problems.join("\n")}`);
+
+  const currentRuntimeEnvironment = readKokoroRuntimeEnvironmentBinding();
+  if (!sameRuntimeEnvironment(runtimeEnvironment, currentRuntimeEnvironment)) {
+    throw new Error("Narration runtime environment binding does not match the currently approved project/lock bytes");
+  }
+  const hostValidation = validateKokoroRuntimeHost({
+    platform: runtime.platform,
+    arch: runtime.arch,
+    pythonVersion: runtime.pythonVersion,
+    torchVersion: runtime.torchVersion,
+    device: runtime.device,
+  });
+  if (!hostValidation.valid) {
+    throw new Error(`Narration runtime host is not approved:\n${hostValidation.issues.join("\n")}`);
+  }
 
   const outputByKey = new Map(outputs.map((output) => [output.key, output]));
   if (outputByKey.size !== generationSet.entries.length || outputs.length !== generationSet.entries.length) {
@@ -251,9 +276,12 @@ export function buildKokoroNarrationReceipt({
         inferenceCommit: APPROVED_KOKORO.inferenceCommit,
         g2pRepository: APPROVED_KOKORO.g2pRepository,
         g2pCommit: APPROVED_KOKORO.g2pCommit,
+        platform: runtime.platform,
+        arch: runtime.arch,
         pythonVersion: runtime.pythonVersion,
         torchVersion: runtime.torchVersion,
         device: runtime.device,
+        environment: runtimeEnvironment,
       },
       encoder: {
         name: "ffmpeg",

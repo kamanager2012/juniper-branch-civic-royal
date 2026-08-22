@@ -1,0 +1,31 @@
+[project]
+name = "chengyu-kokoro-runtime"
+version = "0.1.0"
+description = "Pinned CPU runtime for audited Mandarin narration synthesis"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "addict==2.4.0",
+  "attrs==25.1.0",
+  "cn2an",
+  "huggingface-hub==0.28.1",
+  "jieba",
+  "loguru==0.7.3",
+  "numpy==1.26.4",
+  "ordered-set",
+  "pypinyin",
+  "pypinyin-dict",
+  "regex==2024.11.6",
+  "torch==2.6.0",
+  "transformers==4.48.3",
+]
+
+[tool.uv]
+package = false
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }

@@ -28,12 +28,18 @@ import {
   validateKokoroLocalAssets,
   validateKokoroProviderProfile,
 } from "./kokoro-provider-profile.mjs";
+import {
+  KOKORO_RUNTIME_TORCH_VERSION,
+  readKokoroRuntimeEnvironmentBinding,
+  validateKokoroRuntimeHost,
+} from "./kokoro-runtime-environment.mjs";
 import { buildNarrationGenerationSet } from "./narration-generation-set.mjs";
 import { buildNarrationPlan } from "./narration-plan.mjs";
 import { validateNarrationReceipt } from "./narration-receipt.mjs";
 import { repoRoot } from "./story-model.mjs";
 
 const ENGINE_SCRIPT = join(repoRoot, "scripts/kokoro-synthesize.py");
+const RUNTIME_SMOKE_SCRIPT = join(repoRoot, "scripts/kokoro-runtime-smoke.py");
 const WORK_ROOT = join(repoRoot, ".narration-work");
 
 function argValue(name) {
@@ -65,6 +71,22 @@ function commandReport(command, args, label) {
   return `${result.stdout ?? ""}${result.stderr ?? ""}`.trim();
 }
 
+function commandJsonReport(command, args, label, options = {}) {
+  const result = spawnSync(command, args, {
+    encoding: "utf8",
+    env: options.env ?? process.env,
+  });
+  if (result.error) throw new Error(`${label} is unavailable: ${result.error.message}`);
+  if (result.status !== 0) {
+    throw new Error(`${label} failed (${result.status}): ${(result.stderr || result.stdout || "").trim()}`);
+  }
+  try {
+    return JSON.parse((result.stdout ?? "").trim());
+  } catch (error) {
+    throw new Error(`${label} did not return machine-readable JSON: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
 function inspectFfmpeg(ffmpeg) {
   const versionOutput = commandReport(ffmpeg, ["-version"], "ffmpeg");
   const encoderOutput = commandReport(ffmpeg, ["-hide_banner", "-encoders"], "ffmpeg encoder inventory");
@@ -83,16 +105,55 @@ function inspectPython(python) {
   return { version: match[1] };
 }
 
+function validateRuntimeSmoke(report, kokoroDir, misakiDir) {
+  const problems = [];
+  if (report?.schemaVersion !== 1) problems.push("runtime smoke schemaVersion must be 1");
+  if (report?.runtime !== "kokoro-mandarin-minimal-v1") problems.push("runtime smoke identity drifted");
+  const host = validateKokoroRuntimeHost({
+    platform: report?.platform,
+    arch: report?.arch,
+    pythonVersion: report?.pythonVersion,
+    torchVersion: report?.versions?.torch,
+    device: report?.device,
+  });
+  problems.push(...host.issues);
+  if (report?.versions?.torch !== KOKORO_RUNTIME_TORCH_VERSION) problems.push(`runtime smoke torch must be ${KOKORO_RUNTIME_TORCH_VERSION}`);
+  if (!Array.isArray(report?.bannedModulesLoaded) || report.bannedModulesLoaded.length !== 0) problems.push("runtime smoke loaded banned modules");
+  if (!Number.isInteger(report?.longSampleChunks) || report.longSampleChunks < 2) problems.push("runtime smoke did not exercise lossless long-text splitting");
+
+  for (const [label, modulePath, checkout] of [
+    ["kokoro", report?.kokoroModulePath, kokoroDir],
+    ["misaki", report?.misakiModulePath, misakiDir],
+  ]) {
+    if (typeof modulePath !== "string") {
+      problems.push(`${label} smoke module path is missing`);
+      continue;
+    }
+    const rel = relative(resolve(checkout), resolve(modulePath)).replaceAll("\\", "/");
+    if (rel === ".." || rel.startsWith("../") || rel.startsWith("/")) problems.push(`${label} smoke module resolved outside pinned checkout`);
+  }
+
+  return { valid: problems.length === 0, problems: [...new Set(problems)].sort() };
+}
+
 function validateEngineReport(report, generationSet, expectedDevice, kokoroDir, misakiDir) {
   const problems = [];
   if (report?.schemaVersion !== 1) problems.push("engine report schemaVersion must be 1");
-  if (report?.engine !== "kokoro-local-waveform-v1") problems.push("engine report identity is not kokoro-local-waveform-v1");
+  if (report?.engine !== "kokoro-local-waveform-v2") problems.push("engine report identity is not kokoro-local-waveform-v2");
+  if (report?.g2p !== "misaki.ZHG2P/1.1") problems.push("engine G2P identity is not misaki.ZHG2P/1.1");
   if (report?.sampleRateHz !== KOKORO_SAMPLE_RATE_HZ) problems.push(`engine sample rate must be ${KOKORO_SAMPLE_RATE_HZ}`);
   if (report?.device !== expectedDevice) problems.push(`engine device must equal ${expectedDevice}`);
   if (report?.count !== generationSet.count) problems.push("engine output count does not match narration input set");
   if (!Array.isArray(report?.items) || report.items.length !== generationSet.count) problems.push("engine report items do not exactly cover narration input set");
-  if (typeof report?.pythonVersion !== "string" || report.pythonVersion.trim() === "") problems.push("engine report pythonVersion is missing");
-  if (typeof report?.torchVersion !== "string" || report.torchVersion.trim() === "") problems.push("engine report torchVersion is missing");
+
+  const host = validateKokoroRuntimeHost({
+    platform: report?.platform,
+    arch: report?.arch,
+    pythonVersion: report?.pythonVersion,
+    torchVersion: report?.torchVersion,
+    device: report?.device,
+  });
+  problems.push(...host.issues);
 
   for (const [label, modulePath, checkout] of [
     ["kokoro", report?.kokoroModulePath, kokoroDir],
@@ -113,6 +174,10 @@ function validateEngineReport(report, generationSet, expectedDevice, kokoroDir, 
     for (const item of report.items) {
       if (!Number.isInteger(item?.samples) || item.samples <= 0) problems.push(`${String(item?.key)}: engine sample count is invalid`);
       if (typeof item?.durationSeconds !== "number" || !(item.durationSeconds > 0)) problems.push(`${String(item?.key)}: engine duration is invalid`);
+      if (!Number.isInteger(item?.phonemeChunks) || item.phonemeChunks < 1) problems.push(`${String(item?.key)}: engine phoneme chunk count is invalid`);
+      if (!Number.isInteger(item?.maxPhonemeChunkLength) || item.maxPhonemeChunkLength < 1 || item.maxPhonemeChunkLength > 510) {
+        problems.push(`${String(item?.key)}: engine phoneme chunk length escaped the 1..510 bound`);
+      }
       if (typeof item?.wavPath !== "string" || !existsSync(item.wavPath)) problems.push(`${String(item?.key)}: staged WAV is missing`);
     }
   }
@@ -217,7 +282,7 @@ function parseOptions() {
   if (Boolean(story) === Boolean(all)) throw new Error("Choose exactly one narration scope: --story <id> or --all");
 
   const device = argValue("--device") ?? "cpu";
-  if (!new Set(["cpu", "cuda"]).has(device)) throw new Error("--device must be cpu or cuda");
+  if (device !== "cpu") throw new Error("The approved locked narration runtime is CPU-only; --device must be cpu");
 
   return {
     story,
@@ -240,6 +305,7 @@ async function main() {
   const profileValidation = validateKokoroProviderProfile(profile);
   if (!profileValidation.valid) throw new Error(`Kokoro provider profile is not approved:\n${profileValidation.issues.join("\n")}`);
 
+  const runtimeEnvironment = readKokoroRuntimeEnvironmentBinding();
   const localAssets = validateKokoroLocalAssets(profile, options.assetsDir);
   if (!localAssets.valid) throw new Error(`Pinned Kokoro local assets are invalid:\n${localAssets.issues.join("\n")}`);
 
@@ -272,6 +338,7 @@ async function main() {
     inputDigestSha256: generationSet.inputDigestSha256,
     providerProfileId: providerBinding.profile.profileId,
     providerProfileSha256: providerBinding.sha256,
+    runtimeEnvironment,
     modelRevision: profile.model.revision,
     voice: profile.model.voice.id,
     currentInScope: currentItems.length,
@@ -285,6 +352,28 @@ async function main() {
   if (options.dryRun) return;
 
   const python = inspectPython(options.python);
+  const hostPreflight = validateKokoroRuntimeHost({
+    platform: process.platform,
+    arch: process.arch,
+    pythonVersion: python.version,
+    device: options.device,
+  });
+  if (!hostPreflight.valid) throw new Error(`Narration host preflight failed:\n${hostPreflight.issues.join("\n")}`);
+
+  const offlineEnv = {
+    ...process.env,
+    PYTHONDONTWRITEBYTECODE: "1",
+    HF_HUB_OFFLINE: "1",
+    TRANSFORMERS_OFFLINE: "1",
+  };
+  const runtimeSmoke = commandJsonReport(options.python, [
+    RUNTIME_SMOKE_SCRIPT,
+    "--kokoro-src-dir", options.kokoroSrcDir,
+    "--misaki-src-dir", options.misakiSrcDir,
+  ], "Kokoro locked runtime smoke", { env: offlineEnv });
+  const smokeValidation = validateRuntimeSmoke(runtimeSmoke, options.kokoroSrcDir, options.misakiSrcDir);
+  if (!smokeValidation.valid) throw new Error(`Kokoro locked runtime smoke is invalid:\n${smokeValidation.problems.join("\n")}`);
+
   const ffmpeg = inspectFfmpeg(options.ffmpeg);
   const workDir = join(WORK_ROOT, batchId);
   if (existsSync(workDir)) throw new Error(`Narration work directory already exists: ${relative(repoRoot, workDir)}`);
@@ -319,13 +408,14 @@ async function main() {
     ], {
       encoding: "utf8",
       maxBuffer: 4 * 1024 * 1024,
-      env: { ...process.env, PYTHONDONTWRITEBYTECODE: "1" },
+      env: offlineEnv,
       stdio: ["ignore", "pipe", "inherit"],
     }).trim();
     const engineReport = JSON.parse(engineStdout);
     const engineValidation = validateEngineReport(engineReport, generationSet, options.device, options.kokoroSrcDir, options.misakiSrcDir);
     if (!engineValidation.valid) throw new Error(`Kokoro waveform engine report is invalid:\n${engineValidation.problems.join("\n")}`);
     writeFileSync(join(workDir, "engine-report.json"), `${JSON.stringify(engineReport, null, 2)}\n`, { flag: "wx" });
+    writeFileSync(join(workDir, "runtime-smoke.json"), `${JSON.stringify(runtimeSmoke, null, 2)}\n`, { flag: "wx" });
 
     const engineByKey = new Map(engineReport.items.map((item) => [item.key, item]));
     const outputs = [];
@@ -351,10 +441,13 @@ async function main() {
       outputs,
       createdAt,
       runtime: {
+        platform: engineReport.platform,
+        arch: engineReport.arch,
         pythonVersion: engineReport.pythonVersion ?? python.version,
         torchVersion: engineReport.torchVersion,
         device: engineReport.device,
       },
+      runtimeEnvironment,
       encoder: ffmpeg,
       providerBinding,
     });
@@ -365,6 +458,8 @@ async function main() {
       schemaVersion: 1,
       generated: committed.installed,
       receiptPath: committed.receiptPath,
+      runtimeEnvironmentId: runtimeEnvironment.id,
+      runtimeLockSha256: runtimeEnvironment.lock.sha256,
       narrationStateUpdated: false,
       nextDryRun: `npm run narration:import -- --receipt ${committed.receiptPath}`,
       nextWrite: `npm run narration:import -- --receipt ${committed.receiptPath} --write${options.replace ? " --replace" : ""}`,

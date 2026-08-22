@@ -3,14 +3,22 @@ name: kokoro local narration adapter
 on:
   pull_request:
     paths:
+      - "scripts/kokoro_runtime.py"
+      - "scripts/kokoro-runtime-smoke.py"
+      - "scripts/kokoro-runtime-contract.test.py"
       - "scripts/kokoro-synthesize.py"
+      - "scripts/kokoro-runtime-environment.mjs"
       - "scripts/kokoro-generation-contract.mjs"
       - "scripts/generate-narration.mjs"
       - ".github/workflows/kokoro-adapter.yml"
   push:
     branches: [main]
     paths:
+      - "scripts/kokoro_runtime.py"
+      - "scripts/kokoro-runtime-smoke.py"
+      - "scripts/kokoro-runtime-contract.test.py"
       - "scripts/kokoro-synthesize.py"
+      - "scripts/kokoro-runtime-environment.mjs"
       - "scripts/kokoro-generation-contract.mjs"
       - "scripts/generate-narration.mjs"
       - ".github/workflows/kokoro-adapter.yml"
@@ -19,14 +27,18 @@ permissions:
   contents: read
 
 jobs:
-  python-adapter-syntax:
+  python-adapter-contract:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
-      - name: Compile adapter without importing ML runtime
-        run: python -m py_compile scripts/kokoro-synthesize.py
+      - name: Compile adapters without importing ML runtime
+        run: python -m py_compile scripts/kokoro_runtime.py scripts/kokoro-synthesize.py scripts/kokoro-runtime-smoke.py scripts/kokoro-runtime-contract.test.py
+      - name: Run pure runtime contract tests
+        run: python scripts/kokoro-runtime-contract.test.py
       - name: Verify CLI surface without model dependencies
         run: python scripts/kokoro-synthesize.py --help
+      - name: Verify committed runtime lock binding
+        run: node scripts/kokoro-runtime-environment.mjs

@@ -2,11 +2,24 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { relative, resolve } from "node:path";
 import { computeNarrationInputDigest } from "./narration-generation-set.mjs";
+import {
+  KOKORO_RUNTIME_ARCH,
+  KOKORO_RUNTIME_ENVIRONMENT_ID,
+  KOKORO_RUNTIME_LOCK_PATH,
+  KOKORO_RUNTIME_LOCK_SHA256,
+  KOKORO_RUNTIME_PLATFORM,
+  KOKORO_RUNTIME_PROJECT_PATH,
+  KOKORO_RUNTIME_PROJECT_SHA256,
+  KOKORO_RUNTIME_PYTHON_SERIES,
+  KOKORO_RUNTIME_TORCH_VERSION,
+  KOKORO_RUNTIME_UV_VERSION,
+} from "./kokoro-runtime-environment.mjs";
 import { repoRoot } from "./story-model.mjs";
 
 const ALLOWED_CLAIMS = new Set(["owned", "licensed", "public-domain", "permission"]);
 const RECEIPT_PREFIX = "content/evidence/narration/receipts/";
 export const KOKORO_PROVIDER_PROFILE_PATH = "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json";
+export const KOKORO_GENERATOR_ID = "kokoro-local-adapter-v2";
 
 function nonEmpty(value) {
   return typeof value === "string" && value.trim() !== "";
@@ -60,6 +73,52 @@ function validateProviderProfile(provider, problems) {
   }
 }
 
+function validateKokoroRuntimeEnvironment(receipt, problems) {
+  if (receipt.provider?.name !== "kokoro-local") return;
+  if (receipt.provider.generator !== KOKORO_GENERATOR_ID) {
+    problems.push(`kokoro-local provider.generator must be ${KOKORO_GENERATOR_ID}`);
+  }
+
+  const runtime = receipt.execution?.runtime;
+  if (!runtime || typeof runtime !== "object" || Array.isArray(runtime)) {
+    problems.push("kokoro-local receipt requires execution.runtime");
+    return;
+  }
+  if (runtime.platform !== KOKORO_RUNTIME_PLATFORM) {
+    problems.push(`kokoro-local execution.runtime.platform must be ${KOKORO_RUNTIME_PLATFORM}`);
+  }
+  if (runtime.arch !== KOKORO_RUNTIME_ARCH) {
+    problems.push(`kokoro-local execution.runtime.arch must be ${KOKORO_RUNTIME_ARCH}`);
+  }
+  if (typeof runtime.pythonVersion !== "string" || !runtime.pythonVersion.startsWith(`${KOKORO_RUNTIME_PYTHON_SERIES}.`)) {
+    problems.push(`kokoro-local execution.runtime.pythonVersion must be ${KOKORO_RUNTIME_PYTHON_SERIES}.x`);
+  }
+  if (runtime.torchVersion !== KOKORO_RUNTIME_TORCH_VERSION) {
+    problems.push(`kokoro-local execution.runtime.torchVersion must be ${KOKORO_RUNTIME_TORCH_VERSION}`);
+  }
+  if (runtime.device !== "cpu") problems.push("kokoro-local execution.runtime.device must be cpu");
+
+  const environment = runtime.environment;
+  if (!environment || typeof environment !== "object" || Array.isArray(environment)) {
+    problems.push("kokoro-local receipt requires execution.runtime.environment");
+    return;
+  }
+  if (environment.id !== KOKORO_RUNTIME_ENVIRONMENT_ID) problems.push("kokoro-local runtime environment id drifted");
+  if (environment.target?.platform !== KOKORO_RUNTIME_PLATFORM) problems.push("kokoro-local runtime environment platform drifted");
+  if (environment.target?.arch !== KOKORO_RUNTIME_ARCH) problems.push("kokoro-local runtime environment architecture drifted");
+  if (environment.target?.python !== KOKORO_RUNTIME_PYTHON_SERIES) problems.push("kokoro-local runtime environment Python target drifted");
+  if (environment.target?.device !== "cpu") problems.push("kokoro-local runtime environment device drifted");
+  if (environment.resolver?.name !== "uv" || environment.resolver?.version !== KOKORO_RUNTIME_UV_VERSION) {
+    problems.push("kokoro-local runtime resolver identity drifted");
+  }
+  if (environment.project?.path !== KOKORO_RUNTIME_PROJECT_PATH || environment.project?.sha256 !== KOKORO_RUNTIME_PROJECT_SHA256) {
+    problems.push("kokoro-local runtime project binding drifted");
+  }
+  if (environment.lock?.path !== KOKORO_RUNTIME_LOCK_PATH || environment.lock?.sha256 !== KOKORO_RUNTIME_LOCK_SHA256) {
+    problems.push("kokoro-local runtime lock binding drifted");
+  }
+}
+
 export function validateNarrationReceipt(receipt) {
   const problems = [];
   if (!receipt || typeof receipt !== "object" || Array.isArray(receipt)) {
@@ -104,6 +163,8 @@ export function validateNarrationReceipt(receipt) {
       problems.push("kokoro-local rights.evidence must include the approved provider profile");
     }
   }
+
+  validateKokoroRuntimeEnvironment(receipt, problems);
 
   if (!Array.isArray(receipt.items) || receipt.items.length < 1 || receipt.items.length > 216) {
     problems.push("items must contain between 1 and 216 narration entries");

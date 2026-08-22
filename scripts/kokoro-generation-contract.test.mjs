@@ -15,6 +15,13 @@ import {
   validateGeneratedMp3,
   validateKokoroRuntimeCheckouts,
 } from "./kokoro-generation-contract.mjs";
+import {
+  KOKORO_RUNTIME_ENVIRONMENT_ID,
+  KOKORO_RUNTIME_LOCK_SHA256,
+  KOKORO_RUNTIME_PROJECT_SHA256,
+  KOKORO_RUNTIME_TORCH_VERSION,
+  readKokoroRuntimeEnvironmentBinding,
+} from "./kokoro-runtime-environment.mjs";
 import { buildNarrationGenerationSet } from "./narration-generation-set.mjs";
 import { buildNarrationLineageEntries } from "./narration-lineage.mjs";
 import { buildNarrationProvenanceEntries } from "./narration-rights.mjs";
@@ -23,6 +30,13 @@ import { repoRoot } from "./story-model.mjs";
 
 const AUDIO_SHA = "d".repeat(64);
 const RECEIPT_SHA = "e".repeat(64);
+const APPROVED_RUNTIME = Object.freeze({
+  platform: "linux",
+  arch: "x64",
+  pythonVersion: "3.12.0",
+  torchVersion: KOKORO_RUNTIME_TORCH_VERSION,
+  device: "cpu",
+});
 
 function buildStoryReceiptFixture() {
   const full = buildNarrationGenerationSet();
@@ -35,23 +49,21 @@ function buildStoryReceiptFixture() {
     bytes: 4096,
   }));
   const providerBinding = readApprovedProviderBinding();
+  const runtimeEnvironment = readKokoroRuntimeEnvironmentBinding();
   const receipt = buildKokoroNarrationReceipt({
     generationSet,
     outputs,
     createdAt: new Date("2026-08-22T08:30:00.000Z"),
-    runtime: {
-      pythonVersion: "3.12.0",
-      torchVersion: "2.8.0",
-      device: "cpu",
-    },
+    runtime: APPROVED_RUNTIME,
+    runtimeEnvironment,
     encoder: { version: "ffmpeg version test" },
     providerBinding,
   });
-  return { generationSet, providerBinding, receipt };
+  return { generationSet, providerBinding, receipt, runtimeEnvironment };
 }
 
 function currentNarrationFixture() {
-  const { generationSet, providerBinding, receipt } = buildStoryReceiptFixture();
+  const { generationSet, providerBinding, receipt, runtimeEnvironment } = buildStoryReceiptFixture();
   const entry = generationSet.entries[0];
   const receiptPath = `content/evidence/narration/receipts/${receipt.batchId}.json`;
   const state = {
@@ -62,6 +74,7 @@ function currentNarrationFixture() {
     providerProfileId: receipt.provider.profile.id,
     providerProfilePath: receipt.provider.profile.evidence,
     providerProfileSha256: receipt.provider.profile.sha256,
+    runtimeEnvironment: structuredClone(receipt.execution.runtime.environment),
     textSha256: entry.textSha256,
     audioSha256: AUDIO_SHA,
     generatedAt: receipt.createdAt,
@@ -95,7 +108,8 @@ function currentNarrationFixture() {
     sha256: providerBinding.sha256,
     profile: providerBinding.profile,
   });
-  return { asset, plan, providerBinding, readProviderProfile, readReceipt, receipt };
+  const readRuntimeEnvironment = () => structuredClone(runtimeEnvironment);
+  return { asset, plan, providerBinding, readProviderProfile, readReceipt, readRuntimeEnvironment, receipt, runtimeEnvironment };
 }
 
 test("approved full narration input set is runtime-recomputed and fail-closed", () => {
@@ -147,6 +161,17 @@ test("runtime source checkout identity rejects commit, repository, or dirty-tree
   }
 });
 
+test("approved Python runtime binding is exact and dependency-lock backed", () => {
+  const binding = readKokoroRuntimeEnvironmentBinding();
+  assert.equal(binding.id, KOKORO_RUNTIME_ENVIRONMENT_ID);
+  assert.equal(binding.target.platform, "linux");
+  assert.equal(binding.target.arch, "x64");
+  assert.equal(binding.target.python, "3.12");
+  assert.equal(binding.target.device, "cpu");
+  assert.equal(binding.project.sha256, KOKORO_RUNTIME_PROJECT_SHA256);
+  assert.equal(binding.lock.sha256, KOKORO_RUNTIME_LOCK_SHA256);
+});
+
 test("generated MP3 gate enforces payload identity and release byte budget", () => {
   const valid = Buffer.concat([Buffer.from("ID3", "ascii"), Buffer.alloc(4096, 1)]);
   assert.deepEqual(validateGeneratedMp3(valid), { valid: true, problems: [] });
@@ -156,23 +181,43 @@ test("generated MP3 gate enforces payload identity and release byte budget", () 
   assert.equal(validateGeneratedMp3(oversized).valid, false);
 });
 
-test("Kokoro receipt binds exact approved provider profile and generation set", () => {
-  const { generationSet, providerBinding, receipt } = buildStoryReceiptFixture();
+test("Kokoro receipt binds exact approved provider, runtime host, runtime lock, and generation set", () => {
+  const { generationSet, providerBinding, receipt, runtimeEnvironment } = buildStoryReceiptFixture();
   const validation = validateNarrationReceipt(receipt);
   assert.equal(validation.valid, true, validation.problems.join("; "));
   assert.equal(receipt.inputItemCount, 9);
   assert.equal(receipt.inputDigestSha256, generationSet.inputDigestSha256);
   assert.equal(receipt.provider.name, "kokoro-local");
+  assert.equal(receipt.provider.generator, "kokoro-local-adapter-v2");
   assert.equal(receipt.provider.voice, "zf_001");
   assert.equal(receipt.provider.profile.id, "kokoro-v1.1-zh-zf001");
   assert.equal(receipt.provider.profile.evidence, providerBinding.path);
   assert.equal(receipt.provider.profile.sha256, providerBinding.sha256);
+  assert.equal(receipt.execution.runtime.platform, "linux");
+  assert.equal(receipt.execution.runtime.arch, "x64");
+  assert.equal(receipt.execution.runtime.environment.id, runtimeEnvironment.id);
+  assert.equal(receipt.execution.runtime.environment.lock.sha256, KOKORO_RUNTIME_LOCK_SHA256);
+  assert.equal(receipt.execution.runtime.torchVersion, KOKORO_RUNTIME_TORCH_VERSION);
   assert.equal(receipt.rights.claim, "permission");
   assert.deepEqual(receipt.rights.evidence, [providerBinding.path]);
 
-  const changed = structuredClone(receipt);
-  changed.provider.profile.sha256 = "0".repeat(64);
-  assert.equal(validateNarrationReceipt(changed).valid, true, "generic schema validates hash shape; durable profile verification happens in release rights gate");
+  const changedLock = structuredClone(receipt);
+  changedLock.execution.runtime.environment.lock.sha256 = "0".repeat(64);
+  const changedLockValidation = validateNarrationReceipt(changedLock);
+  assert.equal(changedLockValidation.valid, false);
+  assert.ok(changedLockValidation.problems.some((problem) => problem.includes("runtime lock binding drifted")));
+
+  const changedPlatform = structuredClone(receipt);
+  changedPlatform.execution.runtime.platform = "win32";
+  const changedPlatformValidation = validateNarrationReceipt(changedPlatform);
+  assert.equal(changedPlatformValidation.valid, false);
+  assert.ok(changedPlatformValidation.problems.some((problem) => problem.includes("execution.runtime.platform must be linux")));
+
+  const changedArch = structuredClone(receipt);
+  changedArch.execution.runtime.arch = "arm64";
+  const changedArchValidation = validateNarrationReceipt(changedArch);
+  assert.equal(changedArchValidation.valid, false);
+  assert.ok(changedArchValidation.problems.some((problem) => problem.includes("execution.runtime.arch must be x64")));
 });
 
 test("staged MP3 mutation after initial hashing prevents receipt construction", () => {
@@ -203,7 +248,7 @@ test("staged MP3 mutation after initial hashing prevents receipt construction", 
       generationSet,
       outputs,
       createdAt: new Date("2026-08-22T08:31:00.000Z"),
-      runtime: { pythonVersion: "3.12.0", torchVersion: "2.8.0", device: "cpu" },
+      runtime: APPROVED_RUNTIME,
       encoder: { version: "ffmpeg version test" },
       providerBinding: readApprovedProviderBinding(),
     }), /staged MP3 SHA-256 changed after encoding/);
@@ -217,6 +262,7 @@ test("provider profile byte drift revokes Kokoro narration rights provenance", (
   const good = buildNarrationProvenanceEntries([fixture.asset], fixture.plan, {
     readReceipt: fixture.readReceipt,
     readProviderProfile: fixture.readProviderProfile,
+    readRuntimeEnvironment: fixture.readRuntimeEnvironment,
   });
   assert.deepEqual(Object.keys(good.entries), [fixture.asset.id]);
   assert.deepEqual(good.issues, []);
@@ -228,9 +274,23 @@ test("provider profile byte drift revokes Kokoro narration rights provenance", (
       sha256: "0".repeat(64),
       profile: fixture.providerBinding.profile,
     }),
+    readRuntimeEnvironment: fixture.readRuntimeEnvironment,
   });
   assert.deepEqual(drifted.entries, {});
   assert.ok(drifted.issues.some((issue) => issue.includes("provider profile SHA-256")));
+});
+
+test("runtime lock drift revokes Kokoro narration rights provenance", () => {
+  const fixture = currentNarrationFixture();
+  const changedEnvironment = structuredClone(fixture.runtimeEnvironment);
+  changedEnvironment.lock.sha256 = "0".repeat(64);
+  const drifted = buildNarrationProvenanceEntries([fixture.asset], fixture.plan, {
+    readReceipt: fixture.readReceipt,
+    readProviderProfile: fixture.readProviderProfile,
+    readRuntimeEnvironment: () => changedEnvironment,
+  });
+  assert.deepEqual(drifted.entries, {});
+  assert.ok(drifted.issues.some((issue) => issue.includes("runtime project/lock bytes")));
 });
 
 test("current generated narration gets receipt-backed technical source lineage", () => {
@@ -247,12 +307,18 @@ test("current generated narration gets receipt-backed technical source lineage",
   });
 });
 
-test("legacy xAI direct narration-state writer cannot return", () => {
-  const source = readFileSync(join(repoRoot, "scripts/generate-narration.mjs"), "utf8");
+test("legacy xAI and KPipeline narration paths cannot return", () => {
+  const generator = readFileSync(join(repoRoot, "scripts/generate-narration.mjs"), "utf8");
   for (const forbidden of ["api.x.ai", "XAI_API_KEY", "XAI_TTS_VOICE_ID", "narrationStatePath", "readNarrationState"]) {
-    assert.equal(source.includes(forbidden), false, `legacy generator token must be absent: ${forbidden}`);
+    assert.equal(generator.includes(forbidden), false, `legacy generator token must be absent: ${forbidden}`);
   }
-  assert.match(source, /buildKokoroNarrationReceipt/);
-  assert.match(source, /narrationStateUpdated:\s*false/);
-  assert.match(source, /narration:import/);
+  assert.match(generator, /buildKokoroNarrationReceipt/);
+  assert.match(generator, /readKokoroRuntimeEnvironmentBinding/);
+  assert.match(generator, /narrationStateUpdated:\s*false/);
+  assert.match(generator, /narration:import/);
+
+  const engine = readFileSync(join(repoRoot, "scripts/kokoro-synthesize.py"), "utf8");
+  assert.equal(engine.includes("KPipeline"), true, "engine documentation should explicitly state that KPipeline is not used");
+  assert.equal(engine.includes("from kokoro import KModel, KPipeline"), false);
+  assert.equal(engine.includes("import kokoro"), false);
 });
