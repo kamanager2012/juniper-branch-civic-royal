@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { buildDraftLineageEntries } from "./draft-story-rights.mjs";
+import { buildNarrationLineageEntries } from "./narration-lineage.mjs";
 import { buildPublishedLineageEntries } from "./published-story-rights.mjs";
 import { buildReleaseReadiness, readReleaseAssets } from "./release-readiness.mjs";
 import { repoRoot } from "./story-model.mjs";
@@ -13,6 +14,7 @@ const ALLOWED_METHODS = new Set([
   "git-blob-identity",
   "canonical-source-blob-identity",
   "deterministic-project-generator",
+  "generation-receipt",
 ]);
 
 function readRegistry() {
@@ -43,6 +45,8 @@ function mergedRegistry(assets, historical = readRegistry()) {
   const draft = buildDraftLineageEntries();
   const publishedAssets = assets.filter((asset) => asset.category === "story-text" && asset.textStatus === "media-ready");
   const published = buildPublishedLineageEntries(publishedAssets);
+  const narrationAssets = assets.filter((asset) => asset.category === "narration");
+  const narration = buildNarrationLineageEntries(narrationAssets);
   return {
     ...historical,
     entries: {
@@ -50,8 +54,9 @@ function mergedRegistry(assets, historical = readRegistry()) {
       ...generated.entries,
       ...draft.entries,
       ...published.entries,
+      ...narration.entries,
     },
-    generatedIssues: [...draft.issues, ...published.issues],
+    generatedIssues: [...draft.issues, ...published.issues, ...narration.issues],
   };
 }
 
@@ -99,17 +104,31 @@ function validateEntry(asset, entry) {
   if (!entry.origin || typeof entry.origin !== "object" || Array.isArray(entry.origin)) {
     problems.push("origin must be an object");
   } else {
-    if (typeof entry.origin.commit !== "string" || !/^[a-f0-9]{40}$/.test(entry.origin.commit)) {
-      problems.push("origin.commit must be a 40-character lowercase Git SHA");
+    const method = entry.origin.method;
+    if (!ALLOWED_METHODS.has(method)) {
+      problems.push("origin.method must be git-blob-identity, canonical-source-blob-identity, deterministic-project-generator, or generation-receipt");
     }
     if (typeof entry.origin.path !== "string" || entry.origin.path.trim() === "") {
       problems.push("origin.path must be a non-empty string");
     }
-    if (!ALLOWED_METHODS.has(entry.origin.method)) {
-      problems.push("origin.method must be git-blob-identity, canonical-source-blob-identity, or deterministic-project-generator");
-    }
-    if (typeof entry.origin.gitBlob !== "string" || !/^[a-f0-9]{40}$/.test(entry.origin.gitBlob)) {
-      problems.push("origin.gitBlob must be a 40-character lowercase Git blob SHA");
+
+    if (method === "generation-receipt") {
+      if (typeof entry.origin.receiptSha256 !== "string" || !/^[a-f0-9]{64}$/.test(entry.origin.receiptSha256)) {
+        problems.push("generation-receipt origin.receiptSha256 must be lowercase SHA-256");
+      }
+      if (typeof entry.origin.batchId !== "string" || entry.origin.batchId.trim() === "") {
+        problems.push("generation-receipt origin.batchId must be non-empty");
+      }
+      if (typeof entry.origin.provider !== "string" || entry.origin.provider.trim() === "") {
+        problems.push("generation-receipt origin.provider must be non-empty");
+      }
+    } else {
+      if (typeof entry.origin.commit !== "string" || !/^[a-f0-9]{40}$/.test(entry.origin.commit)) {
+        problems.push("origin.commit must be a 40-character lowercase Git SHA");
+      }
+      if (typeof entry.origin.gitBlob !== "string" || !/^[a-f0-9]{40}$/.test(entry.origin.gitBlob)) {
+        problems.push("origin.gitBlob must be a 40-character lowercase Git blob SHA");
+      }
     }
   }
   if (problems.length > 0) return { status: "invalid", problems };
@@ -157,7 +176,7 @@ export function evaluateLineageRegistry(assets, registry, retiredIds = new Set()
 
   return {
     schemaVersion: 1,
-    registry: "historical + generated + project-authored published/draft lineage",
+    registry: "historical + generated + project-authored published/draft + receipt-backed narration lineage",
     originCommit: registry.originCommit,
     lineage,
     categories,

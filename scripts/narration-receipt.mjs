@@ -6,6 +6,7 @@ import { repoRoot } from "./story-model.mjs";
 
 const ALLOWED_CLAIMS = new Set(["owned", "licensed", "public-domain", "permission"]);
 const RECEIPT_PREFIX = "content/evidence/narration/receipts/";
+export const KOKORO_PROVIDER_PROFILE_PATH = "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json";
 
 function nonEmpty(value) {
   return typeof value === "string" && value.trim() !== "";
@@ -38,6 +39,27 @@ export function sha256Buffer(value) {
   return createHash("sha256").update(value).digest("hex");
 }
 
+function validateProviderProfile(provider, problems) {
+  const profile = provider.profile;
+  if (profile == null) {
+    if (provider.name === "kokoro-local") problems.push("kokoro-local provider requires an exact provider.profile binding");
+    return;
+  }
+  if (typeof profile !== "object" || Array.isArray(profile)) {
+    problems.push("provider.profile must be an object when present");
+    return;
+  }
+  if (!nonEmpty(profile.id)) problems.push("provider.profile.id must be non-empty");
+  if (!safeRelativePath(profile.evidence)) problems.push("provider.profile.evidence must be a safe repository-relative path");
+  if (typeof profile.sha256 !== "string" || !/^[a-f0-9]{64}$/.test(profile.sha256)) {
+    problems.push("provider.profile.sha256 must be lowercase SHA-256");
+  }
+  if (provider.name === "kokoro-local") {
+    if (profile.id !== "kokoro-v1.1-zh-zf001") problems.push("kokoro-local provider.profile.id must be kokoro-v1.1-zh-zf001");
+    if (profile.evidence !== KOKORO_PROVIDER_PROFILE_PATH) problems.push(`kokoro-local provider.profile.evidence must be ${KOKORO_PROVIDER_PROFILE_PATH}`);
+  }
+}
+
 export function validateNarrationReceipt(receipt) {
   const problems = [];
   if (!receipt || typeof receipt !== "object" || Array.isArray(receipt)) {
@@ -68,6 +90,7 @@ export function validateNarrationReceipt(receipt) {
     if (!nonEmpty(provider.voice)) problems.push("provider.voice must be non-empty");
     if (!nonEmpty(provider.language)) problems.push("provider.language must be non-empty");
     if (!nonEmpty(provider.generator)) problems.push("provider.generator must identify the generation implementation");
+    validateProviderProfile(provider, problems);
   }
 
   const rights = receipt.rights;
@@ -77,6 +100,8 @@ export function validateNarrationReceipt(receipt) {
     if (!ALLOWED_CLAIMS.has(rights.claim)) problems.push("rights.claim must be owned/licensed/public-domain/permission");
     if (!Array.isArray(rights.evidence) || rights.evidence.length === 0 || rights.evidence.some((item) => !nonEmpty(item))) {
       problems.push("rights.evidence must contain at least one non-empty reference");
+    } else if (provider?.name === "kokoro-local" && !rights.evidence.includes(KOKORO_PROVIDER_PROFILE_PATH)) {
+      problems.push("kokoro-local rights.evidence must include the approved provider profile");
     }
   }
 

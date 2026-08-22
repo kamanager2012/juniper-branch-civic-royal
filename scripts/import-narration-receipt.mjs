@@ -39,6 +39,11 @@ export function buildNarrationStateFromReceipt({ receipt, receiptPath, receiptSh
     if (problem) problems.push(problem);
   }
 
+  if (receipt.provider.profile?.evidence) {
+    const problem = validateEvidenceReference(receipt.provider.profile.evidence, root);
+    if (problem) problems.push(`provider profile: ${problem}`);
+  }
+
   for (const receiptItem of receipt.items) {
     const canonical = byKey.get(receiptItem.key);
     if (!canonical) {
@@ -80,6 +85,9 @@ export function buildNarrationStateFromReceipt({ receipt, receiptPath, receiptSh
       voice: receipt.provider.voice,
       language: receipt.provider.language,
       generator: receipt.provider.generator,
+      providerProfileId: receipt.provider.profile?.id ?? null,
+      providerProfilePath: receipt.provider.profile?.evidence ?? null,
+      providerProfileSha256: receipt.provider.profile?.sha256 ?? null,
       textSha256: receiptItem.textSha256,
       audioSha256: receiptItem.audioSha256,
       generatedAt: receipt.createdAt,
@@ -142,6 +150,8 @@ if (process.argv[1]?.endsWith("import-narration-receipt.mjs")) {
     batchId: result.receipt.batchId,
     inputItemCount: result.receipt.inputItemCount,
     inputDigestSha256: result.receipt.inputDigestSha256,
+    providerProfileId: result.receipt.provider.profile?.id ?? null,
+    providerProfileSha256: result.receipt.provider.profile?.sha256 ?? null,
     imported: result.imported,
     mode: write ? "write" : "dry-run",
   }, null, 2));
