@@ -39,7 +39,11 @@ test("obsolete duplicate content and direct-state narration generators cannot re
     assert.equal(existsSync(join(repoRoot, path)), false, `${path} is an obsolete second content source`);
   }
 
-  const generator = readFileSync(join(repoRoot, "scripts/generate-narration.mjs"), "utf8");
+  const guard = readFileSync(join(repoRoot, "scripts/generate-narration.mjs"), "utf8");
+  assert.match(guard, /assertNarrationExpansionAllowed/);
+  assert.match(guard, /generate-narration-core\.mjs/);
+
+  const generator = readFileSync(join(repoRoot, "scripts/generate-narration-core.mjs"), "utf8");
   assert.match(generator, /buildNarrationPlan/);
   assert.match(generator, /validateApprovedGenerationSet/);
   assert.match(generator, /buildKokoroNarrationReceipt/);
