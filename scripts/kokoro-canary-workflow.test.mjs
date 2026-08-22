@@ -31,6 +31,33 @@ test("pull-request and main-push canary sensitivity stay exactly aligned", () =>
   assert.deepEqual(pushPaths, pullRequestPaths);
 });
 
+test("uv cache accelerates package downloads without caching the locked runtime environment", () => {
+  const installUv = indexOfRequired("name: Install pinned uv", "pinned uv install step");
+  const cache = indexOfRequired("name: Restore locked narration uv package cache", "uv package cache step");
+  const sync = indexOfRequired("name: Sync locked CPU narration toolchain from lockfile", "locked runtime sync step");
+  const encoder = indexOfRequired("name: Install exact approved MP3 encoder/probe tooling", "encoder step");
+  assert.ok(installUv < cache && cache < sync && sync < encoder, "uv install, cache restore, and locked sync must stay ordered");
+
+  const installBlock = workflow.slice(installUv, cache);
+  assert.match(installBlock, /uv==0\.10\.0/);
+  assert.match(installBlock, /test "\$\(uv cache dir\)" = "\$HOME\/\.cache\/uv"/);
+
+  const cacheBlock = workflow.slice(cache, sync);
+  assert.match(cacheBlock, /uses:\s*actions\/cache@v4/);
+  assert.match(cacheBlock, /path:\s*~\/\.cache\/uv/);
+  assert.match(
+    cacheBlock,
+    /key:\s*kokoro-uv-packages-v1-\$\{\{ runner\.os \}\}-\$\{\{ runner\.arch \}\}-py312-uv0\.10\.0-\$\{\{ hashFiles\('scripts\/narration-runtime\/pyproject\.toml', 'scripts\/narration-runtime\/uv\.lock'\) \}\}/,
+  );
+  assert.equal(cacheBlock.includes(".venv"), false, "uv cache must never include the runnable virtual environment");
+
+  const syncBlock = workflow.slice(sync, encoder);
+  assert.equal(/\n\s*if:/.test(syncBlock), false, "locked runtime sync must run on both uv cache hit and miss");
+  assert.match(syncBlock, /rm -rf scripts\/narration-runtime\/\.venv/);
+  assert.match(syncBlock, /uv sync --locked --project scripts\/narration-runtime/);
+  assert.match(syncBlock, /node scripts\/kokoro-runtime-environment\.mjs/);
+});
+
 test("Kokoro asset cache is keyed by the exact durable provider profile without broad restore fallback", () => {
   assert.match(workflow, /uses:\s*actions\/cache@v4/);
   assert.match(workflow, /path:\s*\.runtime-assets/);
@@ -38,7 +65,7 @@ test("Kokoro asset cache is keyed by the exact durable provider profile without 
     workflow,
     /key:\s*kokoro-local-assets-v1-\$\{\{\s*hashFiles\('content\/evidence\/narration\/providers\/kokoro-v1\.1-zh-zf001\.json'\)\s*\}\}/,
   );
-  assert.equal(workflow.includes("restore-keys:"), false, "canary asset cache must not use broad restore keys");
+  assert.equal(workflow.includes("restore-keys:"), false, "canary caches must not use broad restore keys");
 });
 
 test("cache hit may skip network download but can never skip exact asset verification", () => {
