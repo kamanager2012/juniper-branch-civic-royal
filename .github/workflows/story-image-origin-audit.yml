@@ -1,0 +1,33 @@
+name: story image origin audit
+
+on:
+  pull_request:
+    paths:
+      - "scripts/story-image-origin-audit.mjs"
+      - "scripts/story-image-origin-audit-check.mjs"
+      - ".github/workflows/story-image-origin-audit.yml"
+      - "public/stories/**"
+      - "content/evidence/story-images/**"
+
+permissions:
+  contents: read
+
+jobs:
+  imagine-origin:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Install pinned audit-only JPEG decoder
+        run: npm install --prefix /tmp/story-image-audit-deps --ignore-scripts --no-audit --no-fund jpeg-js@0.4.4
+      - name: Rebuild historical Imagine mapping
+        env:
+          STORY_IMAGE_JPEG_DECODER: /tmp/story-image-audit-deps/node_modules/jpeg-js/index.js
+        run: node scripts/story-image-origin-audit.mjs --output=/tmp/story-image-origin-audit.json
+      - name: Enforce exact origin evidence
+        run: node scripts/story-image-origin-audit-check.mjs /tmp/story-image-origin-audit.json
