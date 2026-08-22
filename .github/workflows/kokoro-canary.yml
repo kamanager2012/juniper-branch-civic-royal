@@ -18,6 +18,24 @@ on:
       - "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json"
       - "content/evidence/narration/pilots/shou-zhu-v1.json"
       - ".github/workflows/kokoro-canary.yml"
+  push:
+    branches: [main]
+    paths:
+      - "scripts/kokoro-canary-qc.mjs"
+      - "scripts/kokoro-canary-qc.test.mjs"
+      - "scripts/generate-narration.mjs"
+      - "scripts/generate-narration-core.mjs"
+      - "scripts/narration-pilot-approval.mjs"
+      - "scripts/narration-pilot-review.mjs"
+      - "scripts/narration-pilot-review.test.mjs"
+      - "scripts/kokoro-synthesize.py"
+      - "scripts/kokoro_runtime.py"
+      - "scripts/kokoro-runtime-smoke.py"
+      - "scripts/kokoro-runtime-environment.mjs"
+      - "scripts/narration-runtime/**"
+      - "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json"
+      - "content/evidence/narration/pilots/shou-zhu-v1.json"
+      - ".github/workflows/kokoro-canary.yml"
   workflow_dispatch:
 
 permissions:
@@ -85,7 +103,15 @@ jobs:
           test "$(git -C .runtime-src/misaki rev-parse HEAD)" = "fba1236595f2d2bf21d414ba6e57d25256afada3"
           test -z "$(git -C .runtime-src/misaki status --porcelain --untracked-files=all)"
 
-      - name: Download exact pinned local model assets
+      - name: Restore exact pinned model asset cache
+        id: kokoro-assets-cache
+        uses: actions/cache@v4
+        with:
+          path: .runtime-assets
+          key: kokoro-local-assets-v1-${{ hashFiles('content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json') }}
+
+      - name: Download exact pinned local model assets on cache miss
+        if: steps.kokoro-assets-cache.outputs.cache-hit != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -96,6 +122,16 @@ jobs:
           curl --fail --location --retry 4 --retry-delay 3 "${BASE}/config.json?download=true" --output .runtime-assets/config.json
           curl --fail --location --retry 4 --retry-delay 3 "${BASE}/kokoro-v1_1-zh.pth?download=true" --output .runtime-assets/kokoro-v1_1-zh.pth
           curl --fail --location --retry 4 --retry-delay 3 "${BASE}/voices/zf_001.pt?download=true" --output .runtime-assets/voices/zf_001.pt
+
+      - name: Verify exact pinned local model assets after restore or download
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t ASSET_FILES < <(find .runtime-assets -type f -printf '%P\n' | sort)
+          test "${#ASSET_FILES[@]}" = "3"
+          test "${ASSET_FILES[0]}" = "config.json"
+          test "${ASSET_FILES[1]}" = "kokoro-v1_1-zh.pth"
+          test "${ASSET_FILES[2]}" = "voices/zf_001.pt"
 
           test "$(sha256sum .runtime-assets/config.json | awk '{print $1}')" = "bc333efa5ce4ceff433c8c8e5d027a1eca0166001e4e4a62bea2d26ff7a46890"
           test "$(wc -c < .runtime-assets/config.json | tr -d ' ')" = "3228"
