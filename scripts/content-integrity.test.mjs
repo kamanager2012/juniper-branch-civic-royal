@@ -3,42 +3,78 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import ts from "typescript";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, "..");
 const sourcePath = join(root, "src/data/stories.ts");
 const source = readFileSync(sourcePath, "utf8");
+const sourceFile = ts.createSourceFile(
+  sourcePath,
+  source,
+  ts.ScriptTarget.Latest,
+  true,
+  ts.ScriptKind.TS,
+);
 
-// Count only actual calls. The helper declaration is `function page(` and is
-// intentionally excluded by requiring the first argument to be a string.
-const pageCallCount = (source.match(/\bpage\(\s*"/g) ?? []).length;
+const pages = [];
+const malformedCalls = [];
 
-// Content text is editorial data and may contain escaped quotes, commas or span
-// multiple lines. The integrity gate cares only about the stable structural
-// fields surrounding it: story id, page id, kind and final image filename.
-const pagePattern =
-  /\bpage\(\s*"([^"]+)"\s*,\s*"([^"]+)"\s*,\s*"(cover|story|moral)"\s*,[\s\S]*?,\s*"([^"]+)"\s*\)/g;
+function literalText(node) {
+  return ts.isStringLiteralLike(node) ? node.text : null;
+}
 
-const pages = [...source.matchAll(pagePattern)].map((match) => ({
-  storyId: match[1],
-  pageId: match[2],
-  kind: match[3],
-  imageFile: match[4],
-}));
+function visit(node) {
+  if (
+    ts.isCallExpression(node) &&
+    ts.isIdentifier(node.expression) &&
+    node.expression.text === "page"
+  ) {
+    const [storyArg, pageArg, kindArg, , imageArg] = node.arguments;
+    const storyId = storyArg ? literalText(storyArg) : null;
+    const pageId = pageArg ? literalText(pageArg) : null;
+    const kind = kindArg ? literalText(kindArg) : null;
+    const imageFile = imageArg ? literalText(imageArg) : null;
+
+    if (
+      !storyId ||
+      !pageId ||
+      !["cover", "story", "moral"].includes(kind) ||
+      !imageFile
+    ) {
+      malformedCalls.push({
+        line: sourceFile.getLineAndCharacterOfPosition(node.getStart()).line + 1,
+        text: node.getText(sourceFile).slice(0, 160),
+      });
+    } else {
+      pages.push({ storyId, pageId, kind, imageFile });
+    }
+  }
+  ts.forEachChild(node, visit);
+}
+
+visit(sourceFile);
 
 function assertNonEmptyFile(path, label) {
   assert.equal(existsSync(path), true, `${label} is missing: ${path}`);
   assert.ok(statSync(path).size > 0, `${label} is empty: ${path}`);
 }
 
-test("every story page resolves to a non-empty image and narration file", () => {
-  assert.ok(pageCallCount > 0, "stories.ts contains no page() calls");
+test("story manifest uses statically verifiable page() calls", () => {
   assert.equal(
-    pages.length,
-    pageCallCount,
-    "content-integrity parser did not understand every page() call; update the gate before changing story syntax",
+    sourceFile.parseDiagnostics.length,
+    0,
+    `stories.ts has parse errors: ${sourceFile.parseDiagnostics.map((d) => d.messageText).join("; ")}`,
   );
+  assert.equal(
+    malformedCalls.length,
+    0,
+    `page() calls must keep literal story/page/kind/image fields: ${JSON.stringify(malformedCalls)}`,
+  );
+  assert.ok(pages.length > 0, "stories.ts contains no page() calls");
+});
 
+test("every story page resolves to a non-empty image and narration file", () => {
   const seen = new Set();
   for (const page of pages) {
     const key = `${page.storyId}/${page.pageId}`;
