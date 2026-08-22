@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -9,6 +9,7 @@ import {
   prepareNarrationPilotReview,
   reviewNarrationPilot,
 } from "./narration-pilot-review.mjs";
+import { repoRoot } from "./story-model.mjs";
 
 const REVIEWED_AT = "2026-08-22T12:30:00.000Z";
 const APPROVE_NOTE = "Human listening review confirmed pronunciation, pacing, intelligibility, and overall narration quality for controlled expansion.";
@@ -129,3 +130,12 @@ test("durable evidence drift blocks review writes and leaves bytes untouched", (
   }), /current evidence is invalid/);
   assert.equal(readFileSync(path, "utf8"), before);
 }));
+
+test("GitHub workflows cannot execute the human pilot review command", () => {
+  const workflowsDir = join(repoRoot, ".github/workflows");
+  const executionPattern = /\b(?:npm\s+run\s+narration:pilot:review|node\s+scripts\/narration-pilot-review\.mjs)\b/;
+  for (const name of readdirSync(workflowsDir).filter((value) => value.endsWith(".yml") || value.endsWith(".yaml"))) {
+    const source = readFileSync(join(workflowsDir, name), "utf8");
+    assert.equal(executionPattern.test(source), false, `${name} must not execute the human pilot review command`);
+  }
+});
