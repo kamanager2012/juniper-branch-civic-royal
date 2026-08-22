@@ -24,6 +24,7 @@
     "narration:plan": "node scripts/narration-plan.mjs --summary",
     "narration:batch": "node scripts/narration-generation-set.mjs",
     "narration:provider:check": "node scripts/kokoro-provider-profile.mjs --check",
+    "narration:runtime:check": "node scripts/kokoro-runtime-environment.mjs",
     "narration:generate": "node scripts/generate-narration.mjs",
     "narration:import": "node scripts/import-narration-receipt.mjs",
     "artwork:generate": "node scripts/generate-product-artwork.mjs --write",
@@ -34,7 +35,7 @@
     "provenance:check": "node scripts/release-readiness.mjs --check --summary",
     "release:report": "node scripts/release-readiness.mjs --summary",
     "release:check": "node scripts/release-readiness.mjs --release --summary",
-    "check": "npm run typecheck && npm test && npm run narration:provider:check && npm run catalog:check && npm run content:check && npm run artwork:check && npm run source:check && npm run provenance:check && npm run media:check && npm run build",
+    "check": "npm run typecheck && npm test && npm run narration:provider:check && npm run narration:runtime:check && npm run catalog:check && npm run content:check && npm run artwork:check && npm run source:check && npm run provenance:check && npm run media:check && npm run build",
     "deps:inventory": "node scripts/dependency-inventory.mjs",
     "lint": "eslint .",
     "format": "prettier --write ."
