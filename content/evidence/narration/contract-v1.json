@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "contract": "narration-verification-v1",
+  "canonicalSource": "content/published-stories.json",
+  "requirements": {
+    "current": [
+      "exact canonical text SHA-256",
+      "exact release MP3 SHA-256"
+    ],
+    "rightsVerified": [
+      "current narration pair",
+      "repository-local durable receipt under content/evidence/narration/receipts/",
+      "receipt SHA-256 matches narration state",
+      "receipt item key/path/text/audio hashes match the canonical release asset",
+      "receipt provider/voice/language/generator metadata matches narration state",
+      "allowed rights claim with durable evidence references"
+    ]
+  },
+  "legacyPolicy": "Existing narration without contemporaneous generation receipts remains unverified. Do not create retrospective receipts merely to raise release coverage.",
+  "driftPolicy": "Text, audio, receipt, provider metadata, rights claim, or rights evidence drift revokes generated narration provenance until a new valid receipt is imported.",
+  "importMode": "dry-run by default; explicit --write required to mutate content/narration-state.json"
+}

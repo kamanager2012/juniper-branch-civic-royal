@@ -13,13 +13,32 @@ function sha256File(path) {
   return createHash("sha256").update(readFileSync(path)).digest("hex");
 }
 
+function isSha256(value) {
+  return typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
+}
+
 export function readNarrationState() {
   if (!existsSync(narrationStatePath)) return { schemaVersion: 1, entries: {} };
   const parsed = JSON.parse(readFileSync(narrationStatePath, "utf8"));
-  if (parsed?.schemaVersion !== 1 || typeof parsed.entries !== "object" || parsed.entries == null) {
+  if (
+    parsed?.schemaVersion !== 1 ||
+    typeof parsed.entries !== "object" ||
+    parsed.entries == null ||
+    Array.isArray(parsed.entries)
+  ) {
     throw new Error("content/narration-state.json must use schemaVersion 1 with an entries object");
   }
   return parsed;
+}
+
+export function evaluateNarrationStatus({ exists, textSha256, audioSha256, entry }) {
+  if (!exists) return "missing";
+  if (!entry) return "unverified";
+
+  // A release narration is current only when BOTH sides of the generated pair
+  // are byte-pinned. Missing/malformed hashes are stale, never implicitly current.
+  if (!isSha256(entry.textSha256) || !isSha256(entry.audioSha256)) return "stale";
+  return entry.textSha256 === textSha256 && entry.audioSha256 === audioSha256 ? "current" : "stale";
 }
 
 export function buildNarrationPlan(options = {}) {
@@ -37,15 +56,7 @@ export function buildNarrationPlan(options = {}) {
       const entry = state.entries[key] ?? null;
       const exists = existsSync(outputPath);
       const audioSha256 = exists ? sha256File(outputPath) : null;
-
-      let status = "missing";
-      if (exists && !entry) status = "unverified";
-      if (exists && entry) {
-        status = entry.textSha256 === textSha256 && (!entry.audioSha256 || entry.audioSha256 === audioSha256)
-          ? "current"
-          : "stale";
-      }
-      if (!exists && entry) status = "missing";
+      const status = evaluateNarrationStatus({ exists, textSha256, audioSha256, entry });
 
       items.push({
         key,

@@ -4,6 +4,7 @@ import { join, relative } from "node:path";
 import { buildDraftProvenanceEntries } from "./draft-story-rights.mjs";
 import { loadDraftStoryCatalog } from "./draft-story-catalog.mjs";
 import { buildNarrationPlan } from "./narration-plan.mjs";
+import { buildNarrationProvenanceEntries } from "./narration-rights.mjs";
 import { buildPublishedProvenanceEntries } from "./published-story-rights.mjs";
 import { buildStoryImageProvenanceEntries } from "./story-image-rights.mjs";
 import { loadStoryModel, repoRoot } from "./story-model.mjs";
@@ -190,20 +191,24 @@ export function buildReleaseReadiness() {
   const assets = buildAssetInventory();
   const publishedStoryAssets = assets.filter((asset) => asset.category === "story-text" && asset.textStatus === "media-ready");
   const storyImageAssets = assets.filter((asset) => asset.category === "story-image");
+  const narrationAssets = assets.filter((asset) => asset.category === "narration");
   const generatedPublished = buildPublishedProvenanceEntries(publishedStoryAssets);
   const generatedDrafts = buildDraftProvenanceEntries();
   const generatedStoryImages = buildStoryImageProvenanceEntries(storyImageAssets);
+  const generatedNarration = buildNarrationProvenanceEntries(narrationAssets);
   const entries = {
     ...registry.entries,
     ...generatedDrafts.entries,
     ...generatedPublished.entries,
     ...generatedStoryImages.entries,
+    ...generatedNarration.entries,
   };
   const inventoryIds = new Set(assets.map((asset) => asset.id));
   const issues = [
     ...generatedDrafts.issues,
     ...generatedPublished.issues,
     ...generatedStoryImages.issues,
+    ...generatedNarration.issues,
   ];
 
   for (const key of Object.keys(entries)) {
@@ -255,7 +260,7 @@ export function buildReleaseReadiness() {
 
   return {
     schemaVersion: 1,
-    registry: "content/release-provenance.json + project-authored text evidence + pinned Grok Imagine image evidence",
+    registry: "content/release-provenance.json + project-authored text evidence + pinned Grok Imagine image evidence + receipt-backed narration evidence",
     provenance,
     narration,
     categories,
