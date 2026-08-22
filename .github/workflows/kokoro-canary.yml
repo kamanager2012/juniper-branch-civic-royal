@@ -70,7 +70,7 @@ jobs:
 
       - name: Restore locked narration uv package cache
         id: narration-uv-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/uv
           key: kokoro-uv-packages-v1-${{ runner.os }}-${{ runner.arch }}-py312-uv0.10.0-${{ hashFiles('scripts/narration-runtime/pyproject.toml', 'scripts/narration-runtime/uv.lock') }}
@@ -117,7 +117,7 @@ jobs:
 
       - name: Restore exact pinned model asset cache
         id: kokoro-assets-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .runtime-assets
           key: kokoro-local-assets-v1-${{ hashFiles('content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json') }}
@@ -221,7 +221,7 @@ jobs:
           done
           find canary-artifact -maxdepth 3 -type f -print
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: kokoro-shou-zhu-canary
