@@ -2,7 +2,7 @@
 
 `content/release-provenance.json` is an evidence registry, not a place to guess rights status.
 
-The registry is intentionally empty until a human or a trusted import process can attach durable evidence to the exact content fingerprint that is being released.
+The registry stays sparse until a human or a trusted import/verification process can attach durable evidence to the exact content fingerprint that is being released.
 
 ## Tracked release assets
 
@@ -20,6 +20,8 @@ Narration has two independent checks:
 2. **Release provenance** — `content/release-provenance.json` records the evidence for distributing that exact MP3.
 
 A narration file is release-ready only when both conditions pass.
+
+Source lineage is a third, separate concept. `content/source-lineage.json` can prove where bytes came from in repository history, but a known origin is never treated as distribution permission by itself.
 
 ## Entry format
 
@@ -56,9 +58,18 @@ Every claim is bound to the current SHA-256 fingerprint. If story text or a file
 
 This prevents a valid license/provenance record for one version from silently authorizing a different version.
 
-## Evidence rules
+## Evidence-reference rule
 
-Evidence must be specific enough for another reviewer to understand why the exact asset can be distributed. Useful evidence can include a repository document, invoice/license record, source terms version, creator declaration, permission record, or other durable source.
+Each verified entry must contain at least one repository-local evidence file. This makes the proof bundle durable even if an external site later changes.
+
+Evidence references are machine-validated:
+
+- repository-local evidence must use a safe relative path, must exist, must be a regular file, and must be non-empty;
+- external evidence must use `https://`;
+- absolute paths, traversal such as `../`, missing files, directories, empty files, and non-HTTPS URLs are rejected;
+- a URL alone is not enough: at least one local evidence artifact must accompany it.
+
+A local evidence artifact can itself record pinned upstream commits, hashes, invoices/license records, source terms snapshots, creator declarations, permission records, or other durable facts. Where automated identity verification is used, record the exact tool/version and comparison result.
 
 Do not use statements such as these as evidence:
 
@@ -66,9 +77,23 @@ Do not use statements such as these as evidence:
 - `downloaded from the internet`;
 - `AI generated`;
 - `the file was already in the repository`;
+- `source lineage is known`;
 - `another agent said it was allowed`.
 
-Do not place API keys, private credentials, personal secrets, or unnecessary personal data in the provenance registry.
+Do not place API keys, private credentials, personal secrets, or unnecessary personal data in the provenance registry or evidence files.
+
+## Current verified example: Ma Shan Zheng
+
+`public/fonts/MaShanZheng.woff2` is verified separately from the historical Grok-export lineage. Its evidence bundle contains:
+
+- the exact local WOFF2 SHA-256;
+- a pinned upstream `googlefonts/mashanzheng` commit and TTF Git blob;
+- FontTools 4.63.0 subset-equivalence results showing every codepoint present in the local WOFF2 matches the official TTF in cmap, outline, and horizontal metrics;
+- a repository-local verbatim copy of the upstream SIL Open Font License 1.1.
+
+See `content/evidence/fonts/MaShanZheng.json` and `licenses/fonts/MaShanZheng/OFL.txt`.
+
+This font verification does not change the status of story text, images, narration, or product artwork.
 
 ## Commands
 
@@ -76,7 +101,7 @@ Do not place API keys, private credentials, personal secrets, or unnecessary per
 # Shows coverage and asset IDs. Unverified assets do not make this command fail.
 npm run release:report
 
-# Used in normal development CI. Fails on malformed, stale, or unknown provenance entries.
+# Used in normal development CI. Fails on malformed, stale, unresolved, or unknown provenance entries.
 npm run provenance:check
 
 # Actual release gate. Fails until every tracked asset has current provenance and every narration is synchronized to current text.
