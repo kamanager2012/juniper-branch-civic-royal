@@ -12,11 +12,13 @@ function argValue(name) {
 async function main() {
   const story = argValue("--story");
   const all = process.argv.includes("--all");
-  if (Boolean(story) === Boolean(all)) {
-    throw new Error("Choose exactly one narration scope: --story <id> or --all");
+  const pending = process.argv.includes("--pending");
+  const scopeCount = Number(Boolean(story)) + Number(all) + Number(pending);
+  if (scopeCount !== 1) {
+    throw new Error("Choose exactly one narration scope: --story <id>, --all, or --pending");
   }
 
-  assertNarrationExpansionAllowed({ story, all });
+  assertNarrationExpansionAllowed({ story, all, pending });
   await import("./generate-narration-core.mjs");
 }
 
