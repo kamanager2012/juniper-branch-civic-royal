@@ -1,0 +1,85 @@
+name: exact-head observable CI
+
+on:
+  push:
+    branches: [main, "feat/**", "fix/**", "chore/**", "generated/**"]
+
+permissions:
+  contents: read
+  statuses: write
+
+jobs:
+  check:
+    name: Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - name: Inventory imported dependencies
+        run: node scripts/dependency-inventory.mjs
+      - run: npm ci
+      - run: npm run check
+
+  dependency-audit:
+    name: dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 22
+          cache: npm
+      - name: Inventory imported dependencies
+        run: node scripts/dependency-inventory.mjs
+      - run: npm ci --ignore-scripts
+      - run: npm audit --audit-level=high
+
+  e2e:
+    name: Chromium desktop + mobile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Install Chromium runtime
+        run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+
+  publish-status:
+    name: publish exact-head status
+    if: ${{ always() }}
+    needs: [check, dependency-audit, e2e]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish machine-readable commit status
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHECK_RESULT: ${{ needs.check.result }}
+          AUDIT_RESULT: ${{ needs.dependency-audit.result }}
+          E2E_RESULT: ${{ needs.e2e.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          state=failure
+          if [ "$CHECK_RESULT" = success ] && [ "$AUDIT_RESULT" = success ] && [ "$E2E_RESULT" = success ]; then
+            state=success
+          fi
+          description="Node20/22=${CHECK_RESULT}; audit=${AUDIT_RESULT}; e2e=${E2E_RESULT}"
+          command -v gh >/dev/null
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
+            -f state="$state" \
+            -f context="exact-head-ci" \
+            -f description="$description" \
+            -f target_url="$RUN_URL"
+          test "$state" = success
