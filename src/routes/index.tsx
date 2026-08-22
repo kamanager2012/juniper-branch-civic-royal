@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({ component: Home });
 
+const EAGER_COVER_COUNT = 4;
+
 const TONE_RING: Record<Story["tone"], string> = {
   wheat: "ring-wheat/70",
   bamboo: "ring-bamboo/70",
@@ -39,6 +41,8 @@ function Home() {
           <img
             src="/ui/bookshelf-paper.jpg"
             alt=""
+            decoding="async"
+            fetchPriority="high"
             className="h-44 w-full object-cover sm:h-56"
           />
           <div className="absolute inset-0 bg-linear-to-r from-ink/55 via-ink/20 to-transparent" />
@@ -55,6 +59,7 @@ function Home() {
         <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6">
           {stories.map((story, i) => {
             const stars = progress[story.id]?.stars ?? 0;
+            const eager = i < EAGER_COVER_COUNT;
             return (
               <li key={story.id} className="rise-in" style={{ animationDelay: `${i * 70}ms` }}>
                 <Link
@@ -72,6 +77,9 @@ function Home() {
                       <img
                         src={story.cover}
                         alt=""
+                        loading={eager ? "eager" : "lazy"}
+                        decoding="async"
+                        fetchPriority={i < 2 ? "high" : "auto"}
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                       />
                       <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-ink/70 to-transparent p-3 pt-10">
