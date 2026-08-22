@@ -200,9 +200,9 @@ function sameRuntimeEnvironment(left, right) {
   return JSON.stringify(left) === JSON.stringify(right);
 }
 
-function approvedEncoderExecution(encoder) {
-  const binding = readApprovedNarrationEncoderBinding();
-  const localSnapshot = inspectLocalNarrationEncoder();
+function approvedEncoderExecution(encoder, options = {}) {
+  const binding = options.binding ?? readApprovedNarrationEncoderBinding();
+  const localSnapshot = options.snapshot ?? inspectLocalNarrationEncoder();
   const localValidation = validateLocalNarrationEncoder(localSnapshot);
   if (!localValidation.valid) {
     throw new Error(`Narration MP3 encoder is not the approved byte-pinned toolchain:\n${localValidation.issues.join("\n")}`);
@@ -236,6 +236,8 @@ export function buildKokoroNarrationReceipt({
   createdAt = new Date(),
   runtime,
   encoder,
+  encoderBinding,
+  encoderSnapshot,
   providerBinding = readApprovedProviderBinding(),
   runtimeEnvironment = readKokoroRuntimeEnvironmentBinding(),
 }) {
@@ -320,7 +322,7 @@ export function buildKokoroNarrationReceipt({
         device: runtime.device,
         environment: runtimeEnvironment,
       },
-      encoder: approvedEncoderExecution(encoder),
+      encoder: approvedEncoderExecution(encoder, { binding: encoderBinding, snapshot: encoderSnapshot }),
     },
     items,
   };

@@ -14,6 +14,7 @@ import {
   KOKORO_RUNTIME_TORCH_VERSION,
   KOKORO_RUNTIME_UV_VERSION,
 } from "./kokoro-runtime-environment.mjs";
+import { NARRATION_ENCODER_PROFILE_ID, NARRATION_ENCODER_PROFILE_PATH } from "./narration-encoder-profile.mjs";
 import { repoRoot } from "./story-model.mjs";
 
 const ALLOWED_CLAIMS = new Set(["owned", "licensed", "public-domain", "permission"]);
@@ -119,6 +120,30 @@ function validateKokoroRuntimeEnvironment(receipt, problems) {
   }
 }
 
+function validateKokoroEncoder(receipt, problems) {
+  if (receipt.provider?.name !== "kokoro-local") return;
+  const encoder = receipt.execution?.encoder;
+  if (!encoder || typeof encoder !== "object" || Array.isArray(encoder)) {
+    problems.push("kokoro-local receipt requires execution.encoder");
+    return;
+  }
+  if (encoder.name !== "ffmpeg") problems.push("kokoro-local encoder.name must be ffmpeg");
+  if (encoder.codec !== "libmp3lame") problems.push("kokoro-local encoder.codec must be libmp3lame");
+  if (encoder.bitrateKbps !== 40) problems.push("kokoro-local encoder bitrate must be 40 kbps");
+  if (encoder.sampleRateHz !== 24000) problems.push("kokoro-local encoder sample rate must be 24000 Hz");
+  if (encoder.channels !== 1) problems.push("kokoro-local encoder channels must be mono");
+  if (encoder.binarySha256 !== "ed16af623947494a72e284b6eb8ff225f2da22b38b5d5069c2fd4b4ba3384e41") problems.push("kokoro-local ffmpeg binary SHA-256 drifted");
+  if (encoder.libmp3lameSha256 !== "14b664b4af2fe18975adb3c06c0369b436dd6504ce421736649c0415447c9d00") problems.push("kokoro-local libmp3lame SHA-256 drifted");
+  const profile = encoder.profile;
+  if (!profile || typeof profile !== "object" || Array.isArray(profile)) {
+    problems.push("kokoro-local encoder requires exact profile binding");
+    return;
+  }
+  if (profile.id !== NARRATION_ENCODER_PROFILE_ID) problems.push("kokoro-local encoder profile id drifted");
+  if (profile.evidence !== NARRATION_ENCODER_PROFILE_PATH) problems.push("kokoro-local encoder profile path drifted");
+  if (typeof profile.sha256 !== "string" || !/^[a-f0-9]{64}$/.test(profile.sha256)) problems.push("kokoro-local encoder profile SHA-256 is invalid");
+}
+
 export function validateNarrationReceipt(receipt) {
   const problems = [];
   if (!receipt || typeof receipt !== "object" || Array.isArray(receipt)) {
@@ -165,6 +190,7 @@ export function validateNarrationReceipt(receipt) {
   }
 
   validateKokoroRuntimeEnvironment(receipt, problems);
+  validateKokoroEncoder(receipt, problems);
 
   if (!Array.isArray(receipt.items) || receipt.items.length < 1 || receipt.items.length > 216) {
     problems.push("items must contain between 1 and 216 narration entries");

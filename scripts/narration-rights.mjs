@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { validateKokoroProviderProfile } from "./kokoro-provider-profile.mjs";
 import { readKokoroRuntimeEnvironmentBinding } from "./kokoro-runtime-environment.mjs";
+import { NARRATION_ENCODER_PROFILE_ID, NARRATION_ENCODER_PROFILE_PATH, validateNarrationEncoderProfile } from "./narration-encoder-profile.mjs";
 import {
   KOKORO_PROVIDER_PROFILE_PATH,
   readNarrationReceipt,
@@ -39,7 +40,9 @@ export function buildNarrationProvenanceEntries(narrationAssets, plan = buildNar
   const readReceipt = options.readReceipt ?? readNarrationReceipt;
   const readProviderProfile = options.readProviderProfile ?? readDurableProviderProfile;
   const readRuntimeEnvironment = options.readRuntimeEnvironment ?? readKokoroRuntimeEnvironmentBinding;
+  const readEncoderProfile = options.readEncoderProfile ?? readDurableProviderProfile;
   const providerProfileCache = new Map();
+  const encoderProfileCache = new Map();
   let currentRuntimeEnvironment;
 
   function durableProviderProfile(path) {
@@ -47,6 +50,11 @@ export function buildNarrationProvenanceEntries(narrationAssets, plan = buildNar
       providerProfileCache.set(path, readProviderProfile(path));
     }
     return providerProfileCache.get(path);
+  }
+
+  function durableEncoderProfile(path) {
+    if (!encoderProfileCache.has(path)) encoderProfileCache.set(path, readEncoderProfile(path));
+    return encoderProfileCache.get(path);
   }
 
   function durableRuntimeEnvironment() {
@@ -142,6 +150,28 @@ export function buildNarrationProvenanceEntries(narrationAssets, plan = buildNar
           if (!sameJson(state.runtimeEnvironment, currentEnvironment)) problems.push("runtime project/lock bytes no longer match narration state");
         } catch (error) {
           problems.push(`runtime environment cannot be revalidated: ${error instanceof Error ? error.message : String(error)}`);
+        }
+
+        const receiptEncoder = receipt.execution?.encoder ?? null;
+        const encoderProfile = receiptEncoder?.profile ?? null;
+        if (!encoderProfile) problems.push("kokoro-local receipt lost its encoder profile binding");
+        if ((encoderProfile?.id ?? null) !== (state.encoderProfileId ?? null)) problems.push("receipt encoder profile id no longer matches narration state");
+        if ((encoderProfile?.evidence ?? null) !== (state.encoderProfilePath ?? null)) problems.push("receipt encoder profile path no longer matches narration state");
+        if ((encoderProfile?.sha256 ?? null) !== (state.encoderProfileSha256 ?? null)) problems.push("receipt encoder profile SHA-256 no longer matches narration state");
+        if ((receiptEncoder?.binarySha256 ?? null) !== (state.encoderBinarySha256 ?? null)) problems.push("receipt ffmpeg SHA-256 no longer matches narration state");
+        if ((receiptEncoder?.libmp3lameSha256 ?? null) !== (state.encoderLibmp3lameSha256 ?? null)) problems.push("receipt libmp3lame SHA-256 no longer matches narration state");
+        if (encoderProfile) {
+          if (encoderProfile.id !== NARRATION_ENCODER_PROFILE_ID) problems.push("encoder profile id is not approved");
+          if (encoderProfile.evidence !== NARRATION_ENCODER_PROFILE_PATH) problems.push("encoder profile path is not approved");
+          try {
+            const currentEncoderProfile = durableEncoderProfile(encoderProfile.evidence);
+            if (currentEncoderProfile.sha256 !== encoderProfile.sha256) problems.push("encoder profile SHA-256 no longer matches receipt");
+            if (currentEncoderProfile.sha256 !== state.encoderProfileSha256) problems.push("encoder profile SHA-256 no longer matches narration state");
+            const encoderValidation = validateNarrationEncoderProfile(currentEncoderProfile.profile);
+            for (const issue of encoderValidation.issues) problems.push(`encoder profile is no longer approved: ${issue}`);
+          } catch (error) {
+            problems.push(`encoder profile cannot be revalidated: ${error instanceof Error ? error.message : String(error)}`);
+          }
         }
       }
 
