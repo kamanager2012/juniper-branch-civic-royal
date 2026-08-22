@@ -1,0 +1,47 @@
+name: narration encoder provenance
+
+on:
+  pull_request:
+    paths:
+      - "content/evidence/narration/encoders/**"
+      - "scripts/narration-encoder-profile.mjs"
+      - "scripts/narration-encoder-profile.test.mjs"
+      - "scripts/kokoro-generation-contract.mjs"
+      - "scripts/narration-receipt.mjs"
+      - "scripts/import-narration-receipt.mjs"
+      - "scripts/narration-rights.mjs"
+      - ".github/workflows/narration-encoder.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  ubuntu-noble-amd64:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+      - name: Install exact approved encoder packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ffmpeg=7:6.1.1-3ubuntu5 \
+            libavcodec60=7:6.1.1-3ubuntu5 \
+            libavformat60=7:6.1.1-3ubuntu5 \
+            libavutil58=7:6.1.1-3ubuntu5 \
+            libswresample4=7:6.1.1-3ubuntu5 \
+            libmp3lame0=3.100-6build1
+      - name: Validate profile and actual local encoder bytes
+        run: node scripts/narration-encoder-profile.mjs --local
+      - name: Verify MP3 encoder surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          ffmpeg -hide_banner -encoders | grep -F "libmp3lame"
+          test "$(dpkg-query -W -f='${Version}' ffmpeg)" = "7:6.1.1-3ubuntu5"
+          test "$(dpkg-query -W -f='${Version}' libmp3lame0)" = "3.100-6build1"
