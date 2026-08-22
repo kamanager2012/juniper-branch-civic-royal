@@ -26,13 +26,23 @@ Maintain **成语故事** as a small, local-first Chinese idiom audio storybook.
 - TTS generation must be explicitly scoped with `--story <id>` or `--all` and must use an explicit voice (`--voice` or `XAI_TTS_VOICE_ID`). No silent bulk generation and no hard-coded provider voice assumptions.
 - API credentials stay in environment variables only. Never commit API keys, tokens, or generated secret-bearing logs.
 
+## Source-lineage boundary
+
+- `content/source-lineage.json` records exact historical origin for current release fingerprints; it is not a rights registry.
+- `scripts/source-lineage.mjs` may recover origin only through exact Git blob identity or byte-identical canonical story source identity.
+- A known Grok-export origin does **not** authorize public distribution. Rights remain governed by `content/release-provenance.json`.
+- Do not fill lineage from filenames, commit-message guesses, model assertions, or visual similarity.
+- If a current asset fingerprint changes, the old lineage entry becomes stale and normal CI must fail until it is recovered or removed.
+- `npm run source:recover` requires full Git history and is an explicit maintenance operation; normal CI uses only `npm run source:check`.
+- See `content/LINEAGE.md` for the evidence model.
+
 ## Release provenance boundary
 
 - `content/release-provenance.json` is an evidence registry for exact content fingerprints; it is not a place to guess legal/rights status.
 - `scripts/release-readiness.mjs` derives the release inventory from canonical story text, referenced story images, narration, fonts, and product artwork.
 - Missing evidence stays `unverified`. Never fill the registry merely to improve a coverage percentage.
 - A provenance entry must contain a current SHA-256 fingerprint, an allowed claim (`owned`, `licensed`, `public-domain`, or `permission`), and durable evidence.
-- Do not use `AI generated`, `downloaded from the internet`, `probably public domain`, repository presence, or another agent's assertion as rights evidence.
+- Do not use `AI generated`, `downloaded from the internet`, `probably public domain`, repository presence, source-lineage status, or another agent's assertion as rights evidence.
 - If an asset changes after evidence was recorded, the old entry becomes `stale`; normal CI must fail until that stale claim is removed or updated with evidence for the new fingerprint.
 - Narration synchronization and narration distribution provenance are separate requirements. A technically current MP3 is not automatically release-cleared.
 - `npm run provenance:check` belongs to normal development CI and fails on malformed/stale/unknown claims. `npm run release:check` is the fail-closed release gate and is allowed to remain red while evidence is incomplete.
@@ -55,6 +65,7 @@ npm run deps:inventory
 npm run typecheck
 npm test
 npm run content:check
+npm run source:check
 npm run provenance:check
 npm run build
 ```
@@ -73,6 +84,7 @@ For story text, page structure, image, narration, font, or product-artwork chang
 ```bash
 npm run content:report
 npm run narration:plan
+npm run source:report
 npm run release:report
 ```
 

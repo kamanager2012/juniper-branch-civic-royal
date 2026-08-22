@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "asset": "public/fonts/MaShanZheng.woff2",
+  "sha256": "11e2c8cbcd09ac08fa38066a2e9699e57fda40a8e2880fbf7cbf101f5926a595",
+  "gitBlob": "79f30c6963e45e7da0b821dc8ea1fec0b1196b1b",
+  "identity": {
+    "method": "fonttools-cmap-outline-hmtx-subset-equivalence",
+    "tool": "fonttools 4.63.0",
+    "localNames": [
+      "Ma Shan Zheng",
+      "Ma Shan Zheng Regular",
+      "MaShanZheng-Regular"
+    ],
+    "localCodepoints": 802,
+    "matchedUpstreamCommit": "72c50ec001cea63d223d35562eeb2ba42f0fe67a",
+    "matchedUpstreamGitBlob": "11bbfb9867d70612158229d037e7a5f622bd0e38",
+    "matchedUpstreamSha256": "6d2546bb189c732a8ca29af9e22457b152387d158aa459e4ac2ce1e51788b7fb",
+    "allLocalCodepointsMatched": true
+  },
+  "comparisons": [
+    {
+      "commit": "72c50ec001cea63d223d35562eeb2ba42f0fe67a",
+      "gitBlob": "11bbfb9867d70612158229d037e7a5f622bd0e38",
+      "upstreamSha256": "6d2546bb189c732a8ca29af9e22457b152387d158aa459e4ac2ce1e51788b7fb",
+      "localCodepoints": 802,
+      "missingCodepoints": [],
+      "outlineMismatches": [],
+      "metricMismatches": [],
+      "matched": true
+    },
+    {
+      "commit": "6bfdbe288f5935c6e9072cdd6ab1aa102a006aab",
+      "gitBlob": "a6ab20d1bd5f27fcfc4ed52515627d1bffb3b6d0",
+      "upstreamSha256": "b844c59bf20bf530e41c20d6ff12b383b23a2e553b9b68cc89f070869213155d",
+      "localCodepoints": 802,
+      "missingCodepoints": [],
+      "outlineMismatches": [],
+      "metricMismatches": [],
+      "matched": true
+    }
+  ],
+  "license": {
+    "type": "SIL Open Font License 1.1",
+    "local": "licenses/fonts/MaShanZheng/OFL.txt",
+    "upstreamRepository": "https://github.com/googlefonts/mashanzheng",
+    "upstreamLicense": "https://github.com/googlefonts/mashanzheng/blob/master/OFL.txt"
+  }
+}
