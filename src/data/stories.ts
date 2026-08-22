@@ -79,8 +79,9 @@ function validateSource(value: unknown): asserts value is { schemaVersion: 1; st
 }
 
 validateSource(publishedSource);
+const publishedStories: PublishedStorySource[] = publishedSource.stories;
 
-export const stories: Story[] = publishedSource.stories.map((story) => ({
+export const stories: Story[] = publishedStories.map((story) => ({
   id: story.id,
   title: story.title,
   pinyin: story.pinyin,
