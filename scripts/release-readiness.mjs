@@ -1,6 +1,8 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
+import { buildDraftProvenanceEntries } from "./draft-story-rights.mjs";
+import { loadDraftStoryCatalog } from "./draft-story-catalog.mjs";
 import { buildNarrationPlan } from "./narration-plan.mjs";
 import { loadStoryModel, repoRoot } from "./story-model.mjs";
 
@@ -75,6 +77,18 @@ function storyTextAsset(story) {
     category: "story-text",
     label: story.title,
     fingerprintSha256: sha256Json(content),
+    textStatus: "media-ready",
+  };
+}
+
+function draftStoryTextAsset(story) {
+  return {
+    id: `text:story:${story.id}`,
+    category: "story-text",
+    label: story.title,
+    fingerprintSha256: story.fingerprintSha256,
+    sourcePath: story.sourcePath,
+    textStatus: "text-ready-media-pending",
   };
 }
 
@@ -95,10 +109,12 @@ function productArtworkFiles() {
 
 function buildAssetInventory() {
   const model = loadStoryModel();
+  const draftCatalog = loadDraftStoryCatalog();
   const narrationPlan = buildNarrationPlan();
   const assets = [];
 
   for (const story of model.stories) assets.push(storyTextAsset(story));
+  for (const story of draftCatalog.stories) assets.push(draftStoryTextAsset(story));
 
   const imagePaths = new Set();
   for (const page of model.pages) imagePaths.add(join(repoRoot, "public", page.image));
@@ -169,16 +185,18 @@ function validateEntry(asset, entry) {
 
 export function buildReleaseReadiness() {
   const registry = readRegistry();
+  const generatedDrafts = buildDraftProvenanceEntries();
+  const entries = { ...registry.entries, ...generatedDrafts.entries };
   const assets = buildAssetInventory();
   const inventoryIds = new Set(assets.map((asset) => asset.id));
-  const issues = [];
+  const issues = [...generatedDrafts.issues];
 
-  for (const key of Object.keys(registry.entries)) {
+  for (const key of Object.keys(entries)) {
     if (!inventoryIds.has(key)) issues.push(`provenance entry points to an unknown asset: ${key}`);
   }
 
   const evaluated = assets.map((asset) => {
-    const entry = registry.entries[asset.id] ?? null;
+    const entry = entries[asset.id] ?? null;
     const result = validateEntry(asset, entry);
     for (const problem of result.problems) issues.push(`${asset.id}: ${problem}`);
     return {
@@ -222,7 +240,7 @@ export function buildReleaseReadiness() {
 
   return {
     schemaVersion: 1,
-    registry: "content/release-provenance.json",
+    registry: "content/release-provenance.json + project-authored draft evidence",
     provenance,
     narration,
     categories,
