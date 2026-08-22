@@ -13,13 +13,15 @@ on:
       - ".github/workflows/kokoro-runtime-lock-bootstrap.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   resolve-python312-cpu-lock:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: feat/narration-runtime-bootstrap
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
@@ -28,11 +30,30 @@ jobs:
       - name: Resolve target runtime
         working-directory: scripts/narration-runtime
         run: uv lock --python "$(command -v python)"
-      - name: Verify resolved CPU torch source
+      - name: Verify exact approved lock bytes and dependency boundary
         working-directory: scripts/narration-runtime
         run: |
+          test "$(sha256sum uv.lock | awk '{print $1}')" = "75dac0288870fd549098dc2ae7a7e3433cbf681433e81a00e15689661accdd9f"
           grep -F 'name = "torch"' uv.lock
           grep -F 'https://download.pytorch.org/whl/cpu' uv.lock
+          for banned in spacy spacy-curated-transformers espeakng-loader phonemizer-fork num2words nvidia-cublas-cu12 triton; do
+            if grep -Fq "name = \"$banned\"" uv.lock; then
+              echo "banned dependency present: $banned" >&2
+              exit 1
+            fi
+          done
+      - name: Commit exact runner-generated lock on branch push only
+        if: github.event_name == 'push'
+        run: |
+          if git diff --quiet -- scripts/narration-runtime/uv.lock && git ls-files --error-unmatch scripts/narration-runtime/uv.lock >/dev/null 2>&1; then
+            echo "lock already committed"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/narration-runtime/uv.lock
+          git commit -m "Pin Kokoro Python 3.12 CPU runtime lock"
+          git push origin HEAD:feat/narration-runtime-bootstrap
       - uses: actions/upload-artifact@v4
         with:
           name: kokoro-runtime-python312-cpu-lock
