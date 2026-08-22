@@ -28,8 +28,10 @@ jobs:
             magick -version | head -n 1
           elif command -v convert >/dev/null 2>&1; then
             convert -version | head -n 1
+          elif command -v ffmpeg >/dev/null 2>&1; then
+            ffmpeg -version | head -n 1
           else
-            echo "ImageMagick is unavailable" >&2
+            echo "No supported JPEG decoder is available" >&2
             exit 1
           fi
       - name: Match release story images to historical Imagine artifacts
