@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 import {
@@ -9,6 +10,7 @@ import {
   KOKORO_MP3_MAX_BYTES,
   buildKokoroNarrationReceipt,
   readApprovedProviderBinding,
+  sha256AudioBuffer,
   validateApprovedGenerationSet,
   validateGeneratedMp3,
   validateKokoroRuntimeCheckouts,
@@ -171,6 +173,43 @@ test("Kokoro receipt binds exact approved provider profile and generation set", 
   const changed = structuredClone(receipt);
   changed.provider.profile.sha256 = "0".repeat(64);
   assert.equal(validateNarrationReceipt(changed).valid, true, "generic schema validates hash shape; durable profile verification happens in release rights gate");
+});
+
+test("staged MP3 mutation after initial hashing prevents receipt construction", () => {
+  const root = mkdtempSync(join(tmpdir(), "kokoro-staged-mutation-"));
+  try {
+    const full = buildNarrationGenerationSet();
+    const generationSet = buildNarrationGenerationSet({ story: full.entries[0].storyId });
+    const initial = Buffer.concat([Buffer.from("ID3", "ascii"), Buffer.alloc(4096, 1)]);
+    const changed = Buffer.concat([Buffer.from("ID3", "ascii"), Buffer.alloc(4096, 2)]);
+    const stagedPath = join(root, "p0.mp3");
+    writeFileSync(stagedPath, initial);
+
+    const outputs = generationSet.entries.map((entry, index) => index === 0 ? {
+      key: entry.key,
+      file: entry.file,
+      audioSha256: sha256AudioBuffer(initial),
+      bytes: initial.length,
+      stagedPath,
+    } : {
+      key: entry.key,
+      file: entry.file,
+      audioSha256: AUDIO_SHA,
+      bytes: 4096,
+    });
+
+    writeFileSync(stagedPath, changed);
+    assert.throws(() => buildKokoroNarrationReceipt({
+      generationSet,
+      outputs,
+      createdAt: new Date("2026-08-22T08:31:00.000Z"),
+      runtime: { pythonVersion: "3.12.0", torchVersion: "2.8.0", device: "cpu" },
+      encoder: { version: "ffmpeg version test" },
+      providerBinding: readApprovedProviderBinding(),
+    }), /staged MP3 SHA-256 changed after encoding/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test("provider profile byte drift revokes Kokoro narration rights provenance", () => {
