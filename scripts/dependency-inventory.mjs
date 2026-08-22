@@ -7,13 +7,11 @@ const roots = ["src", "scripts", "server"];
 const rootFiles = ["vite.config.ts", "eslint.config.mjs"];
 const extensions = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"]);
 const imports = new Map();
-const builtins = new Set([
-  ...builtinModules,
-  ...builtinModules.map((name) => `node:${name}`),
-]);
+const builtins = new Set(builtinModules);
 
 function packageRoot(specifier) {
   if (
+    specifier.startsWith("node:") ||
     builtins.has(specifier) ||
     specifier.startsWith("virtual:") ||
     specifier.startsWith("@/") ||
