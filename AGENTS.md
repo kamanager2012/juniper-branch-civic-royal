@@ -10,10 +10,21 @@ Maintain **成语故事** as a small, local-first Chinese idiom audio storybook.
 - Do not reintroduce `@tanstack/react-start`, Nitro, Better Auth, PostgreSQL/PGlite/Kysely, or Grok Builder runtime code as generic infrastructure.
 - Keep the deployable runtime static: Vite + React + TanStack Router + files under `public/`.
 - Preserve the existing story reading flow, narration, highlighting, page navigation, progress, settings, and mobile-safe-area behavior unless the task explicitly changes UX.
-- Treat `src/data/stories.ts` as the canonical story manifest. Every referenced image and narration file must exist and be non-empty.
+- Treat `src/data/stories.ts` as the only canonical story manifest. Every content tool must consume it through `scripts/story-model.mjs`; do not copy story text into generators, migrations, fixtures, or one-off scripts.
 - Do not silently rename story IDs, page IDs, or asset paths; these are persistence/content keys.
 - Do not commit generated deployment output, screenshots, local workspace state, secrets, or `.env` files.
-- Do not claim content provenance, copyright clearance, or production readiness merely because files exist.
+- Do not claim content provenance, copyright clearance, narration freshness, or production readiness merely because files exist.
+
+## Content pipeline boundary
+
+- `scripts/story-model.mjs` is the shared parser for the canonical story model.
+- `npm run content:check` must pass: referenced images/audio must exist, have valid file signatures, and the story/audio trees must not contain unreferenced orphan assets.
+- `npm run content:report` is the deterministic machine-readable inventory for story/page counts, byte sizes, hashes, warnings, and asset issues.
+- Narration planning is derived from canonical page text with SHA-256 fingerprints. `content/narration-state.json` records only narration generated/verified through the current pipeline.
+- Existing MP3 files without a matching state entry are **unverified**, not current. Never fabricate or infer provenance for them.
+- Do not restore `expand-stories.py`, `generate-narration.py`, `generate-narration-2.py`, or any other duplicate story-text source.
+- TTS generation must be explicitly scoped with `--story <id>` or `--all` and must use an explicit voice (`--voice` or `XAI_TTS_VOICE_ID`). No silent bulk generation and no hard-coded provider voice assumptions.
+- API credentials stay in environment variables only. Never commit API keys, tokens, or generated secret-bearing logs.
 
 ## Offline/PWA boundary
 
@@ -31,6 +42,7 @@ Before claiming a change is complete, run:
 npm run deps:inventory
 npm run typecheck
 npm test
+npm run content:check
 npm run build
 ```
 
@@ -41,6 +53,13 @@ For changes that affect routing, the reader UI, media loading, responsive layout
 ```bash
 npx playwright install chromium
 npm run test:e2e
+```
+
+For story text, page structure, image, or narration changes, also inspect:
+
+```bash
+npm run content:report
+npm run narration:plan
 ```
 
 ## Routing and deployment
