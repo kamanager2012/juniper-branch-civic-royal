@@ -1,0 +1,68 @@
+name: narration installed pilot listening review package
+
+on:
+  pull_request:
+    paths:
+      - "scripts/narration-pilot-review-package.mjs"
+      - "scripts/narration-pilot-review-package.test.mjs"
+      - "scripts/narration-pilot-approval.mjs"
+      - "scripts/narration-plan.mjs"
+      - "content/evidence/narration/pilots/shou-zhu-v1.json"
+      - "content/evidence/narration/receipts/**"
+      - "content/narration-state.json"
+      - "content/published-stories.json"
+      - "public/audio/shou-zhu/**"
+      - ".github/workflows/narration-pilot-review.yml"
+  push:
+    branches: [main]
+    paths:
+      - "scripts/narration-pilot-review-package.mjs"
+      - "scripts/narration-pilot-review-package.test.mjs"
+      - "scripts/narration-pilot-approval.mjs"
+      - "scripts/narration-plan.mjs"
+      - "content/evidence/narration/pilots/shou-zhu-v1.json"
+      - "content/evidence/narration/receipts/**"
+      - "content/narration-state.json"
+      - "content/published-stories.json"
+      - "public/audio/shou-zhu/**"
+      - ".github/workflows/narration-pilot-review.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  installed-pilot-review-package:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "22"
+
+      - name: Validate installed review package contract
+        run: node --test scripts/narration-pilot-review-package.test.mjs
+
+      - name: Build review package from installed release audio only
+        run: node scripts/narration-pilot-review-package.mjs --out-dir pilot-review-artifact
+
+      - name: Prove review packaging did not mutate controlled release state
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --exit-code -- \
+            content/narration-state.json \
+            content/evidence/narration/pilots/shou-zhu-v1.json \
+            public/audio/shou-zhu
+          test "$(find pilot-review-artifact/audio -type f -name '*.mp3' | wc -l | tr -d ' ')" = "9"
+          test -f pilot-review-artifact/review.html
+          test -f pilot-review-artifact/manifest.json
+          test -f pilot-review-artifact/evidence/pilot.json
+          test -f pilot-review-artifact/evidence/receipt.json
+
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: shou-zhu-installed-pilot-review
+          path: pilot-review-artifact/
+          if-no-files-found: error
+          retention-days: 7

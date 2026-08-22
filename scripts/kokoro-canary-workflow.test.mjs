@@ -10,6 +10,7 @@ const NARRATION_WORKFLOW_FILES = [
   "kokoro-provider-audit.yml",
   "kokoro-runtime.yml",
   "narration-encoder.yml",
+  "narration-pilot-review.yml",
 ];
 
 const APPROVED_ACTIONS = new Map([
@@ -25,6 +26,7 @@ const narrationWorkflows = new Map(
   NARRATION_WORKFLOW_FILES.map((file) => [file, readFileSync(workflowPath(file), "utf8")]),
 );
 const workflow = narrationWorkflows.get("kokoro-canary.yml");
+const reviewWorkflow = narrationWorkflows.get("narration-pilot-review.yml");
 
 const CONFIG_SHA = "bc333efa5ce4ceff433c8c8e5d027a1eca0166001e4e4a62bea2d26ff7a46890";
 const WEIGHTS_SHA = "b1d8410fa44dfb5c15471fd6c4225ea6b4e9ac7fa03c98e8bea47a9928476e2b";
@@ -38,11 +40,17 @@ function indexOfRequired(text, label) {
   return index;
 }
 
-function eventPaths(eventName, nextEventName) {
-  const start = indexOfRequired(`  ${eventName}:\n`, `${eventName} trigger`);
-  const end = indexOfRequired(`  ${nextEventName}:\n`, `${nextEventName} trigger`);
+function workflowEventPaths(content, eventName, nextEventName) {
+  const start = content.indexOf(`  ${eventName}:\n`);
+  const end = content.indexOf(`  ${nextEventName}:\n`);
+  assert.notEqual(start, -1, `${eventName} trigger is missing`);
+  assert.notEqual(end, -1, `${nextEventName} trigger is missing`);
   assert.ok(start < end, `${eventName} trigger must appear before ${nextEventName}`);
-  return [...workflow.slice(start, end).matchAll(/^\s{6}- "([^"]+)"$/gm)].map((match) => match[1]);
+  return [...content.slice(start, end).matchAll(/^\s{6}- "([^"]+)"$/gm)].map((match) => match[1]);
+}
+
+function eventPaths(eventName, nextEventName) {
+  return workflowEventPaths(workflow, eventName, nextEventName);
 }
 
 test("narration maintenance workflows pin every GitHub Action to the approved immutable commit", () => {
@@ -63,6 +71,27 @@ test("narration maintenance workflows pin every GitHub Action to the approved im
       assert.equal(majorComment, approved.major, `${file}: ${action} must retain the approved major comment`);
     }
   }
+});
+
+test("installed pilot review workflow is read-only packaging, never synthesis or human decision automation", () => {
+  const pullRequestPaths = workflowEventPaths(reviewWorkflow, "pull_request", "push");
+  const pushPaths = workflowEventPaths(reviewWorkflow, "push", "workflow_dispatch");
+  assert.ok(pullRequestPaths.length > 0);
+  assert.deepEqual(pushPaths, pullRequestPaths);
+  assert.ok(pullRequestPaths.includes("public/audio/shou-zhu/**"));
+  assert.ok(pullRequestPaths.includes("content/evidence/narration/pilots/shou-zhu-v1.json"));
+  assert.ok(pullRequestPaths.includes("content/narration-state.json"));
+
+  assert.match(reviewWorkflow, /permissions:\s*\n\s*contents:\s*read/);
+  assert.equal(reviewWorkflow.includes("contents: write"), false);
+  assert.equal(reviewWorkflow.includes("git push"), false);
+  assert.equal(reviewWorkflow.includes("generate-narration"), false);
+  assert.equal(reviewWorkflow.includes("kokoro-synthesize"), false);
+  assert.equal(reviewWorkflow.includes("ffmpeg"), false);
+  assert.equal(reviewWorkflow.includes("narration-pilot-review.mjs"), false);
+  assert.match(reviewWorkflow, /narration-pilot-review-package\.mjs --out-dir pilot-review-artifact/);
+  assert.match(reviewWorkflow, /git diff --exit-code/);
+  assert.ok(reviewWorkflow.includes(`uses: ${UPLOAD_REF} # v6`));
 });
 
 test("pull-request and main-push canary sensitivity stay exactly aligned", () => {
