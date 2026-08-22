@@ -77,16 +77,26 @@ test("expansion approval requires complete listening review metadata and intact 
   }
 });
 
-test("official generation entrypoint is guarded and raw workflow execution is restricted to the read-only pilot canary", () => {
+test("official and raw narration entrypoints are guarded while the internal core retains receipt separation", () => {
   const pkg = JSON.parse(readFileSync(join(repoRoot, "package.json"), "utf8"));
   assert.equal(pkg.scripts["narration:generate"], "node scripts/generate-narration-guarded.mjs");
 
-  const wrapper = readFileSync(join(repoRoot, "scripts/generate-narration-guarded.mjs"), "utf8");
-  assert.match(wrapper, /assertNarrationExpansionAllowed/);
-  assert.match(wrapper, /scripts\/generate-narration\.mjs/);
+  const official = readFileSync(join(repoRoot, "scripts/generate-narration-guarded.mjs"), "utf8");
+  assert.match(official, /assertNarrationExpansionAllowed/);
+  assert.match(official, /scripts\/generate-narration\.mjs/);
 
-  const generator = readFileSync(join(repoRoot, "scripts/generate-narration.mjs"), "utf8");
-  assert.match(generator, /assertNarrationExpansionAllowed/);
+  const raw = readFileSync(join(repoRoot, "scripts/generate-narration.mjs"), "utf8");
+  assert.match(raw, /assertNarrationExpansionAllowed/);
+  assert.match(raw, /generate-narration-core\.mjs/);
+
+  const core = readFileSync(join(repoRoot, "scripts/generate-narration-core.mjs"), "utf8");
+  for (const forbidden of ["api.x.ai", "XAI_API_KEY", "XAI_TTS_VOICE_ID", "narrationStatePath", "readNarrationState"]) {
+    assert.equal(core.includes(forbidden), false, `internal generator token must be absent: ${forbidden}`);
+  }
+  assert.match(core, /buildKokoroNarrationReceipt/);
+  assert.match(core, /readKokoroRuntimeEnvironmentBinding/);
+  assert.match(core, /narrationStateUpdated:\s*false/);
+  assert.match(core, /narration:import/);
 
   const workflowsDir = join(repoRoot, ".github/workflows");
   const rawExecutions = readdirSync(workflowsDir)
