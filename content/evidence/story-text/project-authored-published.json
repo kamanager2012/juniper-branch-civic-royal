@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "claim": "owned",
+  "scope": "project-use-and-distribution",
+  "description": "The 24 media-ready idiom story texts were freshly rewritten for this project in content/published-stories.json. The claim covers the project-authored wording and structure, not the underlying traditional idioms or historical/mythic plots. This record does not make a jurisdiction-specific assertion about copyrightability of AI-assisted text.",
+  "source": {
+    "path": "content/published-stories.json",
+    "gitBlob": "14ac5fa43cb193feb3b33770cfc40408878972bb",
+    "stories": 24
+  },
+  "externalTextSources": [],
+  "copiedPassages": false,
+  "underlyingIdiomsClaimed": false,
+  "mediaRightsIncluded": false
+}
