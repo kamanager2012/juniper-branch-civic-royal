@@ -54,7 +54,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          cp .github/workflows/kokoro-canary.yml /tmp/kokoro-canary.yml
+          cp .github/workflows/narration-encoder-migrate.yml /tmp/narration-encoder-migrate.yml
           python3 scripts/apply-encoder-provenance.py
+          cp /tmp/kokoro-canary.yml .github/workflows/kokoro-canary.yml
+          cp /tmp/narration-encoder-migrate.yml .github/workflows/narration-encoder-migrate.yml
           git diff --check
           git status --short
           git config user.name "github-actions[bot]"
