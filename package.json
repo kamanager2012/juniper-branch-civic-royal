@@ -18,6 +18,7 @@
     "test:e2e": "playwright test",
     "content:check": "node scripts/content-report.mjs --check --summary",
     "content:report": "node scripts/content-report.mjs",
+    "media:report": "node scripts/media-performance.mjs",
     "narration:plan": "node scripts/narration-plan.mjs --summary",
     "narration:generate": "node scripts/generate-narration.mjs",
     "provenance:check": "node scripts/release-readiness.mjs --check --summary",
