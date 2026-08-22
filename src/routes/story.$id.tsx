@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { DraftStoryReader } from "@/components/draft-story-reader";
-import { StoryReader } from "@/components/story-reader";
+import { IllustratedStoryReader } from "@/components/illustrated-story-reader";
 import { getDraftStory } from "@/data/story-catalog";
 import { getStory } from "@/data/stories";
 
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/story/$id")({
 function StoryRoute() {
   const { id } = Route.useParams();
   const story = getStory(id);
-  if (story) return <StoryReader story={story} />;
+  if (story) return <IllustratedStoryReader story={story} />;
 
   const draft = getDraftStory(id);
   if (draft) return <DraftStoryReader story={draft} />;
