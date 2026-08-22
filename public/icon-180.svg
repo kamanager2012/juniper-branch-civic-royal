@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180" role="img" aria-label="成语故事">
+  <rect width="180" height="180" rx="40" fill="#F4EAD8"/>
+  <rect x="25" y="32" width="130" height="116" rx="15" fill="#B33828"/>
+  <rect x="36" y="43" width="108" height="94" rx="10" fill="#FFF8EC"/>
+  <path d="M90 50v80" stroke="#D9C4A4" stroke-width="5"/>
+  <circle cx="68" cy="86" r="13" fill="#3F7A5A"/>
+  <circle cx="112" cy="94" r="10" fill="#C7922B"/>
+  <rect x="50" y="118" width="33" height="7" rx="3.5" fill="#B33828"/>
+</svg>
