@@ -8,10 +8,11 @@ function sameStringArray(left, right) {
     left.length === right.length && left.every((value, index) => value === right[index]);
 }
 
-export function buildNarrationProvenanceEntries(narrationAssets, plan = buildNarrationPlan()) {
+export function buildNarrationProvenanceEntries(narrationAssets, plan = buildNarrationPlan(), options = {}) {
   const entries = {};
   const issues = [];
   const byOutput = new Map(plan.items.map((item) => [item.output, item]));
+  const readReceipt = options.readReceipt ?? readNarrationReceipt;
 
   for (const asset of narrationAssets) {
     if (asset.category !== "narration") {
@@ -46,7 +47,7 @@ export function buildNarrationProvenanceEntries(narrationAssets, plan = buildNar
     let durable = null;
     if (problems.length === 0) {
       try {
-        durable = readNarrationReceipt(state.receiptPath);
+        durable = readReceipt(state.receiptPath);
       } catch (error) {
         problems.push(`receipt cannot be revalidated: ${error instanceof Error ? error.message : String(error)}`);
       }
