@@ -15,3 +15,12 @@ createRoot(rootElement).render(
     <RouterProvider router={router} />
   </StrictMode>,
 );
+
+if (import.meta.env.PROD && "serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    void navigator.serviceWorker.register("/sw.js").catch(() => {
+      // Offline support is progressive enhancement; a registration failure
+      // must never prevent children from opening and reading the storybook.
+    });
+  });
+}
