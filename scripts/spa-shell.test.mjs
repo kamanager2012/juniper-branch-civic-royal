@@ -1,11 +1,22 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { dirname, join, relative, resolve } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (path) => readFileSync(join(root, path), "utf8");
+
+function sourceFiles(dir) {
+  const files = [];
+  for (const name of readdirSync(dir)) {
+    const path = join(dir, name);
+    const stat = statSync(path);
+    if (stat.isDirectory()) files.push(...sourceFiles(path));
+    else if (/\.(?:ts|tsx|js|jsx|css|json)$/.test(name)) files.push(path);
+  }
+  return files;
+}
 
 test("runtime is a static Vite + TanStack Router SPA", () => {
   const pkg = JSON.parse(read("package.json"));
@@ -22,6 +33,51 @@ test("runtime is a static Vite + TanStack Router SPA", () => {
   assert.match(main, /createRoot/);
   assert.equal(existsSync(join(root, "index.html")), true);
   assert.equal(existsSync(join(root, "server")), false);
+});
+
+test("browser runtime remains model-free and offline-first", () => {
+  const pkg = JSON.parse(read("package.json"));
+  const productionDependencies = Object.keys(pkg.dependencies ?? {});
+  const forbiddenDependencyPatterns = [
+    /^openai$/i,
+    /anthropic/i,
+    /xai/i,
+    /kokoro/i,
+    /transformers/i,
+    /onnxruntime/i,
+    /tensorflow/i,
+    /torch/i,
+    /huggingface/i,
+  ];
+  for (const dependency of productionDependencies) {
+    assert.equal(
+      forbiddenDependencyPatterns.some((pattern) => pattern.test(dependency)),
+      false,
+      `browser production dependency must not include model/runtime package: ${dependency}`,
+    );
+  }
+
+  const forbiddenRuntimeTokens = [
+    "api.openai.com",
+    "api.anthropic.com",
+    "api.x.ai",
+    "huggingface.co",
+    "Kokoro",
+    "KPipeline",
+    "transformers.js",
+    "onnxruntime",
+  ];
+  for (const absolutePath of sourceFiles(join(root, "src"))) {
+    const content = readFileSync(absolutePath, "utf8");
+    const path = relative(root, absolutePath).replaceAll("\\", "/");
+    for (const token of forbiddenRuntimeTokens) {
+      assert.equal(content.includes(token), false, `${path} must not depend on model/remote inference token: ${token}`);
+    }
+  }
+
+  assert.equal(existsSync(join(root, "src", "server")), false);
+  assert.equal(existsSync(join(root, "src", "api")), false);
+  assert.equal(existsSync(join(root, "public", "models")), false);
 });
 
 test("PWA metadata and offline shell are static and product-owned", () => {
