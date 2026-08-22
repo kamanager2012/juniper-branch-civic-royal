@@ -1,0 +1,37 @@
+name: kokoro runtime lock bootstrap
+
+on:
+  push:
+    branches:
+      - feat/narration-runtime-bootstrap
+    paths:
+      - "scripts/narration-runtime/pyproject.toml"
+      - ".github/workflows/kokoro-runtime-lock-bootstrap.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  resolve-python312-cpu-lock:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install pinned uv resolver
+        run: python -m pip install --disable-pip-version-check uv==0.10.0
+      - name: Resolve target runtime
+        working-directory: scripts/narration-runtime
+        run: uv lock --python "$(command -v python)"
+      - name: Verify resolved CPU torch source
+        working-directory: scripts/narration-runtime
+        run: |
+          grep -F 'name = "torch"' uv.lock
+          grep -F 'https://download.pytorch.org/whl/cpu' uv.lock
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kokoro-runtime-python312-cpu-lock
+          path: scripts/narration-runtime/uv.lock
+          if-no-files-found: error
+          retention-days: 1
