@@ -1,0 +1,23 @@
+name: storybook product E2E
+
+on:
+  pull_request:
+    branches: ["feat/storybook-foundation-cleanup"]
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    name: Chromium desktop + mobile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Install Chromium runtime
+        run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e

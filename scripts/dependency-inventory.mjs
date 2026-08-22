@@ -3,8 +3,8 @@ import { builtinModules } from "node:module";
 import { extname, join, relative, resolve } from "node:path";
 
 const root = resolve(new URL("..", import.meta.url).pathname);
-const roots = ["src", "scripts"];
-const rootFiles = ["vite.config.ts", "eslint.config.mjs"];
+const roots = ["src", "scripts", "e2e"];
+const rootFiles = ["vite.config.ts", "playwright.config.ts", "eslint.config.mjs"];
 const extensions = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"]);
 const imports = new Map();
 const builtins = new Set([
@@ -60,7 +60,10 @@ function walk(dir) {
 }
 
 for (const dir of roots) walk(join(root, dir));
-for (const file of rootFiles) scan(join(root, file));
+for (const file of rootFiles) {
+  const path = join(root, file);
+  if (existsSync(path)) scan(path);
+}
 
 const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
 const declared = new Set([

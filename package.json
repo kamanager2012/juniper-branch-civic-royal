@@ -15,6 +15,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "node --test scripts/content-integrity.test.mjs scripts/spa-shell.test.mjs",
+    "test:e2e": "playwright test",
     "check": "npm run typecheck && npm test && npm run build",
     "deps:inventory": "node scripts/dependency-inventory.mjs",
     "lint": "eslint .",
@@ -30,6 +31,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.20.0",
+    "@playwright/test": "1.62.1",
     "@tailwindcss/vite": "^4.3.0",
     "@tanstack/router-plugin": "^1.168.0",
     "@types/node": "^22.16.5",
