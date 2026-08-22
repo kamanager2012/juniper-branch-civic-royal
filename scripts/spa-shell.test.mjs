@@ -37,9 +37,13 @@ test("PWA metadata and offline shell are static and product-owned", () => {
   assert.ok(Array.isArray(manifest.icons) && manifest.icons.length > 0);
   assert.match(html, /href="\/manifest\.webmanifest"/);
   assert.match(main, /serviceWorker\.register\("\/sw\.js"\)/);
-  assert.match(serviceWorker, /chengyu-storybook-shell-v1/);
+  assert.match(serviceWorker, /chengyu-storybook-shell-v2/);
+  assert.match(serviceWorker, /"\/ui\/bookshelf-paper\.jpg"/);
+  assert.match(serviceWorker, /"\/icon-180\.png"/);
+  assert.match(serviceWorker, /pathname\.startsWith\("\/ui\/"\)/);
   assert.match(serviceWorker, /request\.headers\.has\("range"\)/);
   assert.match(serviceWorker, /pathname\.startsWith\("\/audio\/"\)/);
+  assert.doesNotMatch(serviceWorker, /cache:\s*["']no-store["']/);
   assert.equal(existsSync(join(root, "public/sw.js")), true);
   assert.equal(existsSync(join(root, "public/__grok")), false);
 });
