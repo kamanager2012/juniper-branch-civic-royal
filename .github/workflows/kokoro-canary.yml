@@ -46,6 +46,15 @@ jobs:
           uv sync --locked --project scripts/narration-runtime
           node scripts/kokoro-runtime-environment.mjs
 
+      - name: Install local MP3 encoder/probe tooling
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ffmpeg
+          ffmpeg -version | head -1
+          ffprobe -version | head -1
+
       - name: Checkout exact Kokoro and Misaki source commits
         shell: bash
         run: |
@@ -144,8 +153,10 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p canary-artifact/audio canary-artifact/evidence
-          if compgen -G 'public/audio/shou-zhu/*.mp3' > /dev/null; then cp public/audio/shou-zhu/*.mp3 canary-artifact/audio/; fi
-          if [[ -n "${CANARY_RECEIPT:-}" && -f "$CANARY_RECEIPT" ]]; then cp "$CANARY_RECEIPT" canary-artifact/evidence/receipt.json; fi
+          if [[ -n "${CANARY_RECEIPT:-}" && -f "$CANARY_RECEIPT" ]]; then
+            cp "$CANARY_RECEIPT" canary-artifact/evidence/receipt.json
+            cp public/audio/shou-zhu/*.mp3 canary-artifact/audio/
+          fi
           for file in canary-generation.log canary-import-dry-run.json canary-qc.json; do
             if [[ -f "$file" ]]; then cp "$file" canary-artifact/; fi
           done
