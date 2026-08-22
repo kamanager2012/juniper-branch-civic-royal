@@ -22,6 +22,7 @@ import {
   KOKORO_RUNTIME_TORCH_VERSION,
   readKokoroRuntimeEnvironmentBinding,
 } from "./kokoro-runtime-environment.mjs";
+import { readNarrationEncoderProfile } from "./narration-encoder-profile.mjs";
 import { buildNarrationGenerationSet } from "./narration-generation-set.mjs";
 import { buildNarrationLineageEntries } from "./narration-lineage.mjs";
 import { buildNarrationProvenanceEntries } from "./narration-rights.mjs";
@@ -38,6 +39,21 @@ const APPROVED_RUNTIME = Object.freeze({
   device: "cpu",
 });
 
+function approvedEncoderFixture() {
+  const binding = readNarrationEncoderProfile();
+  const profile = binding.profile;
+  return {
+    binding,
+    snapshot: {
+      schemaVersion: 1,
+      architecture: profile.target.architecture,
+      binaries: structuredClone(profile.binaries),
+      libraries: structuredClone(profile.libraries),
+      encoderInventoryLine: profile.encoderInventoryLine,
+    },
+  };
+}
+
 function buildStoryReceiptFixture() {
   const full = buildNarrationGenerationSet();
   const storyId = full.entries[0].storyId;
@@ -50,13 +66,16 @@ function buildStoryReceiptFixture() {
   }));
   const providerBinding = readApprovedProviderBinding();
   const runtimeEnvironment = readKokoroRuntimeEnvironmentBinding();
+  const encoderFixture = approvedEncoderFixture();
   const receipt = buildKokoroNarrationReceipt({
     generationSet,
     outputs,
     createdAt: new Date("2026-08-22T08:30:00.000Z"),
     runtime: APPROVED_RUNTIME,
     runtimeEnvironment,
-    encoder: { version: "ffmpeg version test" },
+    encoder: { version: encoderFixture.snapshot.binaries.find((item) => item.name === "ffmpeg").versionLine },
+    encoderBinding: encoderFixture.binding,
+    encoderSnapshot: encoderFixture.snapshot,
     providerBinding,
   });
   return { generationSet, providerBinding, receipt, runtimeEnvironment };
@@ -75,6 +94,11 @@ function currentNarrationFixture() {
     providerProfilePath: receipt.provider.profile.evidence,
     providerProfileSha256: receipt.provider.profile.sha256,
     runtimeEnvironment: structuredClone(receipt.execution.runtime.environment),
+    encoderProfileId: receipt.execution.encoder.profile.id,
+    encoderProfilePath: receipt.execution.encoder.profile.evidence,
+    encoderProfileSha256: receipt.execution.encoder.profile.sha256,
+    encoderBinarySha256: receipt.execution.encoder.binarySha256,
+    encoderLibmp3lameSha256: receipt.execution.encoder.libmp3lameSha256,
     textSha256: entry.textSha256,
     audioSha256: AUDIO_SHA,
     generatedAt: receipt.createdAt,
@@ -198,6 +222,9 @@ test("Kokoro receipt binds exact approved provider, runtime host, runtime lock, 
   assert.equal(receipt.execution.runtime.environment.id, runtimeEnvironment.id);
   assert.equal(receipt.execution.runtime.environment.lock.sha256, KOKORO_RUNTIME_LOCK_SHA256);
   assert.equal(receipt.execution.runtime.torchVersion, KOKORO_RUNTIME_TORCH_VERSION);
+  assert.equal(receipt.execution.encoder.profile.id, "ffmpeg-noble-6.1.1-libmp3lame-v1");
+  assert.equal(receipt.execution.encoder.binarySha256, "ed16af623947494a72e284b6eb8ff225f2da22b38b5d5069c2fd4b4ba3384e41");
+  assert.equal(receipt.execution.encoder.libmp3lameSha256, "14b664b4af2fe18975adb3c06c0369b436dd6504ce421736649c0415447c9d00");
   assert.equal(receipt.rights.claim, "permission");
   assert.deepEqual(receipt.rights.evidence, [providerBinding.path]);
 
@@ -249,7 +276,9 @@ test("staged MP3 mutation after initial hashing prevents receipt construction", 
       outputs,
       createdAt: new Date("2026-08-22T08:31:00.000Z"),
       runtime: APPROVED_RUNTIME,
-      encoder: { version: "ffmpeg version test" },
+      encoder: { version: approvedEncoderFixture().snapshot.binaries.find((item) => item.name === "ffmpeg").versionLine },
+      encoderBinding: approvedEncoderFixture().binding,
+      encoderSnapshot: approvedEncoderFixture().snapshot,
       providerBinding: readApprovedProviderBinding(),
     }), /staged MP3 SHA-256 changed after encoding/);
   } finally {

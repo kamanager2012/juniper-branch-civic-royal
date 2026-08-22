@@ -13,6 +13,13 @@ import {
   validateKokoroRuntimeHost,
 } from "./kokoro-runtime-environment.mjs";
 import {
+  NARRATION_ENCODER_PROFILE_ID,
+  NARRATION_ENCODER_PROFILE_PATH,
+  inspectLocalNarrationEncoder,
+  readApprovedNarrationEncoderBinding,
+  validateLocalNarrationEncoder,
+} from "./narration-encoder-profile.mjs";
+import {
   buildNarrationGenerationSet,
   computeNarrationInputDigest,
 } from "./narration-generation-set.mjs";
@@ -193,12 +200,44 @@ function sameRuntimeEnvironment(left, right) {
   return JSON.stringify(left) === JSON.stringify(right);
 }
 
+function approvedEncoderExecution(encoder, options = {}) {
+  const binding = options.binding ?? readApprovedNarrationEncoderBinding();
+  const localSnapshot = options.snapshot ?? inspectLocalNarrationEncoder();
+  const localValidation = validateLocalNarrationEncoder(localSnapshot);
+  if (!localValidation.valid) {
+    throw new Error(`Narration MP3 encoder is not the approved byte-pinned toolchain:\n${localValidation.issues.join("\n")}`);
+  }
+  const ffmpeg = localSnapshot.binaries.find((item) => item.name === "ffmpeg");
+  const lame = localSnapshot.libraries.find((item) => item.soname === "libmp3lame.so.0");
+  if (!ffmpeg || !lame) throw new Error("Approved narration encoder snapshot is incomplete");
+  if (encoder?.version !== ffmpeg.versionLine) {
+    throw new Error("Narration encoder version line does not match the approved ffmpeg binary");
+  }
+  return {
+    name: "ffmpeg",
+    version: ffmpeg.versionLine,
+    codec: "libmp3lame",
+    bitrateKbps: KOKORO_MP3_BITRATE_KBPS,
+    sampleRateHz: KOKORO_SAMPLE_RATE_HZ,
+    channels: KOKORO_CHANNELS,
+    binarySha256: ffmpeg.sha256,
+    libmp3lameSha256: lame.sha256,
+    profile: {
+      id: NARRATION_ENCODER_PROFILE_ID,
+      evidence: NARRATION_ENCODER_PROFILE_PATH,
+      sha256: binding.sha256,
+    },
+  };
+}
+
 export function buildKokoroNarrationReceipt({
   generationSet,
   outputs,
   createdAt = new Date(),
   runtime,
   encoder,
+  encoderBinding,
+  encoderSnapshot,
   providerBinding = readApprovedProviderBinding(),
   runtimeEnvironment = readKokoroRuntimeEnvironmentBinding(),
 }) {
@@ -283,14 +322,7 @@ export function buildKokoroNarrationReceipt({
         device: runtime.device,
         environment: runtimeEnvironment,
       },
-      encoder: {
-        name: "ffmpeg",
-        version: encoder.version,
-        codec: "libmp3lame",
-        bitrateKbps: KOKORO_MP3_BITRATE_KBPS,
-        sampleRateHz: KOKORO_SAMPLE_RATE_HZ,
-        channels: KOKORO_CHANNELS,
-      },
+      encoder: approvedEncoderExecution(encoder, { binding: encoderBinding, snapshot: encoderSnapshot }),
     },
     items,
   };
