@@ -23,6 +23,8 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           cache: npm
+      - name: Inventory imported dependencies
+        run: node scripts/dependency-inventory.mjs
       - run: npm ci
       - run: npm run check
 
@@ -35,5 +37,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - name: Inventory imported dependencies
+        run: node scripts/dependency-inventory.mjs
       - run: npm ci --ignore-scripts
       - run: npm audit --audit-level=high
