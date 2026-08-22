@@ -1,4 +1,5 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
+import { builtinModules } from "node:module";
 import { extname, join, relative, resolve } from "node:path";
 
 const root = resolve(new URL("..", import.meta.url).pathname);
@@ -6,11 +7,23 @@ const roots = ["src", "scripts", "server"];
 const rootFiles = ["vite.config.ts", "eslint.config.mjs"];
 const extensions = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"]);
 const imports = new Map();
+const builtins = new Set([
+  ...builtinModules,
+  ...builtinModules.map((name) => `node:${name}`),
+]);
 
 function packageRoot(specifier) {
-  if (specifier.startsWith("node:") || specifier.startsWith(".") || specifier.startsWith("/") || specifier.startsWith("@/")) {
+  if (
+    builtins.has(specifier) ||
+    specifier.startsWith("virtual:") ||
+    specifier.startsWith("@/") ||
+    specifier.startsWith("/") ||
+    specifier.startsWith(".") ||
+    specifier.startsWith("\\")
+  ) {
     return null;
   }
+
   const parts = specifier.split("/");
   return specifier.startsWith("@") ? parts.slice(0, 2).join("/") : parts[0];
 }
@@ -23,6 +36,7 @@ function scan(path) {
     /\bimport\s*\(\s*["']([^"']+)["']\s*\)/g,
     /\brequire\s*\(\s*["']([^"']+)["']\s*\)/g,
   ];
+
   for (const pattern of patterns) {
     for (const match of text.matchAll(pattern)) {
       const pkg = packageRoot(match[1]);
