@@ -7,6 +7,10 @@ on:
     paths:
       - "scripts/narration-runtime/pyproject.toml"
       - ".github/workflows/kokoro-runtime-lock-bootstrap.yml"
+  pull_request:
+    paths:
+      - "scripts/narration-runtime/pyproject.toml"
+      - ".github/workflows/kokoro-runtime-lock-bootstrap.yml"
 
 permissions:
   contents: read
