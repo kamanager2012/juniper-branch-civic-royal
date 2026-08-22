@@ -9,15 +9,21 @@ const root = resolve(here, "..");
 const sourcePath = join(root, "src/data/stories.ts");
 const source = readFileSync(sourcePath, "utf8");
 
-const pageCallCount = (source.match(/\bpage\(/g) ?? []).length - 1; // exclude function page(...)
+// Count only actual calls. The helper declaration is `function page(` and is
+// intentionally excluded by requiring the first argument to be a string.
+const pageCallCount = (source.match(/\bpage\(\s*"/g) ?? []).length;
+
+// Content text is editorial data and may contain escaped quotes, commas or span
+// multiple lines. The integrity gate cares only about the stable structural
+// fields surrounding it: story id, page id, kind and final image filename.
 const pagePattern =
-  /page\(\s*"([^"]+)"\s*,\s*"([^"]+)"\s*,\s*"(cover|story|moral)"\s*,\s*"((?:[^"\\]|\\.)*)"\s*,\s*"([^"]+)"\s*\)/g;
+  /\bpage\(\s*"([^"]+)"\s*,\s*"([^"]+)"\s*,\s*"(cover|story|moral)"\s*,[\s\S]*?,\s*"([^"]+)"\s*\)/g;
 
 const pages = [...source.matchAll(pagePattern)].map((match) => ({
   storyId: match[1],
   pageId: match[2],
   kind: match[3],
-  imageFile: match[5],
+  imageFile: match[4],
 }));
 
 function assertNonEmptyFile(path, label) {
