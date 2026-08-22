@@ -10,10 +10,11 @@ on:
       - "scripts/narration-receipt.mjs"
       - "scripts/import-narration-receipt.mjs"
       - "scripts/narration-rights.mjs"
+      - "scripts/apply-encoder-provenance.py"
       - ".github/workflows/narration-encoder.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   ubuntu-noble-amd64:
@@ -21,6 +22,9 @@ jobs:
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: feat/narration-encoder-provenance
+          fetch-depth: 0
       - uses: actions/setup-node@v7
         with:
           node-version: "22"
@@ -45,3 +49,16 @@ jobs:
           ffmpeg -hide_banner -encoders | grep -F "libmp3lame"
           test "$(dpkg-query -W -f='${Version}' ffmpeg)" = "7:6.1.1-3ubuntu5"
           test "$(dpkg-query -W -f='${Version}' libmp3lame0)" = "3.100-6build1"
+      - name: Apply one-time encoder provenance migration
+        if: hashFiles('scripts/apply-encoder-provenance.py') != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/apply-encoder-provenance.py
+          git diff --check
+          git status --short
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "feat: bind encoder provenance through narration verification"
+          git push origin HEAD:feat/narration-encoder-provenance
