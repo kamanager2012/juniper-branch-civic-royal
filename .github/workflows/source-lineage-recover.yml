@@ -1,0 +1,49 @@
+name: source lineage recover
+
+on:
+  push:
+    branches:
+      - feat/storybook-source-lineage
+
+permissions:
+  contents: write
+
+jobs:
+  recover:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feat/storybook-source-lineage
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Recover exact Git lineage
+        run: npm run source:recover
+      - name: Print font release fingerprint
+        run: |
+          node --input-type=module <<'NODE'
+          import { buildReleaseReadiness } from './scripts/release-readiness.mjs';
+          const asset = buildReleaseReadiness().assets.find((item) => item.id === 'font:public/fonts/MaShanZheng.woff2');
+          if (!asset) throw new Error('font release asset not found');
+          console.log(JSON.stringify(asset, null, 2));
+          NODE
+      - name: Verify project gates
+        run: npm run check
+      - name: Verify dependency audit
+        run: npm audit --audit-level=high
+      - name: Commit recovered lineage
+        run: |
+          if git diff --quiet -- content/source-lineage.json; then
+            echo "source-lineage.json already current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add content/source-lineage.json
+          git commit -m "chore: recover source lineage from export history"
+          git push origin HEAD:feat/storybook-source-lineage
