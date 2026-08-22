@@ -1,6 +1,9 @@
 import { createHash } from "node:crypto";
 import { buildNarrationPlan } from "./narration-plan.mjs";
 
+export const PENDING_NARRATION_STATUSES = Object.freeze(["missing", "stale", "unverified"]);
+const PENDING_STATUS_SET = new Set(PENDING_NARRATION_STATUSES);
+
 function sha256Json(value) {
   return createHash("sha256").update(JSON.stringify(value), "utf8").digest("hex");
 }
@@ -21,8 +24,25 @@ export function computeNarrationInputDigest(items) {
 
 export function buildNarrationGenerationSet(options = {}) {
   const story = options.story ?? null;
-  const plan = options.plan ?? buildNarrationPlan({ story });
-  const entries = plan.items
+  const pending = options.pending === true;
+  if (story && pending) throw new Error("Narration generation set cannot combine story and pending scopes");
+
+  const plan = options.plan ?? buildNarrationPlan({ story: story || null });
+  const sourceItems = pending
+    ? plan.items.filter((item) => {
+        if (item.status === "current") return false;
+        if (!PENDING_STATUS_SET.has(item.status)) {
+          throw new Error(`${item.key}: unsupported narration status for pending scope: ${String(item.status)}`);
+        }
+        return true;
+      })
+    : plan.items;
+
+  if (pending && sourceItems.length === 0) {
+    throw new Error("Pending narration generation set is empty; all narration assets are already current");
+  }
+
+  const entries = sourceItems
     .map((item) => ({
       key: item.key,
       storyId: item.storyId,
@@ -37,7 +57,7 @@ export function buildNarrationGenerationSet(options = {}) {
   return {
     schemaVersion: 1,
     canonicalSource: "content/published-stories.json",
-    scope: story ? { type: "story", storyId: story } : { type: "all" },
+    scope: story ? { type: "story", storyId: story } : pending ? { type: "pending" } : { type: "all" },
     count: entries.length,
     inputDigestSha256: computeNarrationInputDigest(entries),
     entries,
@@ -52,13 +72,14 @@ function argValue(name) {
 if (process.argv[1]?.endsWith("narration-generation-set.mjs")) {
   const story = argValue("--story");
   const all = process.argv.includes("--all");
+  const pending = process.argv.includes("--pending");
   const jsonl = process.argv.includes("--jsonl");
   const summary = process.argv.includes("--summary");
 
-  if (!story && !all) throw new Error("Refusing narration batch export without explicit scope. Pass --story <id> or --all.");
-  if (story && all) throw new Error("Choose exactly one narration batch scope: --story <id> or --all.");
+  const scopeCount = Number(Boolean(story)) + Number(all) + Number(pending);
+  if (scopeCount !== 1) throw new Error("Choose exactly one narration batch scope: --story <id>, --all, or --pending.");
 
-  const set = buildNarrationGenerationSet({ story });
+  const set = buildNarrationGenerationSet({ story, pending });
   if (jsonl) {
     console.log(JSON.stringify({
       type: "narration-generation-set",
