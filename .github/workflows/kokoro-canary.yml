@@ -90,8 +90,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "STATE_BEFORE=$(sha256sum content/narration-state.json | awk '{print $1}')" >> "$GITHUB_ENV"
-          git status --porcelain --untracked-files=all > /tmp/status-before.txt
-          test ! -s /tmp/status-before.txt
+          git diff --exit-code
 
       - name: Generate one real story batch in disposable CI workspace
         shell: bash
@@ -150,7 +149,7 @@ jobs:
           for file in canary-generation.log canary-import-dry-run.json canary-qc.json; do
             if [[ -f "$file" ]]; then cp "$file" canary-artifact/; fi
           done
-          find canary-artifact -type f -maxdepth 3 -print
+          find canary-artifact -maxdepth 3 -type f -print
 
       - uses: actions/upload-artifact@v4
         if: always()
