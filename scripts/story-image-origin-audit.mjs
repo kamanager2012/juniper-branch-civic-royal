@@ -1,15 +1,18 @@
 import { createHash } from "node:crypto";
-import { execFileSync, spawnSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
-import { join, relative, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+const require = createRequire(import.meta.url);
 const repoRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const ORIGIN_COMMIT = "88c2080c715a1c37e64916970cbbc4af2ed7727a";
 const IMAGINE_ROOT = "artifacts/imagine_images";
 const RELEASE_ROOT = join(repoRoot, "public/stories");
 const SAMPLE_SIZE = 16;
+const DECODER_PATH_ENV = "STORY_IMAGE_JPEG_DECODER";
 
 function git(args, options = {}) {
   return execFileSync("git", args, {
@@ -37,47 +40,58 @@ function relativePath(path) {
   return relative(repoRoot, path).replaceAll("\\", "/");
 }
 
-function commandVersion(command, args) {
-  const probe = spawnSync(command, args, { encoding: "utf8" });
-  if (probe.status !== 0) return null;
-  return `${probe.stdout ?? ""}${probe.stderr ?? ""}`.split("\n").find(Boolean)?.trim() ?? command;
+function loadDecoder() {
+  const decoderPath = process.env[DECODER_PATH_ENV];
+  if (!decoderPath) {
+    throw new Error(`${DECODER_PATH_ENV} must point to a pinned jpeg-js module for this evidence audit`);
+  }
+  const absolute = resolve(decoderPath);
+  const jpeg = require(absolute);
+  if (typeof jpeg?.decode !== "function") throw new Error(`invalid jpeg-js decoder module: ${absolute}`);
+  const packageJson = JSON.parse(readFileSync(join(dirname(absolute), "package.json"), "utf8"));
+  if (packageJson.name !== "jpeg-js" || typeof packageJson.version !== "string") {
+    throw new Error(`decoder package metadata is not jpeg-js: ${absolute}`);
+  }
+  return { jpeg, package: `${packageJson.name}@${packageJson.version}` };
 }
 
-function findImageTool() {
-  for (const command of ["magick", "convert"]) {
-    const version = commandVersion(command, ["-version"]);
-    if (version) return { kind: "imagemagick", command, version };
-  }
-  const ffmpegVersion = commandVersion("ffmpeg", ["-version"]);
-  if (ffmpegVersion) return { kind: "ffmpeg", command: "ffmpeg", version: ffmpegVersion };
-  throw new Error("historical image-origin audit requires ImageMagick or FFmpeg");
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
 }
 
-function imageVector(tool, path) {
-  let value;
-  if (tool.kind === "imagemagick") {
-    value = execFileSync(tool.command, [
-      path,
-      "-auto-orient",
-      "-resize", `${SAMPLE_SIZE}x${SAMPLE_SIZE}!`,
-      "-colorspace", "sRGB",
-      "-depth", "8",
-      "rgb:-",
-    ], { encoding: null, maxBuffer: 8 * 1024 * 1024 });
-  } else {
-    value = execFileSync(tool.command, [
-      "-v", "error",
-      "-i", path,
-      "-vf", `scale=${SAMPLE_SIZE}:${SAMPLE_SIZE}:flags=area`,
-      "-frames:v", "1",
-      "-f", "rawvideo",
-      "-pix_fmt", "rgb24",
-      "pipe:1",
-    ], { encoding: null, maxBuffer: 8 * 1024 * 1024 });
+function bilinearChannel(data, width, height, x, y, channel) {
+  const x0 = clamp(Math.floor(x), 0, width - 1);
+  const y0 = clamp(Math.floor(y), 0, height - 1);
+  const x1 = clamp(x0 + 1, 0, width - 1);
+  const y1 = clamp(y0 + 1, 0, height - 1);
+  const tx = clamp(x - x0, 0, 1);
+  const ty = clamp(y - y0, 0, 1);
+  const at = (px, py) => data[(py * width + px) * 4 + channel];
+  const top = at(x0, y0) * (1 - tx) + at(x1, y0) * tx;
+  const bottom = at(x0, y1) * (1 - tx) + at(x1, y1) * tx;
+  return Math.round(top * (1 - ty) + bottom * ty);
+}
+
+function imageVector(decoder, bytes, label) {
+  const decoded = decoder.jpeg.decode(bytes, { useTArray: true, formatAsRGBA: true, tolerantDecoding: false });
+  if (!decoded || !Number.isInteger(decoded.width) || !Number.isInteger(decoded.height) || !decoded.data) {
+    throw new Error(`jpeg-js did not return a valid image for ${label}`);
   }
-  const expected = SAMPLE_SIZE * SAMPLE_SIZE * 3;
-  if (value.length !== expected) throw new Error(`unexpected normalized pixel size for ${path}: ${value.length} != ${expected}`);
-  return value;
+  if (decoded.width < 1 || decoded.height < 1) throw new Error(`invalid JPEG dimensions for ${label}`);
+
+  const vector = Buffer.alloc(SAMPLE_SIZE * SAMPLE_SIZE * 3);
+  let offset = 0;
+  for (let y = 0; y < SAMPLE_SIZE; y += 1) {
+    const sourceY = ((y + 0.5) * decoded.height) / SAMPLE_SIZE - 0.5;
+    for (let x = 0; x < SAMPLE_SIZE; x += 1) {
+      const sourceX = ((x + 0.5) * decoded.width) / SAMPLE_SIZE - 0.5;
+      for (let channel = 0; channel < 3; channel += 1) {
+        vector[offset] = bilinearChannel(decoded.data, decoded.width, decoded.height, sourceX, sourceY, channel);
+        offset += 1;
+      }
+    }
+  }
+  return { vector, width: decoded.width, height: decoded.height };
 }
 
 function errorMetrics(a, b) {
@@ -106,7 +120,7 @@ function round(value) {
 
 function buildAudit() {
   git(["cat-file", "-e", `${ORIGIN_COMMIT}^{commit}`]);
-  const tool = findImageTool();
+  const decoder = loadDecoder();
   const originPaths = git(["ls-tree", "-r", "--name-only", ORIGIN_COMMIT, "--", IMAGINE_ROOT])
     .trim()
     .split("\n")
@@ -119,23 +133,29 @@ function buildAudit() {
       const bytes = git(["show", `${ORIGIN_COMMIT}:${path}`], { binary: true });
       const localPath = join(temp, `origin-${index}.jpg`);
       writeFileSync(localPath, bytes);
+      const sampled = imageVector(decoder, bytes, path);
       return {
         path,
         gitBlob: git(["rev-parse", `${ORIGIN_COMMIT}:${path}`]).trim(),
         sha256: sha256(bytes),
         bytes: bytes.length,
-        vector: imageVector(tool, localPath),
+        width: sampled.width,
+        height: sampled.height,
+        vector: sampled.vector,
       };
     });
 
     const release = releasePaths.map((path) => {
       const bytes = readFileSync(path);
+      const sampled = imageVector(decoder, bytes, relativePath(path));
       return {
         path: relativePath(path),
         gitBlob: git(["hash-object", "--", path]).trim(),
         sha256: sha256(bytes),
         bytes: statSync(path).size,
-        vector: imageVector(tool, path),
+        width: sampled.width,
+        height: sampled.height,
+        vector: sampled.vector,
       };
     });
 
@@ -152,10 +172,12 @@ function buildAudit() {
         releaseGitBlob: item.gitBlob,
         releaseSha256: item.sha256,
         releaseBytes: item.bytes,
+        releaseDimensions: `${item.width}x${item.height}`,
         imaginePath: best.candidate.path,
         imagineGitBlob: best.candidate.gitBlob,
         imagineSha256: best.candidate.sha256,
         imagineBytes: best.candidate.bytes,
+        imagineDimensions: `${best.candidate.width}x${best.candidate.height}`,
         mae: round(best.mae),
         rmse: round(best.rmse),
         secondBestMae: second ? round(second.mae) : null,
@@ -191,9 +213,8 @@ function buildAudit() {
       schemaVersion: 1,
       originCommit: ORIGIN_COMMIT,
       method: {
-        tool: tool.version,
-        toolKind: tool.kind,
-        sample: `${SAMPLE_SIZE}x${SAMPLE_SIZE} sRGB 8-bit RGB`,
+        decoder: decoder.package,
+        sample: `${SAMPLE_SIZE}x${SAMPLE_SIZE} RGB via deterministic bilinear sampling`,
         metric: "mean absolute RGB channel error; RMSE retained as secondary diagnostic",
         selection: "nearest historical Imagine artifact per release image; second-best distance retained for separation analysis",
       },
