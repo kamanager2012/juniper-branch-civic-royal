@@ -19,11 +19,12 @@ test("approved Kokoro Chinese narration profile is exactly pinned", () => {
   assert.equal(approved.model.config.sha256, APPROVED_KOKORO.configSha256);
   assert.equal(approved.model.weights.sha256, APPROVED_KOKORO.weightsSha256);
   assert.equal(approved.model.voice.sha256, APPROVED_KOKORO.voiceSha256);
+  assert.deepEqual(approved.rights.evidence, [...APPROVED_KOKORO.rightsEvidence]);
   assert.equal(approved.approval.approved, true);
   assert.equal(approved.rights.claimForGeneratedNarration, "permission");
 });
 
-test("provider revision, asset hash, runtime commit, or voice policy drift fails closed", () => {
+test("provider identity, rights evidence, audit record, or voice policy drift fails closed", () => {
   for (const mutate of [
     (profile) => { profile.model.revision = "main"; },
     (profile) => { profile.model.config.sha256 = "0".repeat(64); },
@@ -35,6 +36,8 @@ test("provider revision, asset hash, runtime commit, or voice policy drift fails
     (profile) => { profile.generationPolicy.voiceCloning = true; },
     (profile) => { profile.generationPolicy.networkRequiredAtSynthesis = true; },
     (profile) => { profile.rights.claimForGeneratedNarration = "owned"; },
+    (profile) => { profile.rights.evidence[0] = "https://example.com/unrelated"; },
+    (profile) => { profile.approval.approvedByEvidence[0] = "config checked"; },
     (profile) => { profile.approval.approved = false; },
   ]) {
     const changed = structuredClone(approved);
