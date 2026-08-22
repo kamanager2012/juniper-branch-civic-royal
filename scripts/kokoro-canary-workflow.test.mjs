@@ -47,20 +47,21 @@ function eventPaths(eventName, nextEventName) {
 
 test("narration maintenance workflows pin every GitHub Action to the approved immutable commit", () => {
   for (const [file, content] of narrationWorkflows) {
-    const usesLines = [...content.matchAll(/^\s*-\s+uses:\s+([^\s#]+)(?:\s+#\s+(v\d+))?\s*$/gm)];
+    const usesLines = content.split("\n").filter((line) => /^\s*(?:-\s+)?uses:\s+/.test(line));
     assert.ok(usesLines.length > 0, `${file} must contain at least one action use`);
 
-    for (const [, reference, majorComment] of usesLines) {
-      const match = reference.match(/^([^@]+)@([0-9a-f]{40})$/);
-      assert.ok(match, `${file}: action reference must use a lowercase 40-hex commit SHA: ${reference}`);
-      const [, action, sha] = match;
+    for (const line of usesLines) {
+      const lineMatch = line.match(/^\s*(?:-\s+)?uses:\s+([^\s#]+)(?:\s+#\s+(v\d+))?\s*$/);
+      assert.ok(lineMatch, `${file}: malformed or unsupported action reference: ${line.trim()}`);
+      const [, reference, majorComment] = lineMatch;
+      const referenceMatch = reference.match(/^([^@]+)@([0-9a-f]{40})$/);
+      assert.ok(referenceMatch, `${file}: action reference must use a lowercase 40-hex commit SHA: ${reference}`);
+      const [, action, sha] = referenceMatch;
       const approved = APPROVED_ACTIONS.get(action);
       assert.ok(approved, `${file}: unapproved GitHub Action: ${action}`);
       assert.equal(sha, approved.sha, `${file}: ${action} must use the approved immutable commit`);
       assert.equal(majorComment, approved.major, `${file}: ${action} must retain the approved major comment`);
     }
-
-    assert.equal(/uses:\s+[^\s#]+@(?![0-9a-f]{40}(?:\s|#|$))/.test(content), false, `${file}: floating action reference detected`);
   }
 });
 
