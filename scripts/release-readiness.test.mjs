@@ -10,18 +10,22 @@ const model = loadStoryModel();
 const draftCatalog = loadDraftStoryCatalog();
 const report = buildReleaseReadiness();
 
-test("release inventory covers 100 story texts while media remains scoped to 24 stories", () => {
+test("release inventory covers 100 verified story texts while media remains scoped to 24 stories", () => {
   assert.equal(report.categories["story-text"]?.total, model.stories.length + draftCatalog.stories.length);
   assert.equal(report.categories["story-text"]?.total, 100);
+  assert.equal(report.categories["story-text"]?.verified, 100);
+  assert.equal(report.categories["story-text"]?.unverified, 0);
   assert.equal(report.categories.narration?.total, model.pages.length);
   assert.ok((report.categories["story-image"]?.total ?? 0) > 0);
   assert.ok((report.categories.font?.total ?? 0) > 0);
   assert.ok((report.categories["product-artwork"]?.total ?? 0) > 0);
 
+  const publishedAssets = report.assets.filter((asset) => asset.category === "story-text" && asset.textStatus === "media-ready");
   const draftAssets = report.assets.filter((asset) => asset.category === "story-text" && asset.textStatus === "text-ready-media-pending");
+  assert.equal(publishedAssets.length, 24);
   assert.equal(draftAssets.length, 76);
-  assert.ok(draftAssets.every((asset) => asset.provenanceStatus === "verified"));
-  assert.ok(draftAssets.every((asset) => asset.claim === "owned"));
+  assert.ok([...publishedAssets, ...draftAssets].every((asset) => asset.provenanceStatus === "verified"));
+  assert.ok([...publishedAssets, ...draftAssets].every((asset) => asset.claim === "owned"));
 
   const ids = report.assets.map((asset) => asset.id);
   assert.equal(new Set(ids).size, ids.length, "release asset ids must be unique");
@@ -41,29 +45,28 @@ test("provenance accounting is complete and fail-closed", () => {
     p.invalid === 0 &&
     report.narration.current === report.narration.total;
   assert.equal(report.releaseReady, expectedReady);
-  assert.equal(report.releaseReady, false, "100-story catalog must not bypass unresolved media rights/narration gates");
+  assert.equal(report.releaseReady, false, "verified text must not bypass unresolved image/narration rights gates");
 });
 
 test("narration synchronization remains a separate release condition", () => {
   const n = report.narration;
   assert.equal(n.current + n.stale + n.unverified + n.missing, n.total);
   assert.equal(n.total, model.pages.length);
+  assert.ok(n.current < n.total, "rewriting story text must not silently bless existing narration");
 });
 
 test("provenance evidence references must be durable and resolvable", () => {
-  assert.deepEqual(validateEvidenceReference("licenses/fonts/MaShanZheng/OFL.txt"), {
-    valid: true,
-    kind: "local",
-    problem: null,
-  });
+  for (const path of [
+    "licenses/fonts/MaShanZheng/OFL.txt",
+    "content/evidence/story-text/project-authored-drafts.json",
+    "content/evidence/story-text/project-authored-published.json",
+    "content/published-stories.json",
+  ]) {
+    assert.deepEqual(validateEvidenceReference(path), { valid: true, kind: "local", problem: null });
+  }
   assert.deepEqual(validateEvidenceReference("https://github.com/googlefonts/mashanzheng/blob/master/OFL.txt"), {
     valid: true,
     kind: "https",
-    problem: null,
-  });
-  assert.deepEqual(validateEvidenceReference("content/evidence/story-text/project-authored-drafts.json"), {
-    valid: true,
-    kind: "local",
     problem: null,
   });
   assert.equal(validateEvidenceReference("http://example.com/license").valid, false);
