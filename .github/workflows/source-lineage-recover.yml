@@ -24,26 +24,58 @@ jobs:
         run: npm ci
       - name: Recover exact Git lineage
         run: npm run source:recover
-      - name: Print font release fingerprint
+      - name: Probe Ma Shan Zheng binary metadata
         run: |
+          command -v fc-scan >/dev/null
+          mkdir -p content/evidence/fonts
           node --input-type=module <<'NODE'
-          import { buildReleaseReadiness } from './scripts/release-readiness.mjs';
-          const asset = buildReleaseReadiness().assets.find((item) => item.id === 'font:public/fonts/MaShanZheng.woff2');
-          if (!asset) throw new Error('font release asset not found');
-          console.log(JSON.stringify(asset, null, 2));
+          import { execFileSync } from 'node:child_process';
+          import { createHash } from 'node:crypto';
+          import { readFileSync, writeFileSync } from 'node:fs';
+
+          const path = 'public/fonts/MaShanZheng.woff2';
+          const bytes = readFileSync(path);
+          const sha256 = createHash('sha256').update(bytes).digest('hex');
+          const gitBlob = execFileSync('git', ['hash-object', '--', path], { encoding: 'utf8' }).trim();
+          const fields = execFileSync(
+            'fc-scan',
+            ['--format', '%{family}\n%{style}\n%{copyright}\n%{fontversion}\n', path],
+            { encoding: 'utf8' },
+          ).trimEnd().split('\n');
+          const [family = '', style = '', copyright = '', fontversion = ''] = fields;
+
+          if (!family.includes('Ma Shan Zheng')) throw new Error(`unexpected font family: ${family}`);
+          if (!/Ma\s*Shan\s*Zheng/i.test(copyright)) throw new Error(`unexpected font copyright: ${copyright}`);
+
+          const evidence = {
+            schemaVersion: 1,
+            asset: path,
+            sha256,
+            gitBlob,
+            inspectedWith: 'fontconfig fc-scan on ubuntu-24.04',
+            metadata: { family, style, copyright, fontversion },
+            license: {
+              type: 'SIL Open Font License 1.1',
+              local: 'licenses/fonts/MaShanZheng/OFL.txt',
+              upstreamRepository: 'https://github.com/googlefonts/mashanzheng',
+              upstreamLicense: 'https://github.com/googlefonts/mashanzheng/blob/master/OFL.txt'
+            }
+          };
+          writeFileSync('content/evidence/fonts/MaShanZheng.json', `${JSON.stringify(evidence, null, 2)}\n`);
+          console.log(JSON.stringify(evidence, null, 2));
           NODE
       - name: Verify project gates
         run: npm run check
       - name: Verify dependency audit
         run: npm audit --audit-level=high
-      - name: Commit recovered lineage
+      - name: Commit recovered evidence
         run: |
-          if git diff --quiet -- content/source-lineage.json; then
-            echo "source-lineage.json already current"
+          if git diff --quiet -- content/source-lineage.json content/evidence/fonts/MaShanZheng.json; then
+            echo "lineage and font evidence already current"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add content/source-lineage.json
-          git commit -m "chore: recover source lineage from export history"
+          git add content/source-lineage.json content/evidence/fonts/MaShanZheng.json
+          git commit -m "chore: recover source lineage and font evidence"
           git push origin HEAD:feat/storybook-source-lineage
