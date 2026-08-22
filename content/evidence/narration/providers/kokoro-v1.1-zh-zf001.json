@@ -5,6 +5,12 @@
   "providerType": "local-open-weight",
   "language": "zh",
   "sampleRateHz": 24000,
+  "generationPolicy": {
+    "voiceMode": "bundled-profile",
+    "referenceSpeakerAudio": false,
+    "voiceCloning": false,
+    "networkRequiredAtSynthesis": false
+  },
   "model": {
     "repository": "hexgrad/Kokoro-82M-v1.1-zh",
     "revision": "a51e9e2a069a198cbda1f021f3805af3603ba92d",
