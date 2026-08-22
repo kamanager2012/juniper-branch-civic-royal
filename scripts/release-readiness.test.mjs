@@ -10,32 +10,41 @@ const model = loadStoryModel();
 const draftCatalog = loadDraftStoryCatalog();
 const report = buildReleaseReadiness();
 
-test("release inventory covers 100 verified story texts while media remains scoped to 24 stories", () => {
+test("release inventory has 100 verified texts and 192 verified story images", () => {
   assert.equal(report.categories["story-text"]?.total, model.stories.length + draftCatalog.stories.length);
   assert.equal(report.categories["story-text"]?.total, 100);
   assert.equal(report.categories["story-text"]?.verified, 100);
   assert.equal(report.categories["story-text"]?.unverified, 0);
+  assert.equal(report.categories["story-image"]?.total, 192);
+  assert.equal(report.categories["story-image"]?.verified, 192);
+  assert.equal(report.categories["story-image"]?.unverified, 0);
   assert.equal(report.categories.narration?.total, model.pages.length);
-  assert.ok((report.categories["story-image"]?.total ?? 0) > 0);
   assert.ok((report.categories.font?.total ?? 0) > 0);
   assert.ok((report.categories["product-artwork"]?.total ?? 0) > 0);
 
   const publishedAssets = report.assets.filter((asset) => asset.category === "story-text" && asset.textStatus === "media-ready");
   const draftAssets = report.assets.filter((asset) => asset.category === "story-text" && asset.textStatus === "text-ready-media-pending");
+  const imageAssets = report.assets.filter((asset) => asset.category === "story-image");
   assert.equal(publishedAssets.length, 24);
   assert.equal(draftAssets.length, 76);
-  assert.ok([...publishedAssets, ...draftAssets].every((asset) => asset.provenanceStatus === "verified"));
-  assert.ok([...publishedAssets, ...draftAssets].every((asset) => asset.claim === "owned"));
+  assert.equal(imageAssets.length, 192);
+  assert.ok([...publishedAssets, ...draftAssets, ...imageAssets].every((asset) => asset.provenanceStatus === "verified"));
+  assert.ok([...publishedAssets, ...draftAssets, ...imageAssets].every((asset) => asset.claim === "owned"));
 
   const ids = report.assets.map((asset) => asset.id);
   assert.equal(new Set(ids).size, ids.length, "release asset ids must be unique");
   for (const asset of report.assets) assert.match(asset.fingerprintSha256, /^[a-f0-9]{64}$/);
 });
 
-test("provenance accounting is complete and fail-closed", () => {
+test("provenance accounting is complete and remains blocked only by narration", () => {
   const p = report.provenance;
   assert.equal(p.verified + p.unverified + p.stale + p.invalid, p.total);
   assert.equal(p.total, report.assets.length);
+  assert.equal(p.total, 513);
+  assert.equal(p.verified, 297);
+  assert.equal(p.unverified, 216);
+  assert.equal(p.stale, 0);
+  assert.equal(p.invalid, 0);
   assert.ok(p.coverage >= 0 && p.coverage <= 1);
   assert.deepEqual(report.issues, [], `release registry issues: ${report.issues.join("; ")}`);
 
@@ -45,14 +54,15 @@ test("provenance accounting is complete and fail-closed", () => {
     p.invalid === 0 &&
     report.narration.current === report.narration.total;
   assert.equal(report.releaseReady, expectedReady);
-  assert.equal(report.releaseReady, false, "verified text must not bypass unresolved image/narration rights gates");
+  assert.equal(report.releaseReady, false, "verified text/images must not bypass unresolved narration rights and synchronization");
 });
 
-test("narration synchronization remains a separate release condition", () => {
+test("narration synchronization remains the unresolved release condition", () => {
   const n = report.narration;
   assert.equal(n.current + n.stale + n.unverified + n.missing, n.total);
   assert.equal(n.total, model.pages.length);
-  assert.ok(n.current < n.total, "rewriting story text must not silently bless existing narration");
+  assert.equal(n.current, 0);
+  assert.equal(n.unverified, 216);
 });
 
 test("provenance evidence references must be durable and resolvable", () => {
@@ -61,14 +71,19 @@ test("provenance evidence references must be durable and resolvable", () => {
     "content/evidence/story-text/project-authored-drafts.json",
     "content/evidence/story-text/project-authored-published.json",
     "content/published-stories.json",
+    "content/evidence/story-images/grok-imagine-origin-audit.json",
+    "content/evidence/story-images/grok-imagine-rights.json",
   ]) {
     assert.deepEqual(validateEvidenceReference(path), { valid: true, kind: "local", problem: null });
   }
-  assert.deepEqual(validateEvidenceReference("https://github.com/googlefonts/mashanzheng/blob/master/OFL.txt"), {
-    valid: true,
-    kind: "https",
-    problem: null,
-  });
+  for (const url of [
+    "https://github.com/googlefonts/mashanzheng/blob/master/OFL.txt",
+    "https://x.ai/legal/terms-of-service",
+    "https://x.ai/legal/faq",
+    "https://x.ai/legal/brand-guidelines",
+  ]) {
+    assert.deepEqual(validateEvidenceReference(url), { valid: true, kind: "https", problem: null });
+  }
   assert.equal(validateEvidenceReference("http://example.com/license").valid, false);
   assert.equal(validateEvidenceReference("../outside-repo.txt").valid, false);
   assert.equal(validateEvidenceReference("content/evidence/does-not-exist.json").valid, false);
