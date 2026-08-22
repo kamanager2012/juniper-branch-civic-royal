@@ -25,7 +25,7 @@ test("observable gate executes Node 20/22, dependency audit, and Chromium E2E", 
 });
 
 test("all third-party actions are immutable approved commits", () => {
-  const uses = workflow.split("\n").filter((line) => line.includes("uses:")).map((line) => line.trim().replace(/^-\s*/, ""));
+  const uses = workflow.split("\n").filter((line) => /^\s*-\s+uses:\s+/.test(line)).map((line) => line.trim().replace(/^-\s*/, ""));
   assert.ok(uses.length > 0);
   for (const line of uses) {
     assert.ok(line === `uses: ${CHECKOUT}` || line === `uses: ${SETUP_NODE}`, `unexpected action reference: ${line}`);
