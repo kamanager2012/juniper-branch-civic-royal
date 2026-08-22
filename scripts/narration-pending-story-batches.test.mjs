@@ -14,8 +14,16 @@ function realPlan() {
   return buildNarrationPlan();
 }
 
-test("current release expands as exactly 23 whole-story batches / 207 items while protecting shou-zhu", () => {
-  const plan = buildPendingStoryBatchPlan({ plan: realPlan() });
+function preExpansionFixture() {
+  const plan = structuredClone(realPlan());
+  for (const item of plan.items) {
+    item.status = item.storyId === "shou-zhu" ? "current" : "unverified";
+  }
+  return plan;
+}
+
+test("production algorithm expands exactly 23 whole-story batches / 207 items while protecting shou-zhu", () => {
+  const plan = buildPendingStoryBatchPlan({ plan: preExpansionFixture() });
   assert.equal(plan.totalStories, 24);
   assert.equal(plan.currentStoryCount, 1);
   assert.equal(plan.currentItemCount, 9);
@@ -27,8 +35,32 @@ test("current release expands as exactly 23 whole-story batches / 207 items whil
   assert.ok(plan.pendingStories.every((story) => story.statuses.every((status) => ["missing", "stale", "unverified"].includes(status))));
 });
 
+test("live repository is only valid before expansion or after complete atomic expansion", () => {
+  const plan = buildPendingStoryBatchPlan({ plan: realPlan() });
+  assert.equal(plan.totalStories, 24);
+
+  const before = plan.currentStoryCount === 1
+    && plan.currentItemCount === 9
+    && plan.pendingStoryCount === 23
+    && plan.pendingItemCount === 207
+    && plan.currentStories.length === 1
+    && plan.currentStories[0].storyId === "shou-zhu";
+
+  const after = plan.currentStoryCount === 24
+    && plan.currentItemCount === 216
+    && plan.pendingStoryCount === 0
+    && plan.pendingItemCount === 0;
+
+  assert.ok(before || after, `live narration state is neither authorized pre-expansion nor completed post-expansion: ${JSON.stringify({
+    currentStoryCount: plan.currentStoryCount,
+    currentItemCount: plan.currentItemCount,
+    pendingStoryCount: plan.pendingStoryCount,
+    pendingItemCount: plan.pendingItemCount,
+  })}`);
+});
+
 test("mixed current/non-current story fails closed instead of replacing a partial story", () => {
-  const plan = structuredClone(realPlan());
+  const plan = preExpansionFixture();
   const targetStory = buildPendingStoryBatchPlan({ plan }).pendingStories[0].storyId;
   const item = plan.items.find((candidate) => candidate.storyId === targetStory);
   item.status = "current";
@@ -39,7 +71,7 @@ test("mixed current/non-current story fails closed instead of replacing a partia
 });
 
 test("unknown narration status fails closed", () => {
-  const plan = structuredClone(realPlan());
+  const plan = preExpansionFixture();
   const target = plan.items.find((item) => item.status !== "current");
   target.status = "mystery";
   assert.throws(
@@ -49,7 +81,7 @@ test("unknown narration status fails closed", () => {
 });
 
 test("protected-current guard pins existing release text/audio pairs", () => {
-  const plan = realPlan();
+  const plan = preExpansionFixture();
   const snapshot = snapshotCurrentNarration(plan);
   assert.equal(snapshot.length, 9);
   assert.ok(snapshot.every((item) => item.key.startsWith("shou-zhu/")));
