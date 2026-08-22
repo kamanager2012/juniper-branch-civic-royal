@@ -24,7 +24,7 @@
     "provenance:check": "node scripts/release-readiness.mjs --check --summary",
     "release:report": "node scripts/release-readiness.mjs --summary",
     "release:check": "node scripts/release-readiness.mjs --release --summary",
-    "check": "npm run typecheck && npm test && npm run content:check && npm run provenance:check && npm run build",
+    "check": "npm run typecheck && npm test && npm run content:check && npm run provenance:check && npm run media:report -- --summary && npm run build",
     "deps:inventory": "node scripts/dependency-inventory.mjs",
     "lint": "eslint .",
     "format": "prettier --write ."
