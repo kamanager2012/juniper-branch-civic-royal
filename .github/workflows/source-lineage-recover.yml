@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - feat/storybook-source-lineage
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write
@@ -69,6 +72,7 @@ jobs:
       - name: Verify dependency audit
         run: npm audit --audit-level=high
       - name: Commit recovered evidence
+        if: github.event_name == 'push'
         run: |
           if git diff --quiet -- content/source-lineage.json content/evidence/fonts/MaShanZheng.json; then
             echo "lineage and font evidence already current"
