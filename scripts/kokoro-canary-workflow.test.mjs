@@ -17,6 +17,20 @@ function indexOfRequired(text, label) {
   return index;
 }
 
+function eventPaths(eventName, nextEventName) {
+  const start = indexOfRequired(`  ${eventName}:\n`, `${eventName} trigger`);
+  const end = indexOfRequired(`  ${nextEventName}:\n`, `${nextEventName} trigger`);
+  assert.ok(start < end, `${eventName} trigger must appear before ${nextEventName}`);
+  return [...workflow.slice(start, end).matchAll(/^\s{6}- "([^"]+)"$/gm)].map((match) => match[1]);
+}
+
+test("pull-request and main-push canary sensitivity stay exactly aligned", () => {
+  const pullRequestPaths = eventPaths("pull_request", "push");
+  const pushPaths = eventPaths("push", "workflow_dispatch");
+  assert.ok(pullRequestPaths.length > 0, "pull_request canary path list must not be empty");
+  assert.deepEqual(pushPaths, pullRequestPaths);
+});
+
 test("Kokoro asset cache is keyed by the exact durable provider profile without broad restore fallback", () => {
   assert.match(workflow, /uses:\s*actions\/cache@v4/);
   assert.match(workflow, /path:\s*\.runtime-assets/);
