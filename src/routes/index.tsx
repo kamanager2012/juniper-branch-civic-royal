@@ -1,12 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Star } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Petals } from "@/components/petals";
 import { stories, type Story } from "@/data/stories";
 import { allProgress, type StoryProgress } from "@/lib/progress";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({ component: Home });
+
+const EAGER_COVER_COUNT = 4;
+const DEFERRED_COVER_ROOT_MARGIN = "240px 0px";
 
 const TONE_RING: Record<Story["tone"], string> = {
   wheat: "ring-wheat/70",
@@ -16,6 +19,45 @@ const TONE_RING: Record<Story["tone"], string> = {
   well: "ring-well/70",
   temple: "ring-temple/70",
 };
+
+function DeferredCover({ src }: { src: string }) {
+  const imageRef = useRef<HTMLImageElement>(null);
+  const [activeSrc, setActiveSrc] = useState<string>();
+
+  useEffect(() => {
+    const image = imageRef.current;
+    if (!image || activeSrc) return;
+
+    if (!("IntersectionObserver" in window)) {
+      setActiveSrc(src);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        setActiveSrc(src);
+        observer.disconnect();
+      },
+      { rootMargin: DEFERRED_COVER_ROOT_MARGIN },
+    );
+
+    observer.observe(image);
+    return () => observer.disconnect();
+  }, [activeSrc, src]);
+
+  return (
+    <img
+      ref={imageRef}
+      src={activeSrc}
+      alt=""
+      decoding="async"
+      fetchPriority="low"
+      data-cover-loading="deferred"
+      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+    />
+  );
+}
 
 function Home() {
   const [progress, setProgress] = useState<Record<string, StoryProgress>>({});
@@ -39,6 +81,8 @@ function Home() {
           <img
             src="/ui/bookshelf-paper.jpg"
             alt=""
+            decoding="async"
+            fetchPriority="high"
             className="h-44 w-full object-cover sm:h-56"
           />
           <div className="absolute inset-0 bg-linear-to-r from-ink/55 via-ink/20 to-transparent" />
@@ -55,6 +99,7 @@ function Home() {
         <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6">
           {stories.map((story, i) => {
             const stars = progress[story.id]?.stars ?? 0;
+            const eager = i < EAGER_COVER_COUNT;
             return (
               <li key={story.id} className="rise-in" style={{ animationDelay: `${i * 70}ms` }}>
                 <Link
@@ -69,11 +114,18 @@ function Home() {
                     )}
                   >
                     <div className="relative aspect-book overflow-hidden">
-                      <img
-                        src={story.cover}
-                        alt=""
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                      />
+                      {eager ? (
+                        <img
+                          src={story.cover}
+                          alt=""
+                          decoding="async"
+                          fetchPriority={i < 2 ? "high" : "auto"}
+                          data-cover-loading="eager"
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                        />
+                      ) : (
+                        <DeferredCover src={story.cover} />
+                      )}
                       <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-ink/70 to-transparent p-3 pt-10">
                         <h3 className="font-display text-2xl text-panel">{story.title}</h3>
                         <p className="text-[11px] tracking-widest text-panel/80">{story.pinyin}</p>
