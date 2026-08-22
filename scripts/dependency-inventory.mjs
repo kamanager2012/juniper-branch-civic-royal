@@ -1,13 +1,16 @@
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { builtinModules } from "node:module";
 import { extname, join, relative, resolve } from "node:path";
 
 const root = resolve(new URL("..", import.meta.url).pathname);
-const roots = ["src", "scripts", "server"];
+const roots = ["src", "scripts"];
 const rootFiles = ["vite.config.ts", "eslint.config.mjs"];
 const extensions = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"]);
 const imports = new Map();
-const builtins = new Set(builtinModules);
+const builtins = new Set([
+  ...builtinModules,
+  ...builtinModules.map((name) => `node:${name}`),
+]);
 
 function packageRoot(specifier) {
   if (
@@ -47,6 +50,7 @@ function scan(path) {
 }
 
 function walk(dir) {
+  if (!existsSync(dir)) return;
   for (const name of readdirSync(dir)) {
     const path = join(dir, name);
     const stat = statSync(path);
