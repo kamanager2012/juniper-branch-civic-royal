@@ -67,6 +67,7 @@ jobs:
           CHECK_RESULT: ${{ needs.check.result }}
           AUDIT_RESULT: ${{ needs.dependency-audit.result }}
           E2E_RESULT: ${{ needs.e2e.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         shell: bash
         run: |
           set -euo pipefail
@@ -79,5 +80,6 @@ jobs:
           gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
             -f state="$state" \
             -f context="exact-head-ci" \
-            -f description="$description"
+            -f description="$description" \
+            -f target_url="$RUN_URL"
           test "$state" = success
