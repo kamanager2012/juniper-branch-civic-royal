@@ -1,14 +1,19 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import test from "node:test";
 import { buildNarrationGenerationSet, computeNarrationInputDigest } from "./narration-generation-set.mjs";
+import { repoRoot } from "./story-model.mjs";
 
 function sha256Text(value) {
   return createHash("sha256").update(value, "utf8").digest("hex");
 }
 
-test("full narration generation set covers every canonical page exactly once", () => {
+test("full narration generation set is complete and exactly pinned", () => {
   const set = buildNarrationGenerationSet();
+  const evidence = JSON.parse(readFileSync(join(repoRoot, "content/evidence/narration/generation-set-v1.json"), "utf8"));
+
   assert.equal(set.schemaVersion, 1);
   assert.equal(set.canonicalSource, "content/published-stories.json");
   assert.deepEqual(set.scope, { type: "all" });
@@ -26,8 +31,13 @@ test("full narration generation set covers every canonical page exactly once", (
   }
 
   assert.equal(set.inputDigestSha256, computeNarrationInputDigest(set.entries));
-  assert.match(set.inputDigestSha256, /^[a-f0-9]{64}$/);
-  console.log(`[narration-generation-set] count=${set.count} digest=${set.inputDigestSha256}`);
+  assert.equal(set.inputDigestSha256, "a17d000ac3d82fa53576fc83f0e4653e00aba6573c1209557d3f9c2925262828");
+  assert.equal(evidence.schemaVersion, 1);
+  assert.equal(evidence.evidenceType, "narration-generation-input-set");
+  assert.equal(evidence.canonicalSource, set.canonicalSource);
+  assert.equal(evidence.inputItemCount, set.count);
+  assert.equal(evidence.inputDigestSha256, set.inputDigestSha256);
+  assert.deepEqual(evidence.digestProjection, ["key", "file", "textSha256"]);
 });
 
 test("single-story generation set is a nine-item deterministic subset", () => {
