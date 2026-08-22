@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "profileId": "kokoro-v1.1-zh-zf001",
-  "status": "pending-config-sha256",
+  "status": "approved",
   "providerType": "local-open-weight",
   "language": "zh",
   "sampleRateHz": 24000,
@@ -11,7 +11,8 @@
     "license": "Apache-2.0",
     "config": {
       "file": "config.json",
-      "sha256": null
+      "sha256": "bc333efa5ce4ceff433c8c8e5d027a1eca0166001e4e4a62bea2d26ff7a46890",
+      "bytes": 3228
     },
     "weights": {
       "file": "kokoro-v1_1-zh.pth",
@@ -41,6 +42,7 @@
     "g2p": {
       "repository": "hexgrad/misaki",
       "commit": "fba1236595f2d2bf21d414ba6e57d25256afada3",
+      "declaredVersion": "0.9.4",
       "languageExtra": "zh",
       "license": "Apache-2.0"
     }
@@ -64,7 +66,11 @@
     ]
   },
   "approval": {
-    "approved": false,
-    "blockingReason": "Exact SHA-256 of pinned config.json has not yet been independently computed from upstream raw bytes."
+    "approved": true,
+    "approvedByEvidence": [
+      "GitHub Actions fetched config.json from the exact model revision and measured SHA-256 bc333efa5ce4ceff433c8c8e5d027a1eca0166001e4e4a62bea2d26ff7a46890 at 3228 bytes.",
+      "The exact model-revision LFS pointer reports SHA-256 b1d8410fa44dfb5c15471fd6c4225ea6b4e9ac7fa03c98e8bea47a9928476e2b and size 327247856.",
+      "The exact model-revision zf_001 voice LFS pointer reports SHA-256 9bdc9a87e13e9bb1ea3e7803259c2ecbfebaeeb2ff80b5d0c76df1a464c1c962."
+    ]
   }
 }
