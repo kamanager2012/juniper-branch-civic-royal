@@ -1,13 +1,18 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { buildReleaseReadiness } from "./release-readiness.mjs";
+import { buildReleaseReadiness, readReleaseAssets } from "./release-readiness.mjs";
 import { repoRoot } from "./story-model.mjs";
 
 const registryPath = join(repoRoot, "content/source-lineage.json");
+const generatedRegistryPath = join(repoRoot, "content/generated-source-lineage.json");
 const DEFAULT_ORIGIN_COMMIT = "88c2080c715a1c37e64916970cbbc4af2ed7727a";
 const STORY_SOURCE_PATH = "src/data/stories.ts";
-const ALLOWED_METHODS = new Set(["git-blob-identity", "canonical-source-blob-identity"]);
+const ALLOWED_METHODS = new Set([
+  "git-blob-identity",
+  "canonical-source-blob-identity",
+  "deterministic-project-generator",
+]);
 
 function readRegistry() {
   const parsed = JSON.parse(readFileSync(registryPath, "utf8"));
@@ -22,6 +27,29 @@ function readRegistry() {
     throw new Error("content/source-lineage.json must use schemaVersion 1, originCommit, and an entries object");
   }
   return parsed;
+}
+
+function readGeneratedRegistry() {
+  const parsed = JSON.parse(readFileSync(generatedRegistryPath, "utf8"));
+  if (parsed?.schemaVersion !== 1 || !parsed.entries || typeof parsed.entries !== "object" || Array.isArray(parsed.entries)) {
+    throw new Error("content/generated-source-lineage.json must use schemaVersion 1 with an entries object");
+  }
+  return parsed;
+}
+
+function mergedRegistry(historical = readRegistry()) {
+  const generated = readGeneratedRegistry();
+  return {
+    ...historical,
+    entries: {
+      ...historical.entries,
+      ...generated.entries,
+    },
+  };
+}
+
+function retiredAssetIds() {
+  return new Set(readReleaseAssets().retiredProductArtwork.map((path) => `artwork:${path}`));
 }
 
 function git(args) {
@@ -68,7 +96,7 @@ function validateEntry(asset, entry) {
       problems.push("origin.path must be a non-empty string");
     }
     if (!ALLOWED_METHODS.has(entry.origin.method)) {
-      problems.push("origin.method must be git-blob-identity or canonical-source-blob-identity");
+      problems.push("origin.method must be git-blob-identity, canonical-source-blob-identity, or deterministic-project-generator");
     }
     if (typeof entry.origin.gitBlob !== "string" || !/^[a-f0-9]{40}$/.test(entry.origin.gitBlob)) {
       problems.push("origin.gitBlob must be a 40-character lowercase Git blob SHA");
@@ -79,12 +107,12 @@ function validateEntry(asset, entry) {
   return { status: "known", problems: [] };
 }
 
-export function evaluateLineageRegistry(assets, registry) {
+export function evaluateLineageRegistry(assets, registry, retiredIds = new Set()) {
   const inventoryIds = new Set(assets.map((asset) => asset.id));
   const issues = [];
 
   for (const key of Object.keys(registry.entries)) {
-    if (!inventoryIds.has(key)) issues.push(`source-lineage entry points to an unknown asset: ${key}`);
+    if (!inventoryIds.has(key) && !retiredIds.has(key)) issues.push(`source-lineage entry points to an unknown asset: ${key}`);
   }
 
   const evaluated = assets.map((asset) => {
@@ -119,7 +147,7 @@ export function evaluateLineageRegistry(assets, registry) {
 
   return {
     schemaVersion: 1,
-    registry: "content/source-lineage.json",
+    registry: "content/source-lineage.json + content/generated-source-lineage.json",
     originCommit: registry.originCommit,
     lineage,
     categories,
@@ -130,7 +158,7 @@ export function evaluateLineageRegistry(assets, registry) {
 
 export function buildSourceLineage() {
   const release = buildReleaseReadiness();
-  return evaluateLineageRegistry(release.assets, readRegistry());
+  return evaluateLineageRegistry(release.assets, mergedRegistry(), retiredAssetIds());
 }
 
 export function recoverSourceLineage(originCommit = DEFAULT_ORIGIN_COMMIT) {
@@ -158,7 +186,7 @@ export function recoverSourceLineage(originCommit = DEFAULT_ORIGIN_COMMIT) {
       continue;
     }
 
-    if (!asset.path) continue;
+    if (!asset.path || asset.category === "product-artwork") continue;
     const blob = currentBlob(asset.path);
     const originPaths = originIndex.get(blob) ?? [];
     if (originPaths.length === 0) continue;
@@ -175,7 +203,10 @@ export function recoverSourceLineage(originCommit = DEFAULT_ORIGIN_COMMIT) {
   }
 
   const next = { schemaVersion: 1, originCommit, entries };
-  return { registry: next, report: evaluateLineageRegistry(release.assets, next) };
+  return {
+    registry: next,
+    report: evaluateLineageRegistry(release.assets, mergedRegistry(next), retiredAssetIds()),
+  };
 }
 
 if (process.argv[1]?.endsWith("source-lineage.mjs")) {
