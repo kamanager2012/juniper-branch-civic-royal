@@ -46,14 +46,19 @@ jobs:
           uv sync --locked --project scripts/narration-runtime
           node scripts/kokoro-runtime-environment.mjs
 
-      - name: Install local MP3 encoder/probe tooling
+      - name: Install exact approved MP3 encoder/probe tooling
         shell: bash
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends ffmpeg
-          ffmpeg -version | head -1
-          ffprobe -version | head -1
+          sudo apt-get install -y --no-install-recommends \
+            ffmpeg=7:6.1.1-3ubuntu5 \
+            libavcodec60=7:6.1.1-3ubuntu5 \
+            libavformat60=7:6.1.1-3ubuntu5 \
+            libavutil58=7:6.1.1-3ubuntu5 \
+            libswresample4=7:6.1.1-3ubuntu5 \
+            libmp3lame0=3.100-6build1
+          node scripts/narration-encoder-profile.mjs --local
 
       - name: Checkout exact Kokoro and Misaki source commits
         shell: bash
@@ -111,7 +116,8 @@ jobs:
             --kokoro-src-dir .runtime-src/kokoro \
             --misaki-src-dir .runtime-src/misaki \
             --python scripts/narration-runtime/.venv/bin/python \
-            --ffmpeg ffmpeg \
+            --ffmpeg /usr/bin/ffmpeg \
+            --replace \
             --keep-work | tee canary-generation.log
 
           RECEIPT="$(grep -oE 'content/evidence/narration/receipts/[A-Za-z0-9._-]+\.json' canary-generation.log | tail -1)"

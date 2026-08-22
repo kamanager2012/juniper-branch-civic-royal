@@ -1,4 +1,428 @@
 {
   "schemaVersion": 1,
-  "entries": {}
+  "entries": {
+    "shou-zhu/moral": {
+      "provider": "kokoro-local",
+      "voice": "zf_001",
+      "language": "zh",
+      "generator": "kokoro-local-adapter-v2",
+      "providerProfileId": "kokoro-v1.1-zh-zf001",
+      "providerProfilePath": "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json",
+      "providerProfileSha256": "87c7dcc77a20841e45320b4f7479e4cc1d7384c1058ed9be749fdeead68a885b",
+      "runtimeEnvironment": {
+        "id": "kokoro-mandarin-python312-linux-x64-cpu-v1",
+        "target": {
+          "platform": "linux",
+          "arch": "x64",
+          "python": "3.12",
+          "device": "cpu"
+        },
+        "resolver": {
+          "name": "uv",
+          "version": "0.10.0"
+        },
+        "project": {
+          "path": "scripts/narration-runtime/pyproject.toml",
+          "sha256": "b5ae9f93bb07807e73cf497a5815d8526fedefb1cab4c5804d687e6b9ab1d6d0"
+        },
+        "lock": {
+          "path": "scripts/narration-runtime/uv.lock",
+          "sha256": "75dac0288870fd549098dc2ae7a7e3433cbf681433e81a00e15689661accdd9f"
+        }
+      },
+      "encoderProfileId": "ffmpeg-noble-6.1.1-libmp3lame-v1",
+      "encoderProfilePath": "content/evidence/narration/encoders/ffmpeg-noble-6.1.1-libmp3lame.json",
+      "encoderProfileSha256": "68621063c0d2c3edb91c3280bbdec30a66be07917d7f972ea6c54adf3131635a",
+      "encoderBinarySha256": "ed16af623947494a72e284b6eb8ff225f2da22b38b5d5069c2fd4b4ba3384e41",
+      "encoderLibmp3lameSha256": "14b664b4af2fe18975adb3c06c0369b436dd6504ce421736649c0415447c9d00",
+      "textSha256": "e48da39486bd0cbab1125d1e0cb3e2f42b8511d543e0f01134150c5f93ea68c2",
+      "audioSha256": "090e2a7140d70f6427856cee052b4ac0feeda049a59ce1152f2a32e1a4e3a500",
+      "generatedAt": "2026-08-22T11:35:47.510Z",
+      "batchId": "kokoro-20260822t113547510z-shou-zhu-106ebc53267a",
+      "inputItemCount": 9,
+      "inputDigestSha256": "106ebc53267a9e52a254663dcff7d2e79017b4e26b30eb7d3a16c20257c8598c",
+      "receiptPath": "content/evidence/narration/receipts/kokoro-20260822t113547510z-shou-zhu-106ebc53267a.json",
+      "receiptSha256": "dc7aaac72a0754e4436715cd5e97b8fb059422be09048f31f5faed828566c563",
+      "rightsClaim": "permission",
+      "rightsEvidence": [
+        "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json"
+      ]
+    },
+    "shou-zhu/p0": {
+      "provider": "kokoro-local",
+      "voice": "zf_001",
+      "language": "zh",
+      "generator": "kokoro-local-adapter-v2",
+      "providerProfileId": "kokoro-v1.1-zh-zf001",
+      "providerProfilePath": "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json",
+      "providerProfileSha256": "87c7dcc77a20841e45320b4f7479e4cc1d7384c1058ed9be749fdeead68a885b",
+      "runtimeEnvironment": {
+        "id": "kokoro-mandarin-python312-linux-x64-cpu-v1",
+        "target": {
+          "platform": "linux",
+          "arch": "x64",
+          "python": "3.12",
+          "device": "cpu"
+        },
+        "resolver": {
+          "name": "uv",
+          "version": "0.10.0"
+        },
+        "project": {
+          "path": "scripts/narration-runtime/pyproject.toml",
+          "sha256": "b5ae9f93bb07807e73cf497a5815d8526fedefb1cab4c5804d687e6b9ab1d6d0"
+        },
+        "lock": {
+          "path": "scripts/narration-runtime/uv.lock",
+          "sha256": "75dac0288870fd549098dc2ae7a7e3433cbf681433e81a00e15689661accdd9f"
+        }
+      },
+      "encoderProfileId": "ffmpeg-noble-6.1.1-libmp3lame-v1",
+      "encoderProfilePath": "content/evidence/narration/encoders/ffmpeg-noble-6.1.1-libmp3lame.json",
+      "encoderProfileSha256": "68621063c0d2c3edb91c3280bbdec30a66be07917d7f972ea6c54adf3131635a",
+      "encoderBinarySha256": "ed16af623947494a72e284b6eb8ff225f2da22b38b5d5069c2fd4b4ba3384e41",
+      "encoderLibmp3lameSha256": "14b664b4af2fe18975adb3c06c0369b436dd6504ce421736649c0415447c9d00",
+      "textSha256": "c46c5fea27e25efd05fd5e68002d547f93868c6bb8e9806ae5f5cf4babc5e775",
+      "audioSha256": "3bd87f3b86e44dd95fc4a66ff75703e8eee4db116499d3ff697219de731931cd",
+      "generatedAt": "2026-08-22T11:35:47.510Z",
+      "batchId": "kokoro-20260822t113547510z-shou-zhu-106ebc53267a",
+      "inputItemCount": 9,
+      "inputDigestSha256": "106ebc53267a9e52a254663dcff7d2e79017b4e26b30eb7d3a16c20257c8598c",
+      "receiptPath": "content/evidence/narration/receipts/kokoro-20260822t113547510z-shou-zhu-106ebc53267a.json",
+      "receiptSha256": "dc7aaac72a0754e4436715cd5e97b8fb059422be09048f31f5faed828566c563",
+      "rightsClaim": "permission",
+      "rightsEvidence": [
+        "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json"
+      ]
+    },
+    "shou-zhu/p1": {
+      "provider": "kokoro-local",
+      "voice": "zf_001",
+      "language": "zh",
+      "generator": "kokoro-local-adapter-v2",
+      "providerProfileId": "kokoro-v1.1-zh-zf001",
+      "providerProfilePath": "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json",
+      "providerProfileSha256": "87c7dcc77a20841e45320b4f7479e4cc1d7384c1058ed9be749fdeead68a885b",
+      "runtimeEnvironment": {
+        "id": "kokoro-mandarin-python312-linux-x64-cpu-v1",
+        "target": {
+          "platform": "linux",
+          "arch": "x64",
+          "python": "3.12",
+          "device": "cpu"
+        },
+        "resolver": {
+          "name": "uv",
+          "version": "0.10.0"
+        },
+        "project": {
+          "path": "scripts/narration-runtime/pyproject.toml",
+          "sha256": "b5ae9f93bb07807e73cf497a5815d8526fedefb1cab4c5804d687e6b9ab1d6d0"
+        },
+        "lock": {
+          "path": "scripts/narration-runtime/uv.lock",
+          "sha256": "75dac0288870fd549098dc2ae7a7e3433cbf681433e81a00e15689661accdd9f"
+        }
+      },
+      "encoderProfileId": "ffmpeg-noble-6.1.1-libmp3lame-v1",
+      "encoderProfilePath": "content/evidence/narration/encoders/ffmpeg-noble-6.1.1-libmp3lame.json",
+      "encoderProfileSha256": "68621063c0d2c3edb91c3280bbdec30a66be07917d7f972ea6c54adf3131635a",
+      "encoderBinarySha256": "ed16af623947494a72e284b6eb8ff225f2da22b38b5d5069c2fd4b4ba3384e41",
+      "encoderLibmp3lameSha256": "14b664b4af2fe18975adb3c06c0369b436dd6504ce421736649c0415447c9d00",
+      "textSha256": "297e28b9951b27032263222e5d95f3420d307f0d2ab91f36c1493b30de8c9edc",
+      "audioSha256": "0ea97efbcafdabbcd6e6144dcb1e5aeb147904e9d6b7ae9b69379fb6f1ebd20e",
+      "generatedAt": "2026-08-22T11:35:47.510Z",
+      "batchId": "kokoro-20260822t113547510z-shou-zhu-106ebc53267a",
+      "inputItemCount": 9,
+      "inputDigestSha256": "106ebc53267a9e52a254663dcff7d2e79017b4e26b30eb7d3a16c20257c8598c",
+      "receiptPath": "content/evidence/narration/receipts/kokoro-20260822t113547510z-shou-zhu-106ebc53267a.json",
+      "receiptSha256": "dc7aaac72a0754e4436715cd5e97b8fb059422be09048f31f5faed828566c563",
+      "rightsClaim": "permission",
+      "rightsEvidence": [
+        "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json"
+      ]
+    },
+    "shou-zhu/p2": {
+      "provider": "kokoro-local",
+      "voice": "zf_001",
+      "language": "zh",
+      "generator": "kokoro-local-adapter-v2",
+      "providerProfileId": "kokoro-v1.1-zh-zf001",
+      "providerProfilePath": "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json",
+      "providerProfileSha256": "87c7dcc77a20841e45320b4f7479e4cc1d7384c1058ed9be749fdeead68a885b",
+      "runtimeEnvironment": {
+        "id": "kokoro-mandarin-python312-linux-x64-cpu-v1",
+        "target": {
+          "platform": "linux",
+          "arch": "x64",
+          "python": "3.12",
+          "device": "cpu"
+        },
+        "resolver": {
+          "name": "uv",
+          "version": "0.10.0"
+        },
+        "project": {
+          "path": "scripts/narration-runtime/pyproject.toml",
+          "sha256": "b5ae9f93bb07807e73cf497a5815d8526fedefb1cab4c5804d687e6b9ab1d6d0"
+        },
+        "lock": {
+          "path": "scripts/narration-runtime/uv.lock",
+          "sha256": "75dac0288870fd549098dc2ae7a7e3433cbf681433e81a00e15689661accdd9f"
+        }
+      },
+      "encoderProfileId": "ffmpeg-noble-6.1.1-libmp3lame-v1",
+      "encoderProfilePath": "content/evidence/narration/encoders/ffmpeg-noble-6.1.1-libmp3lame.json",
+      "encoderProfileSha256": "68621063c0d2c3edb91c3280bbdec30a66be07917d7f972ea6c54adf3131635a",
+      "encoderBinarySha256": "ed16af623947494a72e284b6eb8ff225f2da22b38b5d5069c2fd4b4ba3384e41",
+      "encoderLibmp3lameSha256": "14b664b4af2fe18975adb3c06c0369b436dd6504ce421736649c0415447c9d00",
+      "textSha256": "6feda8a3ab7bf1099362bb37e86e0ce90cc1c6ec646c4027dea31749982d0aec",
+      "audioSha256": "4dd9851e434e0b843fdbcde5bfcdf25eaae1ee62d5120427e714d63ac1822bd6",
+      "generatedAt": "2026-08-22T11:35:47.510Z",
+      "batchId": "kokoro-20260822t113547510z-shou-zhu-106ebc53267a",
+      "inputItemCount": 9,
+      "inputDigestSha256": "106ebc53267a9e52a254663dcff7d2e79017b4e26b30eb7d3a16c20257c8598c",
+      "receiptPath": "content/evidence/narration/receipts/kokoro-20260822t113547510z-shou-zhu-106ebc53267a.json",
+      "receiptSha256": "dc7aaac72a0754e4436715cd5e97b8fb059422be09048f31f5faed828566c563",
+      "rightsClaim": "permission",
+      "rightsEvidence": [
+        "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json"
+      ]
+    },
+    "shou-zhu/p3": {
+      "provider": "kokoro-local",
+      "voice": "zf_001",
+      "language": "zh",
+      "generator": "kokoro-local-adapter-v2",
+      "providerProfileId": "kokoro-v1.1-zh-zf001",
+      "providerProfilePath": "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json",
+      "providerProfileSha256": "87c7dcc77a20841e45320b4f7479e4cc1d7384c1058ed9be749fdeead68a885b",
+      "runtimeEnvironment": {
+        "id": "kokoro-mandarin-python312-linux-x64-cpu-v1",
+        "target": {
+          "platform": "linux",
+          "arch": "x64",
+          "python": "3.12",
+          "device": "cpu"
+        },
+        "resolver": {
+          "name": "uv",
+          "version": "0.10.0"
+        },
+        "project": {
+          "path": "scripts/narration-runtime/pyproject.toml",
+          "sha256": "b5ae9f93bb07807e73cf497a5815d8526fedefb1cab4c5804d687e6b9ab1d6d0"
+        },
+        "lock": {
+          "path": "scripts/narration-runtime/uv.lock",
+          "sha256": "75dac0288870fd549098dc2ae7a7e3433cbf681433e81a00e15689661accdd9f"
+        }
+      },
+      "encoderProfileId": "ffmpeg-noble-6.1.1-libmp3lame-v1",
+      "encoderProfilePath": "content/evidence/narration/encoders/ffmpeg-noble-6.1.1-libmp3lame.json",
+      "encoderProfileSha256": "68621063c0d2c3edb91c3280bbdec30a66be07917d7f972ea6c54adf3131635a",
+      "encoderBinarySha256": "ed16af623947494a72e284b6eb8ff225f2da22b38b5d5069c2fd4b4ba3384e41",
+      "encoderLibmp3lameSha256": "14b664b4af2fe18975adb3c06c0369b436dd6504ce421736649c0415447c9d00",
+      "textSha256": "fbbf26f389e3098303f2f6e33a4b8784a4ec09babf86f67a1198139ca1a01b13",
+      "audioSha256": "441491f6293c1f56ee3d759701661ab89a55f3937611bc9386909d19dbdc4258",
+      "generatedAt": "2026-08-22T11:35:47.510Z",
+      "batchId": "kokoro-20260822t113547510z-shou-zhu-106ebc53267a",
+      "inputItemCount": 9,
+      "inputDigestSha256": "106ebc53267a9e52a254663dcff7d2e79017b4e26b30eb7d3a16c20257c8598c",
+      "receiptPath": "content/evidence/narration/receipts/kokoro-20260822t113547510z-shou-zhu-106ebc53267a.json",
+      "receiptSha256": "dc7aaac72a0754e4436715cd5e97b8fb059422be09048f31f5faed828566c563",
+      "rightsClaim": "permission",
+      "rightsEvidence": [
+        "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json"
+      ]
+    },
+    "shou-zhu/p4": {
+      "provider": "kokoro-local",
+      "voice": "zf_001",
+      "language": "zh",
+      "generator": "kokoro-local-adapter-v2",
+      "providerProfileId": "kokoro-v1.1-zh-zf001",
+      "providerProfilePath": "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json",
+      "providerProfileSha256": "87c7dcc77a20841e45320b4f7479e4cc1d7384c1058ed9be749fdeead68a885b",
+      "runtimeEnvironment": {
+        "id": "kokoro-mandarin-python312-linux-x64-cpu-v1",
+        "target": {
+          "platform": "linux",
+          "arch": "x64",
+          "python": "3.12",
+          "device": "cpu"
+        },
+        "resolver": {
+          "name": "uv",
+          "version": "0.10.0"
+        },
+        "project": {
+          "path": "scripts/narration-runtime/pyproject.toml",
+          "sha256": "b5ae9f93bb07807e73cf497a5815d8526fedefb1cab4c5804d687e6b9ab1d6d0"
+        },
+        "lock": {
+          "path": "scripts/narration-runtime/uv.lock",
+          "sha256": "75dac0288870fd549098dc2ae7a7e3433cbf681433e81a00e15689661accdd9f"
+        }
+      },
+      "encoderProfileId": "ffmpeg-noble-6.1.1-libmp3lame-v1",
+      "encoderProfilePath": "content/evidence/narration/encoders/ffmpeg-noble-6.1.1-libmp3lame.json",
+      "encoderProfileSha256": "68621063c0d2c3edb91c3280bbdec30a66be07917d7f972ea6c54adf3131635a",
+      "encoderBinarySha256": "ed16af623947494a72e284b6eb8ff225f2da22b38b5d5069c2fd4b4ba3384e41",
+      "encoderLibmp3lameSha256": "14b664b4af2fe18975adb3c06c0369b436dd6504ce421736649c0415447c9d00",
+      "textSha256": "cc991838f4a16751817ec3fa73806bf7b84f7a4746cd542bc5ce6b6cc5013058",
+      "audioSha256": "b5d7707888e57195422d963a043fb2e364651f6b1979718fb3fa865551b33950",
+      "generatedAt": "2026-08-22T11:35:47.510Z",
+      "batchId": "kokoro-20260822t113547510z-shou-zhu-106ebc53267a",
+      "inputItemCount": 9,
+      "inputDigestSha256": "106ebc53267a9e52a254663dcff7d2e79017b4e26b30eb7d3a16c20257c8598c",
+      "receiptPath": "content/evidence/narration/receipts/kokoro-20260822t113547510z-shou-zhu-106ebc53267a.json",
+      "receiptSha256": "dc7aaac72a0754e4436715cd5e97b8fb059422be09048f31f5faed828566c563",
+      "rightsClaim": "permission",
+      "rightsEvidence": [
+        "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json"
+      ]
+    },
+    "shou-zhu/p5": {
+      "provider": "kokoro-local",
+      "voice": "zf_001",
+      "language": "zh",
+      "generator": "kokoro-local-adapter-v2",
+      "providerProfileId": "kokoro-v1.1-zh-zf001",
+      "providerProfilePath": "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json",
+      "providerProfileSha256": "87c7dcc77a20841e45320b4f7479e4cc1d7384c1058ed9be749fdeead68a885b",
+      "runtimeEnvironment": {
+        "id": "kokoro-mandarin-python312-linux-x64-cpu-v1",
+        "target": {
+          "platform": "linux",
+          "arch": "x64",
+          "python": "3.12",
+          "device": "cpu"
+        },
+        "resolver": {
+          "name": "uv",
+          "version": "0.10.0"
+        },
+        "project": {
+          "path": "scripts/narration-runtime/pyproject.toml",
+          "sha256": "b5ae9f93bb07807e73cf497a5815d8526fedefb1cab4c5804d687e6b9ab1d6d0"
+        },
+        "lock": {
+          "path": "scripts/narration-runtime/uv.lock",
+          "sha256": "75dac0288870fd549098dc2ae7a7e3433cbf681433e81a00e15689661accdd9f"
+        }
+      },
+      "encoderProfileId": "ffmpeg-noble-6.1.1-libmp3lame-v1",
+      "encoderProfilePath": "content/evidence/narration/encoders/ffmpeg-noble-6.1.1-libmp3lame.json",
+      "encoderProfileSha256": "68621063c0d2c3edb91c3280bbdec30a66be07917d7f972ea6c54adf3131635a",
+      "encoderBinarySha256": "ed16af623947494a72e284b6eb8ff225f2da22b38b5d5069c2fd4b4ba3384e41",
+      "encoderLibmp3lameSha256": "14b664b4af2fe18975adb3c06c0369b436dd6504ce421736649c0415447c9d00",
+      "textSha256": "f5d3c60235dcb16f2041655ca5d68454117e24b986856eab3265f2ec3a173527",
+      "audioSha256": "eba1be68a53a4e10e89d76c717575180a09404c48e7e7236cf0c390274ca7851",
+      "generatedAt": "2026-08-22T11:35:47.510Z",
+      "batchId": "kokoro-20260822t113547510z-shou-zhu-106ebc53267a",
+      "inputItemCount": 9,
+      "inputDigestSha256": "106ebc53267a9e52a254663dcff7d2e79017b4e26b30eb7d3a16c20257c8598c",
+      "receiptPath": "content/evidence/narration/receipts/kokoro-20260822t113547510z-shou-zhu-106ebc53267a.json",
+      "receiptSha256": "dc7aaac72a0754e4436715cd5e97b8fb059422be09048f31f5faed828566c563",
+      "rightsClaim": "permission",
+      "rightsEvidence": [
+        "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json"
+      ]
+    },
+    "shou-zhu/p6": {
+      "provider": "kokoro-local",
+      "voice": "zf_001",
+      "language": "zh",
+      "generator": "kokoro-local-adapter-v2",
+      "providerProfileId": "kokoro-v1.1-zh-zf001",
+      "providerProfilePath": "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json",
+      "providerProfileSha256": "87c7dcc77a20841e45320b4f7479e4cc1d7384c1058ed9be749fdeead68a885b",
+      "runtimeEnvironment": {
+        "id": "kokoro-mandarin-python312-linux-x64-cpu-v1",
+        "target": {
+          "platform": "linux",
+          "arch": "x64",
+          "python": "3.12",
+          "device": "cpu"
+        },
+        "resolver": {
+          "name": "uv",
+          "version": "0.10.0"
+        },
+        "project": {
+          "path": "scripts/narration-runtime/pyproject.toml",
+          "sha256": "b5ae9f93bb07807e73cf497a5815d8526fedefb1cab4c5804d687e6b9ab1d6d0"
+        },
+        "lock": {
+          "path": "scripts/narration-runtime/uv.lock",
+          "sha256": "75dac0288870fd549098dc2ae7a7e3433cbf681433e81a00e15689661accdd9f"
+        }
+      },
+      "encoderProfileId": "ffmpeg-noble-6.1.1-libmp3lame-v1",
+      "encoderProfilePath": "content/evidence/narration/encoders/ffmpeg-noble-6.1.1-libmp3lame.json",
+      "encoderProfileSha256": "68621063c0d2c3edb91c3280bbdec30a66be07917d7f972ea6c54adf3131635a",
+      "encoderBinarySha256": "ed16af623947494a72e284b6eb8ff225f2da22b38b5d5069c2fd4b4ba3384e41",
+      "encoderLibmp3lameSha256": "14b664b4af2fe18975adb3c06c0369b436dd6504ce421736649c0415447c9d00",
+      "textSha256": "5c7d0080868e9e53456d4f98c14d1e5628dcf387f1a2d8ee531666a0a56c47a6",
+      "audioSha256": "57d2775627a65759cb7d755c0a04d5b57836ad931a2bd63ac21d4de097cf6355",
+      "generatedAt": "2026-08-22T11:35:47.510Z",
+      "batchId": "kokoro-20260822t113547510z-shou-zhu-106ebc53267a",
+      "inputItemCount": 9,
+      "inputDigestSha256": "106ebc53267a9e52a254663dcff7d2e79017b4e26b30eb7d3a16c20257c8598c",
+      "receiptPath": "content/evidence/narration/receipts/kokoro-20260822t113547510z-shou-zhu-106ebc53267a.json",
+      "receiptSha256": "dc7aaac72a0754e4436715cd5e97b8fb059422be09048f31f5faed828566c563",
+      "rightsClaim": "permission",
+      "rightsEvidence": [
+        "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json"
+      ]
+    },
+    "shou-zhu/p7": {
+      "provider": "kokoro-local",
+      "voice": "zf_001",
+      "language": "zh",
+      "generator": "kokoro-local-adapter-v2",
+      "providerProfileId": "kokoro-v1.1-zh-zf001",
+      "providerProfilePath": "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json",
+      "providerProfileSha256": "87c7dcc77a20841e45320b4f7479e4cc1d7384c1058ed9be749fdeead68a885b",
+      "runtimeEnvironment": {
+        "id": "kokoro-mandarin-python312-linux-x64-cpu-v1",
+        "target": {
+          "platform": "linux",
+          "arch": "x64",
+          "python": "3.12",
+          "device": "cpu"
+        },
+        "resolver": {
+          "name": "uv",
+          "version": "0.10.0"
+        },
+        "project": {
+          "path": "scripts/narration-runtime/pyproject.toml",
+          "sha256": "b5ae9f93bb07807e73cf497a5815d8526fedefb1cab4c5804d687e6b9ab1d6d0"
+        },
+        "lock": {
+          "path": "scripts/narration-runtime/uv.lock",
+          "sha256": "75dac0288870fd549098dc2ae7a7e3433cbf681433e81a00e15689661accdd9f"
+        }
+      },
+      "encoderProfileId": "ffmpeg-noble-6.1.1-libmp3lame-v1",
+      "encoderProfilePath": "content/evidence/narration/encoders/ffmpeg-noble-6.1.1-libmp3lame.json",
+      "encoderProfileSha256": "68621063c0d2c3edb91c3280bbdec30a66be07917d7f972ea6c54adf3131635a",
+      "encoderBinarySha256": "ed16af623947494a72e284b6eb8ff225f2da22b38b5d5069c2fd4b4ba3384e41",
+      "encoderLibmp3lameSha256": "14b664b4af2fe18975adb3c06c0369b436dd6504ce421736649c0415447c9d00",
+      "textSha256": "7cca587dc439f62ee9381df1d252a74785a5e85964a9b94430ea5ddd4f67b7cb",
+      "audioSha256": "dc5647ce1f93076b18c428d1ac575c3420266c2dad5206380eaabda8aa2d1ecc",
+      "generatedAt": "2026-08-22T11:35:47.510Z",
+      "batchId": "kokoro-20260822t113547510z-shou-zhu-106ebc53267a",
+      "inputItemCount": 9,
+      "inputDigestSha256": "106ebc53267a9e52a254663dcff7d2e79017b4e26b30eb7d3a16c20257c8598c",
+      "receiptPath": "content/evidence/narration/receipts/kokoro-20260822t113547510z-shou-zhu-106ebc53267a.json",
+      "receiptSha256": "dc7aaac72a0754e4436715cd5e97b8fb059422be09048f31f5faed828566c563",
+      "rightsClaim": "permission",
+      "rightsEvidence": [
+        "content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json"
+      ]
+    }
+  }
 }
