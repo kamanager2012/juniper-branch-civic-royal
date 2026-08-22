@@ -44,10 +44,5 @@
     "local": "licenses/fonts/MaShanZheng/OFL.txt",
     "upstreamRepository": "https://github.com/googlefonts/mashanzheng",
     "upstreamLicense": "https://github.com/googlefonts/mashanzheng/blob/master/OFL.txt"
-  },
-  "verification": {
-    "workflowRun": 32553657585,
-    "job": 96984348120,
-    "runner": "ubuntu-24.04"
   }
 }
