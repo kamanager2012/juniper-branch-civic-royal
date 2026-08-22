@@ -9,6 +9,9 @@ coverage/
 .env.*
 !.env.example
 
+# Local narration generation workspace
+.narration-work/
+
 # Builder / deployment workspace state
 .grok/
 .vercel/
