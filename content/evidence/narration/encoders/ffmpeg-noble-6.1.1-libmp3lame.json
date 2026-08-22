@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "profileId": "ffmpeg-noble-6.1.1-libmp3lame-v1",
+  "status": "approved",
+  "purpose": "maintainer-side static narration MP3 encoding",
+  "target": {
+    "os": "Ubuntu 24.04.4 LTS",
+    "architecture": "amd64"
+  },
+  "codec": {
+    "name": "libmp3lame",
+    "bitrateKbps": 40,
+    "sampleRateHz": 24000,
+    "channels": 1
+  },
+  "binaries": [
+    {
+      "name": "ffmpeg",
+      "path": "/usr/bin/ffmpeg",
+      "package": "ffmpeg",
+      "packageVersion": "7:6.1.1-3ubuntu5",
+      "sha256": "ed16af623947494a72e284b6eb8ff225f2da22b38b5d5069c2fd4b4ba3384e41",
+      "versionLine": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers"
+    },
+    {
+      "name": "ffprobe",
+      "path": "/usr/bin/ffprobe",
+      "package": "ffmpeg",
+      "packageVersion": "7:6.1.1-3ubuntu5",
+      "sha256": "272f6ebc634a63d9c8b4ca68e964119d980f25154e5aa2c35e5487da48e9a58f",
+      "versionLine": "ffprobe version 6.1.1-3ubuntu5 Copyright (c) 2007-2023 the FFmpeg developers"
+    }
+  ],
+  "libraries": [
+    {
+      "soname": "libavcodec.so.60",
+      "path": "/usr/lib/x86_64-linux-gnu/libavcodec.so.60.31.102",
+      "package": "libavcodec60",
+      "packageVersion": "7:6.1.1-3ubuntu5",
+      "sha256": "8231c9aecba7d02c132de0e16195ccb3e8002a235a5f364b3635df09e7f513e0"
+    },
+    {
+      "soname": "libavformat.so.60",
+      "path": "/usr/lib/x86_64-linux-gnu/libavformat.so.60.16.100",
+      "package": "libavformat60",
+      "packageVersion": "7:6.1.1-3ubuntu5",
+      "sha256": "5f0970c52b7723037a7f6357cc1931879513449f742240fff7c37ceb7175ac9f"
+    },
+    {
+      "soname": "libavutil.so.58",
+      "path": "/usr/lib/x86_64-linux-gnu/libavutil.so.58.29.100",
+      "package": "libavutil58",
+      "packageVersion": "7:6.1.1-3ubuntu5",
+      "sha256": "11b0836441b899e1b2183fc10eda5a5f637c03547fdfe5b97774e2cbd5aeb72c"
+    },
+    {
+      "soname": "libmp3lame.so.0",
+      "path": "/usr/lib/x86_64-linux-gnu/libmp3lame.so.0.0.0",
+      "package": "libmp3lame0",
+      "packageVersion": "3.100-6build1",
+      "sha256": "14b664b4af2fe18975adb3c06c0369b436dd6504ce421736649c0415447c9d00"
+    },
+    {
+      "soname": "libswresample.so.4",
+      "path": "/usr/lib/x86_64-linux-gnu/libswresample.so.4.12.100",
+      "package": "libswresample4",
+      "packageVersion": "7:6.1.1-3ubuntu5",
+      "sha256": "d6ca325614995109ee64b2b2e7dc2d2e5a6a67daba26fed101f0a44b65abc1b1"
+    }
+  ],
+  "encoderInventoryLine": "A....D libmp3lame           libmp3lame MP3 (MPEG audio layer 3) (codec mp3)",
+  "evidence": {
+    "workflowRunId": 32569102287,
+    "jobId": 97021892505,
+    "artifactId": 9474851484,
+    "artifactZipSha256": "520ff01026f31a7dfad2d3f59c85e57de7d46713432436c95cb1b1e090241b1f",
+    "runnerImage": "ubuntu-24.04",
+    "runnerImageVersion": "20260816.277.1"
+  },
+  "boundary": "This profile belongs only to the maintainer/CI asset-production toolchain. The browser application does not ship ffmpeg, libmp3lame, a model runtime, or online inference."
+}
