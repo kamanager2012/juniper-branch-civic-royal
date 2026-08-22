@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "evidenceType": "historical-grok-imagine-derivation-audit",
+  "rightsClaimApplied": false,
+  "scope": "technical-origin-only",
+  "origin": {
+    "commit": "88c2080c715a1c37e64916970cbbc4af2ed7727a",
+    "workspaceStatus": {
+      "path": ".grok/status",
+      "gitBlob": "3dfc100ff2bc86b3a681459133200c862be22e30",
+      "timestamp": "2026-08-20T12:57:06Z"
+    },
+    "imagineWorkflowDocumentation": {
+      "path": ".grok/skills/imagine/SKILL.md",
+      "gitBlob": "4fcb9f5d2b32bc814b9d7653292469e1018c56a0",
+      "summary": "The Grok Build Imagine skill documents that image-generation tools return real sandbox file paths under artifacts and instructs the agent not to invent paths."
+    },
+    "imagineArtifactRoot": {
+      "path": "artifacts/imagine_images",
+      "gitTree": "850d95b6842fcb94fb4887ae85e67198d492b10b"
+    }
+  },
+  "audit": {
+    "script": "scripts/story-image-origin-audit.mjs",
+    "checker": "scripts/story-image-origin-audit-check.mjs",
+    "decoder": "jpeg-js@0.4.4",
+    "normalization": "16x16 RGB via deterministic bilinear sampling",
+    "metric": "mean absolute RGB channel error with RMSE retained as a secondary diagnostic",
+    "releaseImages": 192,
+    "historicalImagineArtifacts": 194,
+    "uniqueImagineMatches": 192,
+    "collisions": 0,
+    "unusedImagineArtifacts": 2,
+    "minMae": 2.3125,
+    "maxMae": 4.085938,
+    "averageMae": 3.119941,
+    "minBestVsSecondMargin": 7.523438,
+    "mappingDigestSha256": "ca3f410fe320ddb4b443d8089b84a4483de0e13d5731c806c894e865ad1c2cac"
+  },
+  "interpretation": {
+    "supported": "Each of the 192 current release story images resolves to a different historical Grok Imagine artifact with a low visual error after deterministic normalization; there are zero collisions and two unused historical Imagine artifacts.",
+    "notSupported": "This technical audit does not by itself establish legal ownership, copyrightability, non-infringement, or permission to use third-party material. Rights provenance is intentionally handled in a separate change."
+  }
+}
