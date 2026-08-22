@@ -8,8 +8,8 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({ component: Home });
 
-const EAGER_COVER_COUNT = 4;
-const DEFERRED_COVER_ROOT_MARGIN = "240px 0px";
+const EAGER_COVER_COUNT = 2;
+const DEFERRED_COVER_ROOT_MARGIN = "120px 0px";
 
 const TONE_RING: Record<Story["tone"], string> = {
   wheat: "ring-wheat/70",
@@ -119,7 +119,7 @@ function Home() {
                           src={story.cover}
                           alt=""
                           decoding="async"
-                          fetchPriority={i < 2 ? "high" : "auto"}
+                          fetchPriority="high"
                           data-cover-loading="eager"
                           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                         />
