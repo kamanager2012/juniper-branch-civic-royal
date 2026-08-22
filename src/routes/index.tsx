@@ -1,10 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BookOpen, Star } from "lucide-react";
+import { BookOpen, Image } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Petals } from "@/components/petals";
 import { storyCatalog } from "@/data/story-catalog";
 import type { Story } from "@/data/stories";
-import { allProgress, type StoryProgress } from "@/lib/progress";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({ component: Home });
@@ -70,14 +69,8 @@ function DeferredCover({ src }: { src: string }) {
 }
 
 function Home() {
-  const [progress, setProgress] = useState<Record<string, StoryProgress>>({});
-  useEffect(() => {
-    setProgress(allProgress());
-  }, []);
-
-  const heard = Object.values(progress).filter((p) => p.heard).length;
-  const mediaCount = storyCatalog.filter((item) => item.kind === "media").length;
-  const textCount = storyCatalog.length - mediaCount;
+  const illustratedCount = storyCatalog.filter((item) => item.kind === "media").length;
+  const textCount = storyCatalog.length - illustratedCount;
 
   return (
     <main className="relative min-h-dvh overflow-hidden">
@@ -100,15 +93,15 @@ function Home() {
           <div className="absolute inset-0 bg-linear-to-r from-ink/60 via-ink/25 to-transparent" />
           <div className="absolute inset-0 flex flex-col justify-end p-5 sm:p-7">
             <p className="font-display text-2xl text-panel sm:text-3xl">轻轻点开一本</p>
-            <p className="mt-1 text-sm text-panel/90">共 {storyCatalog.length} 本 · {mediaCount} 本有声绘本 · {textCount} 本文字版</p>
-            {heard > 0 && <p className="mt-2 text-xs text-panel/75">已经听过 {heard} 本有声故事</p>}
+            <p className="mt-1 text-sm text-panel/90">共 {storyCatalog.length} 本 · {illustratedCount} 本图文版 · {textCount} 本文字版</p>
+            <p className="mt-2 text-xs text-panel/75">旁白统一重新生成并校验后再恢复播放</p>
           </div>
         </section>
 
         <div className="mb-4 flex items-end justify-between gap-4">
           <div>
             <h2 className="font-display text-2xl text-ink">书架</h2>
-            <p className="mt-1 text-xs text-muted">文字版会继续补齐插图与旁白，不用假素材占位。</p>
+            <p className="mt-1 text-xs text-muted">24 本已有插图；76 本先提供完整文字。未校验的旧旁白不会播放。</p>
           </div>
           <span className="shrink-0 rounded-full bg-panel px-3 py-1.5 text-xs text-ink-soft shadow-panel">100 本</span>
         </div>
@@ -116,7 +109,6 @@ function Home() {
         <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6">
           {storyCatalog.map((item, i) => {
             const story = item.story;
-            const stars = item.kind === "media" ? (progress[story.id]?.stars ?? 0) : 0;
             const mediaIndex = item.kind === "media" ? i : -1;
             const eager = item.kind === "media" && mediaIndex < EAGER_COVER_COUNT;
 
@@ -173,16 +165,12 @@ function Home() {
                     <div className="flex items-center justify-between gap-2 px-3 py-2.5">
                       <p className="truncate text-sm text-ink-soft">{story.tagline}</p>
                       {item.kind === "media" ? (
-                        <span className="flex gap-0.5" aria-label={`${stars} 颗星`}>
-                          {[0, 1, 2].map((s) => (
-                            <Star
-                              key={s}
-                              className={cn("size-3.5", s < stars ? "fill-star text-star" : "text-line")}
-                            />
-                          ))}
+                        <span className="inline-flex shrink-0 items-center gap-1 text-[10px] text-muted">
+                          <Image className="size-3" aria-hidden="true" />
+                          图文
                         </span>
                       ) : (
-                        <span className="shrink-0 text-[10px] text-muted">待配音</span>
+                        <span className="shrink-0 text-[10px] text-muted">待插图</span>
                       )}
                     </div>
                   </article>
