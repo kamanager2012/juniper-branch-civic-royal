@@ -37,7 +37,7 @@ function Home() {
 
         <section className="relative mb-8 overflow-hidden rounded-[32px] book-spine">
           <img
-            src="/stories/bookshelf-hero.jpg"
+            src="/ui/bookshelf-paper.jpg"
             alt=""
             className="h-44 w-full object-cover sm:h-56"
           />
