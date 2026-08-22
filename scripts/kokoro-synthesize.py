@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Synthesize pinned Kokoro Mandarin narration to staging WAV files.
 
-This engine deliberately does not know about release provenance or narration state.
-The Node orchestrator validates provider/runtime identity, encodes MP3, writes the
-contemporaneous receipt, and commits outputs atomically.
+The engine imports KModel and ZHG2P directly from clean, pinned source
+checkouts via ``kokoro_runtime``. It never imports KPipeline, never downloads
+model assets, never writes narration state, and never truncates over-limit
+phoneme sequences.
 """
 
 from __future__ import annotations
@@ -16,11 +17,20 @@ from pathlib import Path
 import sys
 import wave
 
+from kokoro_runtime import (
+    assert_minimal_runtime_imports,
+    load_pinned_runtime,
+    phonemize_losslessly,
+    validate_voice_pack,
+    voice_reference_for_phonemes,
+)
+
 MODEL_REPOSITORY = "hexgrad/Kokoro-82M-v1.1-zh"
 SAMPLE_RATE = 24000
 VOICE_FILE = "voices/zf_001.pt"
 MODEL_FILE = "kokoro-v1_1-zh.pth"
 CONFIG_FILE = "config.json"
+ENGINE_ID = "kokoro-local-waveform-v2"
 
 
 def parse_args() -> argparse.Namespace:
@@ -31,19 +41,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--misaki-src-dir", required=True)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
     return parser.parse_args()
-
-
-def prepend_source_checkout(path: Path) -> None:
-    sys.path.insert(0, str(path.resolve()))
-
-
-def ensure_module_from_checkout(module_file: str, checkout: Path, label: str) -> None:
-    module_path = Path(module_file).resolve()
-    checkout_path = checkout.resolve()
-    try:
-        module_path.relative_to(checkout_path)
-    except ValueError as exc:
-        raise RuntimeError(f"{label} resolved outside pinned checkout: {module_path}") from exc
 
 
 def write_pcm16_wav(path: Path, audio, torch_module) -> int:
@@ -76,16 +73,12 @@ def synthesize() -> dict:
     misaki_src = Path(args.misaki_src_dir).resolve()
     manifest_path = Path(args.manifest).resolve()
 
-    prepend_source_checkout(kokoro_src)
-    prepend_source_checkout(misaki_src)
-
     import torch  # type: ignore
-    import kokoro  # type: ignore
-    import misaki  # type: ignore
-    from kokoro import KModel, KPipeline  # type: ignore
 
-    ensure_module_from_checkout(kokoro.__file__, kokoro_src, "kokoro")
-    ensure_module_from_checkout(misaki.__file__, misaki_src, "misaki")
+    runtime = load_pinned_runtime(kokoro_src, misaki_src)
+    KModel = runtime["KModel"]
+    ZHG2P = runtime["ZHG2P"]
+    assert_minimal_runtime_imports()
 
     if args.device == "cuda" and not torch.cuda.is_available():
         raise RuntimeError("CUDA was requested but torch.cuda.is_available() is false")
@@ -112,12 +105,11 @@ def synthesize() -> dict:
         config=str(config_path),
         model=str(model_path),
     ).to(args.device).eval()
-    pipeline = KPipeline(
-        lang_code="z",
-        repo_id=MODEL_REPOSITORY,
-        model=model,
-        device=args.device,
-    )
+    voice_pack = torch.load(str(voice_path), map_location="cpu", weights_only=True)
+    validate_voice_pack(voice_pack, torch)
+    voice_pack = voice_pack.to(args.device)
+    g2p = ZHG2P(version="1.1", en_callable=None)
+    assert_minimal_runtime_imports()
 
     completed = []
     silence = torch.zeros(int(SAMPLE_RATE * 0.12), dtype=torch.float32)
@@ -131,9 +123,12 @@ def synthesize() -> dict:
 
         wav_path = Path(wav_path_value).resolve()
         chunks = []
-        for result in pipeline(text, voice=str(voice_path), speed=1.0):
-            if result.audio is not None and result.audio.numel() > 0:
-                chunks.append(result.audio.detach().to("cpu").float())
+        phoneme_chunks = phonemize_losslessly(g2p, text)
+        for _graphemes, phonemes in phoneme_chunks:
+            ref_s = voice_reference_for_phonemes(voice_pack, phonemes)
+            audio = model(phonemes, ref_s, speed=1.0)
+            if audio is not None and audio.numel() > 0:
+                chunks.append(audio.detach().to("cpu").float())
         if not chunks:
             raise RuntimeError(f"{key}: Kokoro returned no audio")
 
@@ -154,18 +149,22 @@ def synthesize() -> dict:
                 "wavPath": str(wav_path),
                 "samples": sample_count,
                 "durationSeconds": sample_count / SAMPLE_RATE,
+                "phonemeChunks": len(phoneme_chunks),
+                "maxPhonemeChunkLength": max(len(phonemes) for _, phonemes in phoneme_chunks),
             }
         )
 
+    assert_minimal_runtime_imports()
     return {
         "schemaVersion": 1,
-        "engine": "kokoro-local-waveform-v1",
+        "engine": ENGINE_ID,
         "pythonVersion": sys.version.split()[0],
         "torchVersion": str(torch.__version__),
         "device": args.device,
         "sampleRateHz": SAMPLE_RATE,
-        "kokoroModulePath": str(Path(kokoro.__file__).resolve()),
-        "misakiModulePath": str(Path(misaki.__file__).resolve()),
+        "g2p": "misaki.ZHG2P/1.1",
+        "kokoroModulePath": runtime["kokoroModulePath"],
+        "misakiModulePath": runtime["misakiModulePath"],
         "count": len(completed),
         "items": completed,
     }
