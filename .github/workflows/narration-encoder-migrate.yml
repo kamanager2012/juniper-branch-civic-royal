@@ -228,3 +228,5 @@ jobs:
           git add scripts/kokoro-generation-contract.mjs scripts/kokoro-generation-contract.test.mjs scripts/narration-receipt.mjs scripts/import-narration-receipt.mjs scripts/narration-rights.mjs .github/workflows/kokoro-canary.yml .github/workflows/narration-encoder-migrate.yml
           git commit -m "feat: bind encoder provenance through narration verification"
           git push origin HEAD:feat/narration-encoder-provenance
+
+# trigger migration
