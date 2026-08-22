@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "profileId": "kokoro-v1.1-zh-zf001",
+  "status": "approved",
+  "providerType": "local-open-weight",
+  "language": "zh",
+  "sampleRateHz": 24000,
+  "generationPolicy": {
+    "voiceMode": "bundled-profile",
+    "referenceSpeakerAudio": false,
+    "voiceCloning": false,
+    "networkRequiredAtSynthesis": false
+  },
+  "model": {
+    "repository": "hexgrad/Kokoro-82M-v1.1-zh",
+    "revision": "a51e9e2a069a198cbda1f021f3805af3603ba92d",
+    "license": "Apache-2.0",
+    "config": {
+      "file": "config.json",
+      "sha256": "bc333efa5ce4ceff433c8c8e5d027a1eca0166001e4e4a62bea2d26ff7a46890",
+      "bytes": 3228
+    },
+    "weights": {
+      "file": "kokoro-v1_1-zh.pth",
+      "sha256": "b1d8410fa44dfb5c15471fd6c4225ea6b4e9ac7fa03c98e8bea47a9928476e2b",
+      "bytes": 327247856
+    },
+    "voice": {
+      "id": "zf_001",
+      "label": "Chinese female voice pack zf_001",
+      "file": "voices/zf_001.pt",
+      "sha256": "9bdc9a87e13e9bb1ea3e7803259c2ecbfebaeeb2ff80b5d0c76df1a464c1c962"
+    }
+  },
+  "runtime": {
+    "inference": {
+      "repository": "hexgrad/kokoro",
+      "commit": "dfb907a02bba8152ca444717ca5d78747ccb4bec",
+      "declaredVersion": "0.9.4",
+      "license": "Apache-2.0",
+      "localAssetLoading": {
+        "modelConfigPath": true,
+        "modelWeightsPath": true,
+        "voicePackPath": true,
+        "implicitNetworkRequired": false
+      }
+    },
+    "g2p": {
+      "repository": "hexgrad/misaki",
+      "commit": "fba1236595f2d2bf21d414ba6e57d25256afada3",
+      "declaredVersion": "0.9.4",
+      "languageExtra": "zh",
+      "license": "Apache-2.0"
+    }
+  },
+  "rights": {
+    "claimForGeneratedNarration": "permission",
+    "basis": [
+      "The model repository declares Apache-2.0.",
+      "The official model card states that the Chinese training data was freely and permissively granted to the model trainers by LongMaoData.",
+      "zf_001 is a bundled Chinese voice pack in the same pinned model repository revision.",
+      "The official Kokoro inference library and Misaki G2P library declare Apache-2.0.",
+      "The project will synthesize only its pinned canonical story text using the bundled zf_001 voice pack; no external reference speaker audio or voice cloning input is part of this profile."
+    ],
+    "boundary": "This profile records permission to use the pinned model, bundled voice pack, and runtime for project narration. It does not assert exclusive ownership of the model, voice identity, training data, or universal copyrightability/non-infringement of generated audio.",
+    "evidence": [
+      "https://huggingface.co/hexgrad/Kokoro-82M-v1.1-zh",
+      "https://huggingface.co/hexgrad/Kokoro-82M-v1.1-zh/blob/a51e9e2a069a198cbda1f021f3805af3603ba92d/kokoro-v1_1-zh.pth",
+      "https://huggingface.co/hexgrad/Kokoro-82M-v1.1-zh/blob/a51e9e2a069a198cbda1f021f3805af3603ba92d/voices/zf_001.pt",
+      "https://github.com/hexgrad/kokoro/blob/dfb907a02bba8152ca444717ca5d78747ccb4bec/LICENSE",
+      "https://github.com/hexgrad/misaki/blob/fba1236595f2d2bf21d414ba6e57d25256afada3/LICENSE"
+    ]
+  },
+  "approval": {
+    "approved": true,
+    "approvedByEvidence": [
+      "GitHub Actions fetched config.json from the exact model revision and measured SHA-256 bc333efa5ce4ceff433c8c8e5d027a1eca0166001e4e4a62bea2d26ff7a46890 at 3228 bytes.",
+      "The exact model-revision LFS pointer reports SHA-256 b1d8410fa44dfb5c15471fd6c4225ea6b4e9ac7fa03c98e8bea47a9928476e2b and size 327247856.",
+      "The exact model-revision zf_001 voice LFS pointer reports SHA-256 9bdc9a87e13e9bb1ea3e7803259c2ecbfebaeeb2ff80b5d0c76df1a464c1c962."
+    ]
+  }
+}
