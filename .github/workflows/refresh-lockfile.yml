@@ -1,0 +1,42 @@
+name: refresh pruned lockfile
+
+on:
+  push:
+    branches: ["feat/storybook-foundation-cleanup"]
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: feat/storybook-foundation-cleanup
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - name: Verify import inventory
+        run: node scripts/dependency-inventory.mjs
+      - name: Regenerate lockfile from pruned manifest
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Verify reproducible clean install
+        run: npm ci
+      - name: Run complete project gate
+        run: npm run check
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
+      - name: Commit verified lockfile
+        run: |
+          if git diff --quiet -- package-lock.json; then
+            echo "package-lock.json already matches package.json"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          git commit -m "chore: refresh pruned dependency lockfile"
+          git push origin HEAD:feat/storybook-foundation-cleanup
