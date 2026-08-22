@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
 import { mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { basename, join, relative, resolve } from "node:path";
+import { join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -37,27 +37,44 @@ function relativePath(path) {
   return relative(repoRoot, path).replaceAll("\\", "/");
 }
 
-function findImageMagick() {
+function commandVersion(command, args) {
+  const probe = spawnSync(command, args, { encoding: "utf8" });
+  if (probe.status !== 0) return null;
+  return `${probe.stdout ?? ""}${probe.stderr ?? ""}`.split("\n").find(Boolean)?.trim() ?? command;
+}
+
+function findImageTool() {
   for (const command of ["magick", "convert"]) {
-    const probe = spawnSync(command, ["-version"], { encoding: "utf8" });
-    if (probe.status === 0) {
-      const firstLine = `${probe.stdout ?? ""}${probe.stderr ?? ""}`.split("\n").find(Boolean) ?? command;
-      return { command, version: firstLine.trim() };
-    }
+    const version = commandVersion(command, ["-version"]);
+    if (version) return { kind: "imagemagick", command, version };
   }
-  throw new Error("ImageMagick is required for this historical image-origin audit (magick/convert not found)");
+  const ffmpegVersion = commandVersion("ffmpeg", ["-version"]);
+  if (ffmpegVersion) return { kind: "ffmpeg", command: "ffmpeg", version: ffmpegVersion };
+  throw new Error("historical image-origin audit requires ImageMagick or FFmpeg");
 }
 
 function imageVector(tool, path) {
-  const args = [
-    path,
-    "-auto-orient",
-    "-resize", `${SAMPLE_SIZE}x${SAMPLE_SIZE}!`,
-    "-colorspace", "sRGB",
-    "-depth", "8",
-    "rgb:-",
-  ];
-  const value = execFileSync(tool.command, args, { encoding: null, maxBuffer: 8 * 1024 * 1024 });
+  let value;
+  if (tool.kind === "imagemagick") {
+    value = execFileSync(tool.command, [
+      path,
+      "-auto-orient",
+      "-resize", `${SAMPLE_SIZE}x${SAMPLE_SIZE}!`,
+      "-colorspace", "sRGB",
+      "-depth", "8",
+      "rgb:-",
+    ], { encoding: null, maxBuffer: 8 * 1024 * 1024 });
+  } else {
+    value = execFileSync(tool.command, [
+      "-v", "error",
+      "-i", path,
+      "-vf", `scale=${SAMPLE_SIZE}:${SAMPLE_SIZE}:flags=area`,
+      "-frames:v", "1",
+      "-f", "rawvideo",
+      "-pix_fmt", "rgb24",
+      "pipe:1",
+    ], { encoding: null, maxBuffer: 8 * 1024 * 1024 });
+  }
   const expected = SAMPLE_SIZE * SAMPLE_SIZE * 3;
   if (value.length !== expected) throw new Error(`unexpected normalized pixel size for ${path}: ${value.length} != ${expected}`);
   return value;
@@ -89,7 +106,7 @@ function round(value) {
 
 function buildAudit() {
   git(["cat-file", "-e", `${ORIGIN_COMMIT}^{commit}`]);
-  const tool = findImageMagick();
+  const tool = findImageTool();
   const originPaths = git(["ls-tree", "-r", "--name-only", ORIGIN_COMMIT, "--", IMAGINE_ROOT])
     .trim()
     .split("\n")
@@ -175,9 +192,10 @@ function buildAudit() {
       originCommit: ORIGIN_COMMIT,
       method: {
         tool: tool.version,
-        sample: `${SAMPLE_SIZE}x${SAMPLE_SIZE} sRGB 8-bit RGB after auto-orient`,
+        toolKind: tool.kind,
+        sample: `${SAMPLE_SIZE}x${SAMPLE_SIZE} sRGB 8-bit RGB`,
         metric: "mean absolute RGB channel error; RMSE retained as secondary diagnostic",
-        selection: "nearest Imagine artifact per release image; second-best distance retained for separation analysis",
+        selection: "nearest historical Imagine artifact per release image; second-best distance retained for separation analysis",
       },
       counts: {
         releaseImages: release.length,
