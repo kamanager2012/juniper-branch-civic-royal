@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "productArtwork": [
+    "public/favicon.svg",
+    "public/icon-180.svg",
+    "public/og.svg",
+    "public/ui/bookshelf-paper.svg"
+  ],
+  "retiredProductArtwork": [
+    "public/icon-180.png",
+    "public/og.jpg",
+    "public/ui/bookshelf-paper.jpg"
+  ]
+}

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-label="纸张纹理背景">
+  <defs>
+    <linearGradient id="base" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFF8EC"/>
+      <stop offset="1" stop-color="#F4EAD8"/>
+    </linearGradient>
+    <pattern id="fiber" width="72" height="72" patternUnits="userSpaceOnUse">
+      <path d="M2 18C16 11 27 25 42 17S62 12 70 20" fill="none" stroke="#D9C4A4" stroke-width="1.2" opacity=".28"/>
+      <path d="M8 52c13-8 24 6 39-2s18-5 23-1" fill="none" stroke="#C9B08A" stroke-width="1" opacity=".18"/>
+      <circle cx="18" cy="35" r="1.2" fill="#B99A6D" opacity=".20"/>
+      <circle cx="55" cy="61" r="1" fill="#B99A6D" opacity=".16"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="800" fill="url(#base)"/>
+  <rect width="1200" height="800" fill="url(#fiber)"/>
+  <path d="M0 130C210 95 350 160 560 122S930 88 1200 138" fill="none" stroke="#FFFFFF" stroke-width="3" opacity=".18"/>
+  <path d="M0 650C240 610 420 690 670 642s350-18 530 2" fill="none" stroke="#C9B08A" stroke-width="2" opacity=".10"/>
+</svg>

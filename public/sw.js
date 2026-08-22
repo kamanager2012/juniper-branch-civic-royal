@@ -1,10 +1,11 @@
-const CACHE_NAME = "chengyu-storybook-shell-v2";
+const CACHE_NAME = "chengyu-storybook-shell-v3";
 const CACHE_PREFIX = "chengyu-storybook-";
 const STATIC_PATHS = [
   "/manifest.webmanifest",
   "/favicon.svg",
-  "/icon-180.png",
-  "/ui/bookshelf-paper.jpg",
+  "/icon-180.svg",
+  "/og.svg",
+  "/ui/bookshelf-paper.svg",
 ];
 
 async function cacheShell() {

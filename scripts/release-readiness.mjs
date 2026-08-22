@@ -1,10 +1,11 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { basename, join, relative } from "node:path";
+import { join, relative } from "node:path";
 import { buildNarrationPlan } from "./narration-plan.mjs";
 import { loadStoryModel, repoRoot } from "./story-model.mjs";
 
 const registryPath = join(repoRoot, "content/release-provenance.json");
+const releaseAssetsPath = join(repoRoot, "content/release-assets.json");
 const ALLOWED_CLAIMS = new Set(["owned", "licensed", "public-domain", "permission"]);
 
 function sha256Buffer(value) {
@@ -42,6 +43,23 @@ function readRegistry() {
   return parsed;
 }
 
+export function readReleaseAssets() {
+  const parsed = JSON.parse(readFileSync(releaseAssetsPath, "utf8"));
+  if (parsed?.schemaVersion !== 1 || !Array.isArray(parsed.productArtwork) || !Array.isArray(parsed.retiredProductArtwork)) {
+    throw new Error("content/release-assets.json must use schemaVersion 1 with productArtwork and retiredProductArtwork arrays");
+  }
+  const productArtwork = parsed.productArtwork.map((value) => {
+    if (typeof value !== "string" || !value.startsWith("public/") || value.includes("..") || value.includes("\\")) {
+      throw new Error(`invalid product artwork path: ${String(value)}`);
+    }
+    const absolute = join(repoRoot, value);
+    if (!existsSync(absolute) || !statSync(absolute).isFile()) throw new Error(`product artwork missing: ${value}`);
+    return value;
+  });
+  if (new Set(productArtwork).size !== productArtwork.length) throw new Error("productArtwork paths must be unique");
+  return { ...parsed, productArtwork };
+}
+
 function storyTextAsset(story) {
   const content = {
     id: story.id,
@@ -72,14 +90,7 @@ function fileAsset(idPrefix, category, path, extra = {}) {
 }
 
 function productArtworkFiles() {
-  const rootFiles = readdirSync(join(repoRoot, "public"), { withFileTypes: true })
-    .filter((entry) => entry.isFile())
-    .map((entry) => join(repoRoot, "public", entry.name))
-    .filter((path) => {
-      const name = basename(path);
-      return name === "favicon.svg" || name === "og.jpg" || /^icon-\d+\.(?:png|jpe?g|webp|svg)$/i.test(name);
-    });
-  return [...rootFiles, ...walk(join(repoRoot, "public/ui"))].sort();
+  return readReleaseAssets().productArtwork.map((path) => join(repoRoot, path)).sort();
 }
 
 function buildAssetInventory() {

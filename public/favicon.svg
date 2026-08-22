@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="成语故事">
   <rect width="100" height="100" rx="22" fill="#F4EAD8"/>
   <rect x="14" y="18" width="72" height="64" rx="8" fill="#B33828"/>
   <rect x="20" y="24" width="60" height="52" rx="5" fill="#FFF8EC"/>

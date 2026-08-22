@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "claim": "owned",
+  "method": "deterministic-repository-generator",
+  "generator": {
+    "path": "scripts/generate-product-artwork.mjs",
+    "sha256": "29cadd9f682f628407765e51756d420a1813839198964b6e2000cf1a8ab5888f",
+    "externalInputs": [],
+    "dependencies": []
+  },
+  "outputs": [
+    {
+      "path": "public/favicon.svg",
+      "sha256": "c65508575651c8b6f1c10a9a2d252ae3ca81d35a2f4cdad0b96a4b7c90f2db88"
+    },
+    {
+      "path": "public/icon-180.svg",
+      "sha256": "fb60054d2c983046533b58d3567b85f6ce037942165c859b1286c9fc852f196f"
+    },
+    {
+      "path": "public/og.svg",
+      "sha256": "14b665893ee808757e8424c43f06e80417a8916e1fad26da33fa41dae41c71f3"
+    },
+    {
+      "path": "public/ui/bookshelf-paper.svg",
+      "sha256": "3e9a63d953f1694b74f87027073a90742fa51dfc8e6eee42a0629c65e4145836"
+    }
+  ],
+  "construction": {
+    "source": "repository-authored SVG primitives and literal project copy only",
+    "thirdPartyImages": false,
+    "thirdPartyFontsEmbedded": false,
+    "networkFetches": false,
+    "stockAssets": false
+  },
+  "retiredLegacyArtwork": [
+    "public/icon-180.png",
+    "public/og.jpg",
+    "public/ui/bookshelf-paper.jpg"
+  ]
+}

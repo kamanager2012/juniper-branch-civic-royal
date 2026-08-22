@@ -79,7 +79,7 @@ function Home() {
 
         <section className="relative mb-8 overflow-hidden rounded-[32px] book-spine">
           <img
-            src="/ui/bookshelf-paper.jpg"
+            src="/ui/bookshelf-paper.svg"
             alt=""
             decoding="async"
             fetchPriority="high"

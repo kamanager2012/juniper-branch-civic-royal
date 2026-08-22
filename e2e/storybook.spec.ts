@@ -16,7 +16,7 @@ test("bookshelf, deep link, media assets and viewport stay healthy", async ({ pa
   await page.goto("/", { waitUntil: "networkidle" });
   await expect(page.getByRole("heading", { name: "成语故事", exact: true })).toBeVisible();
 
-  const bookshelfHero = page.locator('img[src="/ui/bookshelf-paper.jpg"]').first();
+  const bookshelfHero = page.locator('img[src="/ui/bookshelf-paper.svg"]').first();
   await expect(bookshelfHero).toBeVisible();
   expect(
     await bookshelfHero.evaluate((image) => image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0),

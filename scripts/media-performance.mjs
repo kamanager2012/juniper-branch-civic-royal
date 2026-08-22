@@ -27,7 +27,7 @@ export function buildMediaPerformanceReport() {
   const covers = new Set(model.stories.map((story) => story.cover.replace(/^\//, "")));
   const storyImages = new Set(model.pages.map((page) => page.image.replace(/^\//, "")));
   const narration = new Set(model.pages.map((page) => page.audio.replace(/^\//, "")));
-  const hero = "ui/bookshelf-paper.jpg";
+  const hero = "ui/bookshelf-paper.svg";
   const heroBytes = statSync(join(repoRoot, "public", hero)).size;
   const coverStats = stats(covers);
   const storyImageStats = stats(storyImages);
