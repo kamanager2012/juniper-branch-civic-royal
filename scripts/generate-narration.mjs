@@ -1,141 +1,379 @@
 #!/usr/bin/env node
-import { createHash } from "node:crypto";
-import { mkdirSync, renameSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { buildNarrationPlan, narrationStatePath, readNarrationState } from "./narration-plan.mjs";
+import { execFileSync, spawnSync } from "node:child_process";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  renameSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { dirname, join, relative, resolve } from "node:path";
+import {
+  KOKORO_CHANNELS,
+  KOKORO_MP3_BITRATE_KBPS,
+  KOKORO_SAMPLE_RATE_HZ,
+  buildKokoroNarrationReceipt,
+  buildNarrationBatchId,
+  readApprovedProviderBinding,
+  readRuntimeCheckoutSnapshot,
+  receiptPathForBatch,
+  sha256AudioBuffer,
+  validateApprovedGenerationSet,
+  validateGeneratedMp3,
+  validateKokoroRuntimeCheckouts,
+} from "./kokoro-generation-contract.mjs";
+import {
+  readKokoroProviderProfile,
+  validateKokoroLocalAssets,
+  validateKokoroProviderProfile,
+} from "./kokoro-provider-profile.mjs";
+import { buildNarrationGenerationSet } from "./narration-generation-set.mjs";
+import { buildNarrationPlan } from "./narration-plan.mjs";
+import { validateNarrationReceipt } from "./narration-receipt.mjs";
 import { repoRoot } from "./story-model.mjs";
 
-const API = "https://api.x.ai/v1/tts";
-const VOICES_API = "https://api.x.ai/v1/tts/voices";
+const ENGINE_SCRIPT = join(repoRoot, "scripts/kokoro-synthesize.py");
+const WORK_ROOT = join(repoRoot, ".narration-work");
 
 function argValue(name) {
   const index = process.argv.indexOf(name);
   return index >= 0 ? process.argv[index + 1] : null;
 }
 
-function sha256(buffer) {
-  return createHash("sha256").update(buffer).digest("hex");
+function requiredArg(name) {
+  const value = argValue(name);
+  if (!value) throw new Error(`Missing required argument ${name}`);
+  return value;
 }
 
-function looksLikeMp3(buffer) {
-  if (buffer.length >= 3 && buffer.subarray(0, 3).toString("ascii") === "ID3") return true;
-  return buffer.length >= 2 && buffer[0] === 0xff && (buffer[1] & 0xe0) === 0xe0;
-}
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function listVoiceIds(apiKey) {
-  const response = await fetch(VOICES_API, {
-    headers: { Authorization: `Bearer ${apiKey}` },
-  });
-  if (!response.ok) throw new Error(`xAI voice lookup failed: ${response.status} ${await response.text()}`);
-  const body = await response.json();
-  const voices = Array.isArray(body?.voices) ? body.voices : [];
-  return voices.map((voice) => voice?.voice_id).filter((id) => typeof id === "string");
-}
-
-async function decodeAudio(response) {
-  const type = response.headers.get("content-type") ?? "";
-  if (type.includes("application/json")) {
-    const body = await response.json();
-    if (typeof body?.audio !== "string") throw new Error("xAI TTS JSON response did not contain base64 audio");
-    return Buffer.from(body.audio, "base64");
+function safeRepositoryPath(root, value) {
+  const absolute = resolve(root, value);
+  const rel = relative(root, absolute).replaceAll("\\", "/");
+  if (rel === ".." || rel.startsWith("../") || rel.startsWith("/")) {
+    throw new Error(`Path escapes repository root: ${value}`);
   }
-  return Buffer.from(await response.arrayBuffer());
+  return absolute;
 }
 
-async function synthesize(item, apiKey, voiceId) {
-  let lastError = null;
-  for (let attempt = 1; attempt <= 3; attempt += 1) {
-    try {
-      const response = await fetch(API, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          text: item.text,
-          voice_id: voiceId,
-          language: "zh",
-        }),
-      });
-      if (!response.ok) throw new Error(`xAI TTS failed: ${response.status} ${await response.text()}`);
-      const audio = await decodeAudio(response);
-      if (audio.length < 1000 || !looksLikeMp3(audio)) {
-        throw new Error(`xAI TTS returned an invalid MP3 payload (${audio.length} bytes)`);
-      }
-      return audio;
-    } catch (error) {
-      lastError = error;
-      if (attempt < 3) await sleep(attempt * 900);
+function commandReport(command, args, label) {
+  const result = spawnSync(command, args, { encoding: "utf8" });
+  if (result.error) throw new Error(`${label} is unavailable: ${result.error.message}`);
+  if (result.status !== 0) {
+    throw new Error(`${label} failed (${result.status}): ${(result.stderr || result.stdout || "").trim()}`);
+  }
+  return `${result.stdout ?? ""}${result.stderr ?? ""}`.trim();
+}
+
+function inspectFfmpeg(ffmpeg) {
+  const versionOutput = commandReport(ffmpeg, ["-version"], "ffmpeg");
+  const encoderOutput = commandReport(ffmpeg, ["-hide_banner", "-encoders"], "ffmpeg encoder inventory");
+  if (!/\blibmp3lame\b/.test(encoderOutput)) {
+    throw new Error("ffmpeg must expose the libmp3lame encoder");
+  }
+  return {
+    version: versionOutput.split(/\r?\n/, 1)[0],
+  };
+}
+
+function inspectPython(python) {
+  const output = commandReport(python, ["--version"], "Python");
+  const match = output.match(/Python\s+([^\s]+)/);
+  if (!match) throw new Error(`Unable to parse Python version from: ${output}`);
+  return { version: match[1] };
+}
+
+function validateEngineReport(report, generationSet, expectedDevice, kokoroDir, misakiDir) {
+  const problems = [];
+  if (report?.schemaVersion !== 1) problems.push("engine report schemaVersion must be 1");
+  if (report?.engine !== "kokoro-local-waveform-v1") problems.push("engine report identity is not kokoro-local-waveform-v1");
+  if (report?.sampleRateHz !== KOKORO_SAMPLE_RATE_HZ) problems.push(`engine sample rate must be ${KOKORO_SAMPLE_RATE_HZ}`);
+  if (report?.device !== expectedDevice) problems.push(`engine device must equal ${expectedDevice}`);
+  if (report?.count !== generationSet.count) problems.push("engine output count does not match narration input set");
+  if (!Array.isArray(report?.items) || report.items.length !== generationSet.count) problems.push("engine report items do not exactly cover narration input set");
+  if (typeof report?.pythonVersion !== "string" || report.pythonVersion.trim() === "") problems.push("engine report pythonVersion is missing");
+  if (typeof report?.torchVersion !== "string" || report.torchVersion.trim() === "") problems.push("engine report torchVersion is missing");
+
+  for (const [label, modulePath, checkout] of [
+    ["kokoro", report?.kokoroModulePath, kokoroDir],
+    ["misaki", report?.misakiModulePath, misakiDir],
+  ]) {
+    if (typeof modulePath !== "string") {
+      problems.push(`${label} module path is missing from engine report`);
+      continue;
+    }
+    const rel = relative(resolve(checkout), resolve(modulePath)).replaceAll("\\", "/");
+    if (rel === ".." || rel.startsWith("../") || rel.startsWith("/")) problems.push(`${label} module resolved outside pinned checkout`);
+  }
+
+  if (Array.isArray(report?.items)) {
+    const expectedKeys = generationSet.entries.map((entry) => entry.key).sort();
+    const actualKeys = report.items.map((item) => item?.key).sort();
+    if (JSON.stringify(actualKeys) !== JSON.stringify(expectedKeys)) problems.push("engine report keys do not exactly match narration input keys");
+    for (const item of report.items) {
+      if (!Number.isInteger(item?.samples) || item.samples <= 0) problems.push(`${String(item?.key)}: engine sample count is invalid`);
+      if (typeof item?.durationSeconds !== "number" || !(item.durationSeconds > 0)) problems.push(`${String(item?.key)}: engine duration is invalid`);
+      if (typeof item?.wavPath !== "string" || !existsSync(item.wavPath)) problems.push(`${String(item?.key)}: staged WAV is missing`);
     }
   }
-  throw lastError;
+
+  return { valid: problems.length === 0, problems: [...new Set(problems)].sort() };
 }
 
-async function worker(queue, state, apiKey, voiceId) {
-  while (queue.length > 0) {
-    const item = queue.shift();
-    if (!item) return;
-    const audio = await synthesize(item, apiKey, voiceId);
-    const outputPath = join(repoRoot, item.output);
-    mkdirSync(dirname(outputPath), { recursive: true });
-    const tempPath = `${outputPath}.tmp-${process.pid}`;
-    writeFileSync(tempPath, audio);
-    renameSync(tempPath, outputPath);
-    state.entries[item.key] = {
-      provider: "xai",
-      endpoint: "/v1/tts",
-      voiceId,
-      language: "zh",
-      textSha256: item.textSha256,
-      audioSha256: sha256(audio),
-      generatedAt: new Date().toISOString(),
-    };
-    console.log(`generated ${item.key} (${audio.length} bytes)`);
+function encodeMp3(ffmpeg, wavPath, mp3Path) {
+  mkdirSync(dirname(mp3Path), { recursive: true });
+  const result = spawnSync(ffmpeg, [
+    "-hide_banner",
+    "-loglevel", "error",
+    "-y",
+    "-i", wavPath,
+    "-vn",
+    "-ac", String(KOKORO_CHANNELS),
+    "-ar", String(KOKORO_SAMPLE_RATE_HZ),
+    "-c:a", "libmp3lame",
+    "-b:a", `${KOKORO_MP3_BITRATE_KBPS}k`,
+    mp3Path,
+  ], { encoding: "utf8" });
+  if (result.error) throw new Error(`ffmpeg encode failed to start: ${result.error.message}`);
+  if (result.status !== 0) throw new Error(`ffmpeg encode failed (${result.status}): ${(result.stderr || result.stdout || "").trim()}`);
+}
+
+export function commitGeneratedBatch({ outputs, receipt, receiptPath, workDir, root = repoRoot }) {
+  const receiptValidation = validateNarrationReceipt(receipt);
+  if (!receiptValidation.valid) throw new Error(`Refusing to commit invalid receipt:\n${receiptValidation.problems.join("\n")}`);
+
+  const receiptTarget = safeRepositoryPath(root, receiptPath);
+  if (existsSync(receiptTarget)) throw new Error(`Receipt already exists: ${receiptPath}`);
+
+  const backupRoot = join(workDir, "backup");
+  const movedBackups = [];
+  const installed = [];
+  let receiptInstalled = false;
+  const receiptTemp = `${receiptTarget}.tmp-${process.pid}`;
+
+  for (const output of outputs) {
+    if (!existsSync(output.stagedPath)) throw new Error(`${output.key}: staged MP3 is missing before release commit`);
+    safeRepositoryPath(root, output.file);
   }
+
+  try {
+    for (const output of outputs) {
+      const target = safeRepositoryPath(root, output.file);
+      mkdirSync(dirname(target), { recursive: true });
+      if (existsSync(target)) {
+        const backup = join(backupRoot, output.file);
+        mkdirSync(dirname(backup), { recursive: true });
+        renameSync(target, backup);
+        movedBackups.push({ target, backup });
+      }
+    }
+
+    for (const output of outputs) {
+      const target = safeRepositoryPath(root, output.file);
+      renameSync(output.stagedPath, target);
+      installed.push(target);
+    }
+
+    mkdirSync(dirname(receiptTarget), { recursive: true });
+    writeFileSync(receiptTemp, `${JSON.stringify(receipt, null, 2)}\n`, { flag: "wx" });
+    renameSync(receiptTemp, receiptTarget);
+    receiptInstalled = true;
+  } catch (error) {
+    const rollbackProblems = [];
+    try {
+      if (existsSync(receiptTemp)) rmSync(receiptTemp, { force: true });
+      if (receiptInstalled && existsSync(receiptTarget)) rmSync(receiptTarget, { force: true });
+    } catch (rollbackError) {
+      rollbackProblems.push(`receipt rollback failed: ${rollbackError instanceof Error ? rollbackError.message : String(rollbackError)}`);
+    }
+
+    for (const target of [...installed].reverse()) {
+      try {
+        if (existsSync(target)) rmSync(target, { force: true });
+      } catch (rollbackError) {
+        rollbackProblems.push(`new audio rollback failed for ${target}: ${rollbackError instanceof Error ? rollbackError.message : String(rollbackError)}`);
+      }
+    }
+    for (const { target, backup } of [...movedBackups].reverse()) {
+      try {
+        if (existsSync(backup)) renameSync(backup, target);
+      } catch (rollbackError) {
+        rollbackProblems.push(`old audio restore failed for ${target}: ${rollbackError instanceof Error ? rollbackError.message : String(rollbackError)}`);
+      }
+    }
+
+    const original = error instanceof Error ? error.message : String(error);
+    const suffix = rollbackProblems.length > 0 ? `\nRollback problems:\n${rollbackProblems.join("\n")}` : "";
+    throw new Error(`Narration release commit failed: ${original}${suffix}`);
+  }
+
+  rmSync(backupRoot, { recursive: true, force: true });
+  return { receiptPath, installed: outputs.length };
+}
+
+function parseOptions() {
+  const story = argValue("--story");
+  const all = process.argv.includes("--all");
+  if (Boolean(story) === Boolean(all)) throw new Error("Choose exactly one narration scope: --story <id> or --all");
+
+  const device = argValue("--device") ?? "cpu";
+  if (!new Set(["cpu", "cuda"]).has(device)) throw new Error("--device must be cpu or cuda");
+
+  return {
+    story,
+    all,
+    assetsDir: resolve(requiredArg("--assets-dir")),
+    kokoroSrcDir: resolve(requiredArg("--kokoro-src-dir")),
+    misakiSrcDir: resolve(requiredArg("--misaki-src-dir")),
+    python: argValue("--python") ?? (process.platform === "win32" ? "python" : "python3"),
+    ffmpeg: argValue("--ffmpeg") ?? "ffmpeg",
+    device,
+    dryRun: process.argv.includes("--dry-run"),
+    replace: process.argv.includes("--replace"),
+    keepWork: process.argv.includes("--keep-work"),
+  };
 }
 
 async function main() {
-  const story = argValue("--story");
-  const all = process.argv.includes("--all");
-  const dryRun = process.argv.includes("--dry-run");
-  const force = process.argv.includes("--force");
-  const voiceId = argValue("--voice") ?? process.env.XAI_TTS_VOICE_ID ?? null;
-  const concurrencyRaw = Number(argValue("--concurrency") ?? "3");
-  const concurrency = Number.isInteger(concurrencyRaw) && concurrencyRaw >= 1 && concurrencyRaw <= 8 ? concurrencyRaw : 3;
+  const options = parseOptions();
+  const profile = readKokoroProviderProfile();
+  const profileValidation = validateKokoroProviderProfile(profile);
+  if (!profileValidation.valid) throw new Error(`Kokoro provider profile is not approved:\n${profileValidation.issues.join("\n")}`);
 
-  if (!story && !all) throw new Error("Refusing bulk generation without an explicit scope. Pass --story <id> or --all.");
-  if (!voiceId) throw new Error("Voice must be explicit. Pass --voice <voice_id> or set XAI_TTS_VOICE_ID.");
+  const localAssets = validateKokoroLocalAssets(profile, options.assetsDir);
+  if (!localAssets.valid) throw new Error(`Pinned Kokoro local assets are invalid:\n${localAssets.issues.join("\n")}`);
 
-  const plan = buildNarrationPlan({ story });
-  const selected = plan.items.filter((item) => force || item.status !== "current");
-  const summary = {
-    scope: story ?? "all",
-    voiceId,
-    selected: selected.length,
-    currentSkipped: plan.items.length - selected.length,
-    statuses: Object.fromEntries(["current", "stale", "unverified", "missing"].map((status) => [status, plan.items.filter((item) => item.status === status).length])),
+  const runtimeCheckouts = {
+    kokoro: readRuntimeCheckoutSnapshot(options.kokoroSrcDir),
+    misaki: readRuntimeCheckoutSnapshot(options.misakiSrcDir),
   };
-  console.log(JSON.stringify(summary, null, 2));
-  if (dryRun || selected.length === 0) return;
+  const runtimeValidation = validateKokoroRuntimeCheckouts(runtimeCheckouts);
+  if (!runtimeValidation.valid) throw new Error(`Pinned Kokoro runtime checkout is invalid:\n${runtimeValidation.problems.join("\n")}`);
 
-  const apiKey = process.env.XAI_API_KEY;
-  if (!apiKey) throw new Error("XAI_API_KEY is required for generation");
-  const voiceIds = await listVoiceIds(apiKey);
-  if (!voiceIds.includes(voiceId)) {
-    throw new Error(`Configured xAI voice '${voiceId}' is unavailable. Available voices: ${voiceIds.join(", ")}`);
+  const generationSet = buildNarrationGenerationSet({ story: options.story });
+  const generationValidation = validateApprovedGenerationSet(generationSet);
+  if (!generationValidation.valid) throw new Error(`Narration generation input set is not approved:\n${generationValidation.problems.join("\n")}`);
+
+  const plan = buildNarrationPlan({ story: options.story });
+  const currentItems = plan.items.filter((item) => item.status === "current");
+  if (currentItems.length > 0 && !options.replace) {
+    throw new Error(`Scope contains ${currentItems.length} current narration assets. Pass --replace only after intentional review to regenerate the whole scope.`);
   }
 
-  const state = readNarrationState();
-  const queue = [...selected];
-  await Promise.all(Array.from({ length: Math.min(concurrency, queue.length) }, () => worker(queue, state, apiKey, voiceId)));
+  const providerBinding = readApprovedProviderBinding();
+  const createdAt = new Date();
+  const batchId = buildNarrationBatchId(createdAt, generationSet.inputDigestSha256, generationSet.scope);
+  const receiptPath = receiptPathForBatch(batchId);
+  const summary = {
+    schemaVersion: 1,
+    mode: options.dryRun ? "dry-run" : "generate",
+    scope: generationSet.scope,
+    inputItemCount: generationSet.count,
+    inputDigestSha256: generationSet.inputDigestSha256,
+    providerProfileId: providerBinding.profile.profileId,
+    providerProfileSha256: providerBinding.sha256,
+    modelRevision: profile.model.revision,
+    voice: profile.model.voice.id,
+    currentInScope: currentItems.length,
+    replace: options.replace,
+    batchId,
+    receiptPath,
+    localAssets: localAssets.checked,
+    runtimeCheckouts,
+  };
+  console.log(JSON.stringify(summary, null, 2));
+  if (options.dryRun) return;
 
-  const sortedEntries = Object.fromEntries(Object.entries(state.entries).sort(([a], [b]) => a.localeCompare(b)));
-  writeFileSync(narrationStatePath, `${JSON.stringify({ schemaVersion: 1, entries: sortedEntries }, null, 2)}\n`);
+  const python = inspectPython(options.python);
+  const ffmpeg = inspectFfmpeg(options.ffmpeg);
+  const workDir = join(WORK_ROOT, batchId);
+  if (existsSync(workDir)) throw new Error(`Narration work directory already exists: ${relative(repoRoot, workDir)}`);
+  mkdirSync(workDir, { recursive: true });
+
+  try {
+    const wavRoot = join(workDir, "wav");
+    const mp3Root = join(workDir, "mp3");
+    const manifestPath = join(workDir, "manifest.json");
+    const manifest = {
+      schemaVersion: 1,
+      batchId,
+      inputItemCount: generationSet.count,
+      inputDigestSha256: generationSet.inputDigestSha256,
+      entries: generationSet.entries.map((entry) => ({
+        key: entry.key,
+        text: entry.text,
+        textSha256: entry.textSha256,
+        file: entry.file,
+        wavPath: join(wavRoot, `${entry.key}.wav`),
+      })),
+    };
+    writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, { flag: "wx" });
+
+    const engineStdout = execFileSync(options.python, [
+      ENGINE_SCRIPT,
+      "--manifest", manifestPath,
+      "--assets-dir", options.assetsDir,
+      "--kokoro-src-dir", options.kokoroSrcDir,
+      "--misaki-src-dir", options.misakiSrcDir,
+      "--device", options.device,
+    ], {
+      encoding: "utf8",
+      maxBuffer: 4 * 1024 * 1024,
+      env: { ...process.env, PYTHONDONTWRITEBYTECODE: "1" },
+      stdio: ["ignore", "pipe", "inherit"],
+    }).trim();
+    const engineReport = JSON.parse(engineStdout);
+    const engineValidation = validateEngineReport(engineReport, generationSet, options.device, options.kokoroSrcDir, options.misakiSrcDir);
+    if (!engineValidation.valid) throw new Error(`Kokoro waveform engine report is invalid:\n${engineValidation.problems.join("\n")}`);
+    writeFileSync(join(workDir, "engine-report.json"), `${JSON.stringify(engineReport, null, 2)}\n`, { flag: "wx" });
+
+    const engineByKey = new Map(engineReport.items.map((item) => [item.key, item]));
+    const outputs = [];
+    for (const entry of generationSet.entries) {
+      const engineItem = engineByKey.get(entry.key);
+      if (!engineItem) throw new Error(`${entry.key}: engine output disappeared after validation`);
+      const stagedPath = join(mp3Root, `${entry.key}.mp3`);
+      encodeMp3(options.ffmpeg, engineItem.wavPath, stagedPath);
+      const audio = readFileSync(stagedPath);
+      const mp3Validation = validateGeneratedMp3(audio);
+      if (!mp3Validation.valid) throw new Error(`${entry.key}: generated MP3 is invalid:\n${mp3Validation.problems.join("\n")}`);
+      outputs.push({
+        key: entry.key,
+        file: entry.file,
+        stagedPath,
+        bytes: audio.length,
+        audioSha256: sha256AudioBuffer(audio),
+      });
+    }
+
+    const receipt = buildKokoroNarrationReceipt({
+      generationSet,
+      outputs,
+      createdAt,
+      runtime: {
+        pythonVersion: engineReport.pythonVersion ?? python.version,
+        torchVersion: engineReport.torchVersion,
+        device: engineReport.device,
+      },
+      encoder: ffmpeg,
+      providerBinding,
+    });
+    writeFileSync(join(workDir, "receipt-preview.json"), `${JSON.stringify(receipt, null, 2)}\n`, { flag: "wx" });
+
+    const committed = commitGeneratedBatch({ outputs, receipt, receiptPath, workDir });
+    console.log(JSON.stringify({
+      schemaVersion: 1,
+      generated: committed.installed,
+      receiptPath: committed.receiptPath,
+      narrationStateUpdated: false,
+      nextDryRun: `npm run narration:import -- --receipt ${committed.receiptPath}`,
+      nextWrite: `npm run narration:import -- --receipt ${committed.receiptPath} --write${options.replace ? " --replace" : ""}`,
+    }, null, 2));
+  } finally {
+    const backupRoot = join(workDir, "backup");
+    rmSync(backupRoot, { recursive: true, force: true });
+    if (!options.keepWork) rmSync(workDir, { recursive: true, force: true });
+  }
 }
 
 main().catch((error) => {
