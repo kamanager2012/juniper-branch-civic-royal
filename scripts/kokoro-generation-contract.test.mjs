@@ -181,7 +181,7 @@ test("generated MP3 gate enforces payload identity and release byte budget", () 
   assert.equal(validateGeneratedMp3(oversized).valid, false);
 });
 
-test("Kokoro receipt binds exact approved provider, runtime lock, and generation set", () => {
+test("Kokoro receipt binds exact approved provider, runtime host, runtime lock, and generation set", () => {
   const { generationSet, providerBinding, receipt, runtimeEnvironment } = buildStoryReceiptFixture();
   const validation = validateNarrationReceipt(receipt);
   assert.equal(validation.valid, true, validation.problems.join("; "));
@@ -193,17 +193,31 @@ test("Kokoro receipt binds exact approved provider, runtime lock, and generation
   assert.equal(receipt.provider.profile.id, "kokoro-v1.1-zh-zf001");
   assert.equal(receipt.provider.profile.evidence, providerBinding.path);
   assert.equal(receipt.provider.profile.sha256, providerBinding.sha256);
+  assert.equal(receipt.execution.runtime.platform, "linux");
+  assert.equal(receipt.execution.runtime.arch, "x64");
   assert.equal(receipt.execution.runtime.environment.id, runtimeEnvironment.id);
   assert.equal(receipt.execution.runtime.environment.lock.sha256, KOKORO_RUNTIME_LOCK_SHA256);
   assert.equal(receipt.execution.runtime.torchVersion, KOKORO_RUNTIME_TORCH_VERSION);
   assert.equal(receipt.rights.claim, "permission");
   assert.deepEqual(receipt.rights.evidence, [providerBinding.path]);
 
-  const changed = structuredClone(receipt);
-  changed.execution.runtime.environment.lock.sha256 = "0".repeat(64);
-  const changedValidation = validateNarrationReceipt(changed);
-  assert.equal(changedValidation.valid, false);
-  assert.ok(changedValidation.problems.some((problem) => problem.includes("runtime lock binding drifted")));
+  const changedLock = structuredClone(receipt);
+  changedLock.execution.runtime.environment.lock.sha256 = "0".repeat(64);
+  const changedLockValidation = validateNarrationReceipt(changedLock);
+  assert.equal(changedLockValidation.valid, false);
+  assert.ok(changedLockValidation.problems.some((problem) => problem.includes("runtime lock binding drifted")));
+
+  const changedPlatform = structuredClone(receipt);
+  changedPlatform.execution.runtime.platform = "win32";
+  const changedPlatformValidation = validateNarrationReceipt(changedPlatform);
+  assert.equal(changedPlatformValidation.valid, false);
+  assert.ok(changedPlatformValidation.problems.some((problem) => problem.includes("execution.runtime.platform must be linux")));
+
+  const changedArch = structuredClone(receipt);
+  changedArch.execution.runtime.arch = "arm64";
+  const changedArchValidation = validateNarrationReceipt(changedArch);
+  assert.equal(changedArchValidation.valid, false);
+  assert.ok(changedArchValidation.problems.some((problem) => problem.includes("execution.runtime.arch must be x64")));
 });
 
 test("staged MP3 mutation after initial hashing prevents receipt construction", () => {
