@@ -33,6 +33,7 @@ export function StoryReader({ story }: { story: Story }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const timesRef = useRef<number[]>([]);
   const playingRef = useRef(false);
+  const startedRef = useRef(false);
   const autoRef = useRef(true);
   const indexRef = useRef(0);
   const flipRef = useRef<number | null>(null);
@@ -50,6 +51,7 @@ export function StoryReader({ story }: { story: Story }) {
   flipLive.current = flip;
 
   playingRef.current = playing;
+  startedRef.current = started;
   autoRef.current = autoFlip;
   indexRef.current = index;
 
@@ -106,11 +108,32 @@ export function StoryReader({ story }: { story: Story }) {
     [last, pages, finishTurn],
   );
 
+  const preloadAdjacentImages = useCallback(
+    (at: number) => {
+      const next = pages[at + 1];
+      if (next) {
+        const img = new Image();
+        img.src = next.image;
+      }
+      const previous = pages[at - 1];
+      if (previous) {
+        const img = new Image();
+        img.src = previous.image;
+      }
+    },
+    [pages],
+  );
+
   useEffect(() => {
     clearFlip();
-    const audio = new Audio(page.audio);
-    audio.preload = "auto";
+
+    // Keep the event-bearing audio object ready, but do not bind a media URL
+    // until the user explicitly starts the story. This preserves synchronous
+    // play() inside the user gesture while avoiding speculative MP3 transfer.
+    const audio = new Audio();
+    audio.preload = "none";
     audioRef.current = audio;
+
     const onMeta = () => {
       const dur = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 5;
       timesRef.current = charStartTimes(page.text, dur);
@@ -134,39 +157,40 @@ export function StoryReader({ story }: { story: Story }) {
         go(indexRef.current + 1);
       }, 1100);
     };
+
     audio.addEventListener("loadedmetadata", onMeta);
     audio.addEventListener("timeupdate", onTime);
     audio.addEventListener("ended", onEnded);
-    if (playingRef.current) {
-      const delay = justFlipped.current ? 220 : 0;
-      justFlipped.current = false;
-      window.setTimeout(() => {
-        if (audioRef.current === audio && playingRef.current) {
-          void audio.play().catch(() => {
-            setPlaying(false);
-            playingRef.current = false;
-          });
-        }
-      }, delay);
+
+    if (startedRef.current) {
+      audio.preload = "auto";
+      audio.src = page.audio;
+      preloadAdjacentImages(index);
+
+      if (playingRef.current) {
+        const delay = justFlipped.current ? 220 : 0;
+        justFlipped.current = false;
+        window.setTimeout(() => {
+          if (audioRef.current === audio && playingRef.current) {
+            void audio.play().catch(() => {
+              setPlaying(false);
+              playingRef.current = false;
+            });
+          }
+        }, delay);
+      }
     }
-    const nxt = pages[index + 1];
-    if (nxt) {
-      const img = new Image();
-      img.src = nxt.image;
-    }
-    const prv = pages[index - 1];
-    if (prv) {
-      const img = new Image();
-      img.src = prv.image;
-    }
+
     return () => {
       audio.pause();
-      audio.src = "";
       audio.removeEventListener("loadedmetadata", onMeta);
       audio.removeEventListener("timeupdate", onTime);
       audio.removeEventListener("ended", onEnded);
+      if (audioRef.current === audio) audioRef.current = null;
+      audio.removeAttribute("src");
+      audio.load();
     };
-  }, [page.audio, page.text, index, last, pages, story.id, go]);
+  }, [page.audio, page.text, index, last, story.id, go, preloadAdjacentImages]);
 
   useEffect(() => () => {
     clearFlip();
@@ -182,12 +206,24 @@ export function StoryReader({ story }: { story: Story }) {
   }, [page.kind, started, story.id]);
 
   function begin() {
+    const audio = audioRef.current;
     markHeard(story.id);
+    startedRef.current = true;
     setStarted(true);
     setPlaying(true);
     playingRef.current = true;
     if (musicOn) setMusicEnabled(true);
-    void audioRef.current?.play().catch(() => {
+    preloadAdjacentImages(indexRef.current);
+
+    if (!audio) {
+      setPlaying(false);
+      playingRef.current = false;
+      return;
+    }
+
+    audio.preload = "auto";
+    audio.src = page.audio;
+    void audio.play().catch(() => {
       setPlaying(false);
       playingRef.current = false;
     });
@@ -217,6 +253,7 @@ export function StoryReader({ story }: { story: Story }) {
     setIndex(0);
     setActive(-1);
     setStarted(true);
+    startedRef.current = true;
     setPlaying(true);
     playingRef.current = true;
     if (musicOn) setMusicEnabled(true);
@@ -234,9 +271,6 @@ export function StoryReader({ story }: { story: Story }) {
     setAutoFlip(next);
     setSettings({ autoFlip: next });
   }
-
-  const startedRef = useRef(false);
-  startedRef.current = started;
 
   function fromControls(target: EventTarget | null) {
     return target instanceof Element && Boolean(target.closest("button, a, input, textarea, [data-no-flip]"));
