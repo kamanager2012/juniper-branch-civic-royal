@@ -14,12 +14,12 @@ test("installed app shell and a visited story remain readable offline", async ({
   });
 
   expect(
-    await page.evaluate(async () => Boolean(await caches.match("/ui/bookshelf-paper.jpg"))),
+    await page.evaluate(async () => Boolean(await caches.match("/ui/bookshelf-paper.svg"))),
     "bookshelf paper is product UI and must be part of the installed shell cache",
   ).toBeTruthy();
 
   expect(
-    await page.evaluate(async () => Boolean(await caches.match("/icon-180.png"))),
+    await page.evaluate(async () => Boolean(await caches.match("/icon-180.svg"))),
     "manifest icon must be part of the installed shell cache",
   ).toBeTruthy();
 
@@ -54,7 +54,7 @@ test("installed app shell and a visited story remain readable offline", async ({
   try {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     await expect(page.getByRole("heading", { name: "成语故事", exact: true })).toBeVisible();
-    const bookshelfHero = page.locator('img[src="/ui/bookshelf-paper.jpg"]');
+    const bookshelfHero = page.locator('img[src="/ui/bookshelf-paper.svg"]');
     await expect(bookshelfHero).toBeVisible();
     expect(
       await bookshelfHero.evaluate(
