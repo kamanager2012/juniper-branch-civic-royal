@@ -64,7 +64,7 @@ export function buildNarrationPlan(options = {}) {
   }
 
   if (storyFilter && items.length === 0) throw new Error(`Unknown story id: ${storyFilter}`);
-  return { schemaVersion: 1, canonicalSource: "src/data/stories.ts", items };
+  return { schemaVersion: 1, canonicalSource: "content/published-stories.json", items };
 }
 
 function argValue(name) {
@@ -77,7 +77,7 @@ if (process.argv[1]?.endsWith("narration-plan.mjs")) {
   const plan = buildNarrationPlan({ story });
   const counts = Object.fromEntries(["current", "stale", "unverified", "missing"].map((status) => [status, plan.items.filter((item) => item.status === status).length]));
   if (process.argv.includes("--summary")) {
-    console.log(JSON.stringify({ schemaVersion: plan.schemaVersion, total: plan.items.length, counts }, null, 2));
+    console.log(JSON.stringify({ schemaVersion: plan.schemaVersion, canonicalSource: plan.canonicalSource, total: plan.items.length, counts }, null, 2));
   } else if (process.argv.includes("--jsonl")) {
     for (const item of plan.items) console.log(JSON.stringify(item));
   } else {

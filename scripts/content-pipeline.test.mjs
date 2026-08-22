@@ -8,9 +8,11 @@ import { loadStoryModel, repoRoot } from "./story-model.mjs";
 
 const model = loadStoryModel();
 
-test("all content tooling consumes the canonical story model", () => {
+test("all content tooling consumes the rewritten canonical story source", () => {
   const report = buildContentReport();
   const plan = buildNarrationPlan();
+  assert.equal(report.canonicalSource, "content/published-stories.json");
+  assert.equal(plan.canonicalSource, "content/published-stories.json");
   assert.equal(report.totals.stories, model.stories.length);
   assert.equal(report.totals.pages, model.pages.length);
   assert.equal(plan.items.length, model.pages.length);

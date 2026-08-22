@@ -136,7 +136,7 @@ export function buildContentReport() {
 
   return {
     schemaVersion: 1,
-    canonicalSource: "src/data/stories.ts",
+    canonicalSource: "content/published-stories.json",
     totals: {
       stories: stories.length,
       pages: stories.reduce((sum, story) => sum + story.pageCount, 0),
@@ -157,7 +157,7 @@ if (isCli) {
   const check = process.argv.includes("--check");
   const summaryOnly = process.argv.includes("--summary");
   if (summaryOnly) {
-    console.log(JSON.stringify({ schemaVersion: report.schemaVersion, totals: report.totals, narration: report.narration, issues: report.issues, warnings: report.warnings }, null, 2));
+    console.log(JSON.stringify({ schemaVersion: report.schemaVersion, canonicalSource: report.canonicalSource, totals: report.totals, narration: report.narration, issues: report.issues, warnings: report.warnings }, null, 2));
   } else {
     console.log(JSON.stringify(report, null, 2));
   }
