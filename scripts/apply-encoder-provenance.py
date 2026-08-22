@@ -1,0 +1,192 @@
+from pathlib import Path
+
+
+def replace(path, old, new):
+    p = Path(path)
+    text = p.read_text()
+    if old not in text:
+        raise SystemExit(f"expected patch anchor missing in {path}: {old[:100]!r}")
+    if text.count(old) != 1:
+        raise SystemExit(f"patch anchor is not unique in {path}: count={text.count(old)}")
+    p.write_text(text.replace(old, new))
+
+
+replace(
+    "scripts/kokoro-generation-contract.mjs",
+    "function approvedEncoderExecution(encoder) {\n  const binding = readApprovedNarrationEncoderBinding();\n  const localSnapshot = inspectLocalNarrationEncoder();",
+    "function approvedEncoderExecution(encoder, options = {}) {\n  const binding = options.binding ?? readApprovedNarrationEncoderBinding();\n  const localSnapshot = options.snapshot ?? inspectLocalNarrationEncoder();",
+)
+replace(
+    "scripts/kokoro-generation-contract.mjs",
+    "  encoder,\n  providerBinding = readApprovedProviderBinding(),",
+    "  encoder,\n  encoderBinding,\n  encoderSnapshot,\n  providerBinding = readApprovedProviderBinding(),",
+)
+replace(
+    "scripts/kokoro-generation-contract.mjs",
+    "      encoder: approvedEncoderExecution(encoder),",
+    "      encoder: approvedEncoderExecution(encoder, { binding: encoderBinding, snapshot: encoderSnapshot }),",
+)
+
+replace(
+    "scripts/narration-receipt.mjs",
+    'import { repoRoot } from "./story-model.mjs";',
+    'import { NARRATION_ENCODER_PROFILE_ID, NARRATION_ENCODER_PROFILE_PATH } from "./narration-encoder-profile.mjs";\nimport { repoRoot } from "./story-model.mjs";',
+)
+marker = "export function validateNarrationReceipt(receipt) {"
+encoder_validator = '''function validateKokoroEncoder(receipt, problems) {
+  if (receipt.provider?.name !== "kokoro-local") return;
+  const encoder = receipt.execution?.encoder;
+  if (!encoder || typeof encoder !== "object" || Array.isArray(encoder)) {
+    problems.push("kokoro-local receipt requires execution.encoder");
+    return;
+  }
+  if (encoder.name !== "ffmpeg") problems.push("kokoro-local encoder.name must be ffmpeg");
+  if (encoder.codec !== "libmp3lame") problems.push("kokoro-local encoder.codec must be libmp3lame");
+  if (encoder.bitrateKbps !== 40) problems.push("kokoro-local encoder bitrate must be 40 kbps");
+  if (encoder.sampleRateHz !== 24000) problems.push("kokoro-local encoder sample rate must be 24000 Hz");
+  if (encoder.channels !== 1) problems.push("kokoro-local encoder channels must be mono");
+  if (encoder.binarySha256 !== "ed16af623947494a72e284b6eb8ff225f2da22b38b5d5069c2fd4b4ba3384e41") problems.push("kokoro-local ffmpeg binary SHA-256 drifted");
+  if (encoder.libmp3lameSha256 !== "14b664b4af2fe18975adb3c06c0369b436dd6504ce421736649c0415447c9d00") problems.push("kokoro-local libmp3lame SHA-256 drifted");
+  const profile = encoder.profile;
+  if (!profile || typeof profile !== "object" || Array.isArray(profile)) {
+    problems.push("kokoro-local encoder requires exact profile binding");
+    return;
+  }
+  if (profile.id !== NARRATION_ENCODER_PROFILE_ID) problems.push("kokoro-local encoder profile id drifted");
+  if (profile.evidence !== NARRATION_ENCODER_PROFILE_PATH) problems.push("kokoro-local encoder profile path drifted");
+  if (typeof profile.sha256 !== "string" || !/^[a-f0-9]{64}$/.test(profile.sha256)) problems.push("kokoro-local encoder profile SHA-256 is invalid");
+}
+
+'''
+replace("scripts/narration-receipt.mjs", marker, encoder_validator + marker)
+replace(
+    "scripts/narration-receipt.mjs",
+    "  validateKokoroRuntimeEnvironment(receipt, problems);",
+    "  validateKokoroRuntimeEnvironment(receipt, problems);\n  validateKokoroEncoder(receipt, problems);",
+)
+
+replace(
+    "scripts/import-narration-receipt.mjs",
+    "      runtimeEnvironment: cloneJson(receipt.execution?.runtime?.environment ?? null),\n      textSha256:",
+    "      runtimeEnvironment: cloneJson(receipt.execution?.runtime?.environment ?? null),\n      encoderProfileId: receipt.execution?.encoder?.profile?.id ?? null,\n      encoderProfilePath: receipt.execution?.encoder?.profile?.evidence ?? null,\n      encoderProfileSha256: receipt.execution?.encoder?.profile?.sha256 ?? null,\n      encoderBinarySha256: receipt.execution?.encoder?.binarySha256 ?? null,\n      encoderLibmp3lameSha256: receipt.execution?.encoder?.libmp3lameSha256 ?? null,\n      textSha256:",
+)
+replace(
+    "scripts/import-narration-receipt.mjs",
+    "    runtimeLockSha256: result.receipt.execution?.runtime?.environment?.lock?.sha256 ?? null,\n    imported:",
+    "    runtimeLockSha256: result.receipt.execution?.runtime?.environment?.lock?.sha256 ?? null,\n    encoderProfileId: result.receipt.execution?.encoder?.profile?.id ?? null,\n    encoderProfileSha256: result.receipt.execution?.encoder?.profile?.sha256 ?? null,\n    encoderBinarySha256: result.receipt.execution?.encoder?.binarySha256 ?? null,\n    imported:",
+)
+
+replace(
+    "scripts/narration-rights.mjs",
+    'import { readKokoroRuntimeEnvironmentBinding } from "./kokoro-runtime-environment.mjs";',
+    'import { readKokoroRuntimeEnvironmentBinding } from "./kokoro-runtime-environment.mjs";\nimport { NARRATION_ENCODER_PROFILE_ID, NARRATION_ENCODER_PROFILE_PATH, validateNarrationEncoderProfile } from "./narration-encoder-profile.mjs";',
+)
+replace(
+    "scripts/narration-rights.mjs",
+    "  const readRuntimeEnvironment = options.readRuntimeEnvironment ?? readKokoroRuntimeEnvironmentBinding;\n  const providerProfileCache = new Map();",
+    "  const readRuntimeEnvironment = options.readRuntimeEnvironment ?? readKokoroRuntimeEnvironmentBinding;\n  const readEncoderProfile = options.readEncoderProfile ?? readDurableProviderProfile;\n  const providerProfileCache = new Map();\n  const encoderProfileCache = new Map();",
+)
+replace(
+    "scripts/narration-rights.mjs",
+    "  function durableRuntimeEnvironment() {",
+    "  function durableEncoderProfile(path) {\n    if (!encoderProfileCache.has(path)) encoderProfileCache.set(path, readEncoderProfile(path));\n    return encoderProfileCache.get(path);\n  }\n\n  function durableRuntimeEnvironment() {",
+)
+runtime_anchor = '''        } catch (error) {
+          problems.push(`runtime environment cannot be revalidated: ${error instanceof Error ? error.message : String(error)}`);
+        }
+      }
+
+      const receiptItem = receipt.items.find((candidate) => candidate.key === item.key);'''
+encoder_block = '''        } catch (error) {
+          problems.push(`runtime environment cannot be revalidated: ${error instanceof Error ? error.message : String(error)}`);
+        }
+
+        const receiptEncoder = receipt.execution?.encoder ?? null;
+        const encoderProfile = receiptEncoder?.profile ?? null;
+        if (!encoderProfile) problems.push("kokoro-local receipt lost its encoder profile binding");
+        if ((encoderProfile?.id ?? null) !== (state.encoderProfileId ?? null)) problems.push("receipt encoder profile id no longer matches narration state");
+        if ((encoderProfile?.evidence ?? null) !== (state.encoderProfilePath ?? null)) problems.push("receipt encoder profile path no longer matches narration state");
+        if ((encoderProfile?.sha256 ?? null) !== (state.encoderProfileSha256 ?? null)) problems.push("receipt encoder profile SHA-256 no longer matches narration state");
+        if ((receiptEncoder?.binarySha256 ?? null) !== (state.encoderBinarySha256 ?? null)) problems.push("receipt ffmpeg SHA-256 no longer matches narration state");
+        if ((receiptEncoder?.libmp3lameSha256 ?? null) !== (state.encoderLibmp3lameSha256 ?? null)) problems.push("receipt libmp3lame SHA-256 no longer matches narration state");
+        if (encoderProfile) {
+          if (encoderProfile.id !== NARRATION_ENCODER_PROFILE_ID) problems.push("encoder profile id is not approved");
+          if (encoderProfile.evidence !== NARRATION_ENCODER_PROFILE_PATH) problems.push("encoder profile path is not approved");
+          try {
+            const currentEncoderProfile = durableEncoderProfile(encoderProfile.evidence);
+            if (currentEncoderProfile.sha256 !== encoderProfile.sha256) problems.push("encoder profile SHA-256 no longer matches receipt");
+            if (currentEncoderProfile.sha256 !== state.encoderProfileSha256) problems.push("encoder profile SHA-256 no longer matches narration state");
+            const encoderValidation = validateNarrationEncoderProfile(currentEncoderProfile.profile);
+            for (const issue of encoderValidation.issues) problems.push(`encoder profile is no longer approved: ${issue}`);
+          } catch (error) {
+            problems.push(`encoder profile cannot be revalidated: ${error instanceof Error ? error.message : String(error)}`);
+          }
+        }
+      }
+
+      const receiptItem = receipt.items.find((candidate) => candidate.key === item.key);'''
+replace("scripts/narration-rights.mjs", runtime_anchor, encoder_block)
+
+replace(
+    "scripts/kokoro-generation-contract.test.mjs",
+    'import { buildNarrationGenerationSet } from "./narration-generation-set.mjs";',
+    'import { readNarrationEncoderProfile } from "./narration-encoder-profile.mjs";\nimport { buildNarrationGenerationSet } from "./narration-generation-set.mjs";',
+)
+helper_anchor = "function buildStoryReceiptFixture() {"
+helper = '''function approvedEncoderFixture() {
+  const binding = readNarrationEncoderProfile();
+  const profile = binding.profile;
+  return {
+    binding,
+    snapshot: {
+      schemaVersion: 1,
+      architecture: profile.target.architecture,
+      binaries: structuredClone(profile.binaries),
+      libraries: structuredClone(profile.libraries),
+      encoderInventoryLine: profile.encoderInventoryLine,
+    },
+  };
+}
+
+'''
+replace("scripts/kokoro-generation-contract.test.mjs", helper_anchor, helper + helper_anchor)
+replace(
+    "scripts/kokoro-generation-contract.test.mjs",
+    "  const providerBinding = readApprovedProviderBinding();\n  const runtimeEnvironment = readKokoroRuntimeEnvironmentBinding();\n  const receipt = buildKokoroNarrationReceipt({",
+    "  const providerBinding = readApprovedProviderBinding();\n  const runtimeEnvironment = readKokoroRuntimeEnvironmentBinding();\n  const encoderFixture = approvedEncoderFixture();\n  const receipt = buildKokoroNarrationReceipt({",
+)
+replace(
+    "scripts/kokoro-generation-contract.test.mjs",
+    '    encoder: { version: "ffmpeg version test" },\n    providerBinding,',
+    '    encoder: { version: encoderFixture.snapshot.binaries.find((item) => item.name === "ffmpeg").versionLine },\n    encoderBinding: encoderFixture.binding,\n    encoderSnapshot: encoderFixture.snapshot,\n    providerBinding,',
+)
+replace(
+    "scripts/kokoro-generation-contract.test.mjs",
+    "    runtimeEnvironment: structuredClone(receipt.execution.runtime.environment),\n    textSha256:",
+    "    runtimeEnvironment: structuredClone(receipt.execution.runtime.environment),\n    encoderProfileId: receipt.execution.encoder.profile.id,\n    encoderProfilePath: receipt.execution.encoder.profile.evidence,\n    encoderProfileSha256: receipt.execution.encoder.profile.sha256,\n    encoderBinarySha256: receipt.execution.encoder.binarySha256,\n    encoderLibmp3lameSha256: receipt.execution.encoder.libmp3lameSha256,\n    textSha256:",
+)
+staged_old = '''      runtime: APPROVED_RUNTIME,
+      encoder: { version: "ffmpeg version test" },
+      providerBinding: readApprovedProviderBinding(),
+    }), /staged MP3 SHA-256 changed after encoding/);'''
+staged_new = '''      runtime: APPROVED_RUNTIME,
+      encoder: { version: approvedEncoderFixture().snapshot.binaries.find((item) => item.name === "ffmpeg").versionLine },
+      encoderBinding: approvedEncoderFixture().binding,
+      encoderSnapshot: approvedEncoderFixture().snapshot,
+      providerBinding: readApprovedProviderBinding(),
+    }), /staged MP3 SHA-256 changed after encoding/);'''
+replace("scripts/kokoro-generation-contract.test.mjs", staged_old, staged_new)
+replace(
+    "scripts/kokoro-generation-contract.test.mjs",
+    '  assert.equal(receipt.execution.runtime.torchVersion, KOKORO_RUNTIME_TORCH_VERSION);\n  assert.equal(receipt.rights.claim, "permission");',
+    '  assert.equal(receipt.execution.runtime.torchVersion, KOKORO_RUNTIME_TORCH_VERSION);\n  assert.equal(receipt.execution.encoder.profile.id, "ffmpeg-noble-6.1.1-libmp3lame-v1");\n  assert.equal(receipt.execution.encoder.binarySha256, "ed16af623947494a72e284b6eb8ff225f2da22b38b5d5069c2fd4b4ba3384e41");\n  assert.equal(receipt.execution.encoder.libmp3lameSha256, "14b664b4af2fe18975adb3c06c0369b436dd6504ce421736649c0415447c9d00");\n  assert.equal(receipt.rights.claim, "permission");',
+)
+
+replace(
+    ".github/workflows/kokoro-canary.yml",
+    "          sudo apt-get install -y --no-install-recommends ffmpeg\n          ffmpeg -version | head -1\n          ffprobe -version | head -1",
+    "          sudo apt-get install -y --no-install-recommends ffmpeg=7:6.1.1-3ubuntu5 libavcodec60=7:6.1.1-3ubuntu5 libavformat60=7:6.1.1-3ubuntu5 libavutil58=7:6.1.1-3ubuntu5 libswresample4=7:6.1.1-3ubuntu5 libmp3lame0=3.100-6build1\n          node scripts/narration-encoder-profile.mjs --local\n          ffmpeg -version | head -1\n          ffprobe -version | head -1",
+)
+
+Path(".github/workflows/narration-encoder-migrate.yml").unlink(missing_ok=True)
+Path("scripts/apply-encoder-provenance.py").unlink(missing_ok=True)
