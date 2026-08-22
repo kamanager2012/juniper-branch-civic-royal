@@ -209,8 +209,13 @@ export function writePilotReviewPackage(options = {}) {
   const validation = validateCurrentNarrationPilot();
   const pilotEvidenceSource = join(repoRoot, "content/evidence/narration/pilots/shou-zhu-v1.json");
   const receiptSource = join(repoRoot, validation.evidence.installedBatch.receiptPath);
-  copyFileSync(pilotEvidenceSource, join(outDir, "evidence/pilot.json"));
-  copyFileSync(receiptSource, join(outDir, "evidence/receipt.json"));
+  const pilotEvidenceTarget = join(outDir, "evidence/pilot.json");
+  const receiptTarget = join(outDir, "evidence/receipt.json");
+  copyFileSync(pilotEvidenceSource, pilotEvidenceTarget);
+  copyFileSync(receiptSource, receiptTarget);
+  if (sha256File(receiptTarget) !== manifest.installedBatch.receiptSha256) {
+    throw new Error("copied pilot receipt SHA mismatch");
+  }
 
   const manifestPath = join(outDir, "manifest.json");
   writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
