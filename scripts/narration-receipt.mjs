@@ -84,6 +84,12 @@ function validateKokoroRuntimeEnvironment(receipt, problems) {
     problems.push("kokoro-local receipt requires execution.runtime");
     return;
   }
+  if (runtime.platform !== KOKORO_RUNTIME_PLATFORM) {
+    problems.push(`kokoro-local execution.runtime.platform must be ${KOKORO_RUNTIME_PLATFORM}`);
+  }
+  if (runtime.arch !== KOKORO_RUNTIME_ARCH) {
+    problems.push(`kokoro-local execution.runtime.arch must be ${KOKORO_RUNTIME_ARCH}`);
+  }
   if (typeof runtime.pythonVersion !== "string" || !runtime.pythonVersion.startsWith(`${KOKORO_RUNTIME_PYTHON_SERIES}.`)) {
     problems.push(`kokoro-local execution.runtime.pythonVersion must be ${KOKORO_RUNTIME_PYTHON_SERIES}.x`);
   }
