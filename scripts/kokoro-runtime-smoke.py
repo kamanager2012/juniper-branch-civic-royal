@@ -4,8 +4,10 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import importlib.metadata
 import json
+import platform as host_platform
 from pathlib import Path
 import sys
 
@@ -28,11 +30,17 @@ def package_version(name: str) -> str:
     return importlib.metadata.version(name)
 
 
+def normalized_arch() -> str:
+    machine = host_platform.machine().lower()
+    return "x64" if machine in {"x86_64", "amd64"} else machine
+
+
 def main() -> None:
     args = parse_args()
     runtime = load_pinned_runtime(Path(args.kokoro_src_dir), Path(args.misaki_src_dir))
     ZHG2P = runtime["ZHG2P"]
-    g2p = ZHG2P(version="1.1", en_callable=None)
+    with contextlib.redirect_stdout(sys.stderr):
+        g2p = ZHG2P(version="1.1", en_callable=None)
 
     sample = "守株待兔，不能只靠运气。"
     chunks = phonemize_losslessly(g2p, sample)
@@ -65,6 +73,9 @@ def main() -> None:
         "schemaVersion": 1,
         "runtime": "kokoro-mandarin-minimal-v1",
         "pythonVersion": sys.version.split()[0],
+        "platform": sys.platform,
+        "arch": normalized_arch(),
+        "device": "cpu",
         "versions": {
             "torch": package_version("torch"),
             "transformers": package_version("transformers"),
@@ -80,7 +91,7 @@ def main() -> None:
         "longSampleChunks": len(long_chunks),
         "bannedModulesLoaded": unexpectedly_loaded,
     }
-    print(json.dumps(report, ensure_ascii=False, indent=2))
+    print(json.dumps(report, ensure_ascii=False, separators=(",", ":")))
 
 
 if __name__ == "__main__":
