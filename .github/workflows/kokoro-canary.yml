@@ -9,6 +9,7 @@ on:
       - "scripts/generate-narration-core.mjs"
       - "scripts/narration-pilot-approval.mjs"
       - "scripts/narration-pilot-review.mjs"
+      - "scripts/narration-pilot-review.test.mjs"
       - "scripts/kokoro-synthesize.py"
       - "scripts/kokoro_runtime.py"
       - "scripts/kokoro-runtime-smoke.py"
