@@ -27,46 +27,144 @@ jobs:
         run: npm ci
       - name: Recover exact Git lineage
         run: npm run source:recover
-      - name: Probe Ma Shan Zheng binary metadata
+      - name: Verify Ma Shan Zheng against pinned upstream TTFs
         run: |
-          command -v fc-scan >/dev/null
-          mkdir -p content/evidence/fonts
-          node --input-type=module <<'NODE'
-          import { execFileSync } from 'node:child_process';
-          import { createHash } from 'node:crypto';
-          import { readFileSync, writeFileSync } from 'node:fs';
+          python3 -m pip install --disable-pip-version-check 'fonttools[woff]==4.63.0'
+          mkdir -p content/evidence/fonts /tmp/mashanzheng
+          curl --fail --location --silent --show-error \
+            'https://raw.githubusercontent.com/googlefonts/mashanzheng/72c50ec001cea63d223d35562eeb2ba42f0fe67a/fonts/ttf/MaShanZheng-Regular.ttf' \
+            --output /tmp/mashanzheng/current.ttf
+          curl --fail --location --silent --show-error \
+            'https://raw.githubusercontent.com/googlefonts/mashanzheng/6bfdbe288f5935c6e9072cdd6ab1aa102a006aab/fonts/ttf/MaShanZheng-Regular.ttf' \
+            --output /tmp/mashanzheng/pre-bugfix.ttf
+          python3 <<'PY'
+          import hashlib
+          import json
+          import subprocess
+          from pathlib import Path
 
-          const path = 'public/fonts/MaShanZheng.woff2';
-          const bytes = readFileSync(path);
-          const sha256 = createHash('sha256').update(bytes).digest('hex');
-          const gitBlob = execFileSync('git', ['hash-object', '--', path], { encoding: 'utf8' }).trim();
-          const fields = execFileSync(
-            'fc-scan',
-            ['--format', '%{family}\n%{style}\n%{copyright}\n%{fontversion}\n', path],
-            { encoding: 'utf8' },
-          ).trimEnd().split('\n');
-          const [family = '', style = '', copyright = '', fontversion = ''] = fields;
+          from fontTools.pens.recordingPen import DecomposingRecordingPen
+          from fontTools.ttLib import TTFont
 
-          if (!family.includes('Ma Shan Zheng')) throw new Error(`unexpected font family: ${family}`);
-          if (!/Ma\s*Shan\s*Zheng/i.test(copyright)) throw new Error(`unexpected font copyright: ${copyright}`);
+          LOCAL = Path('public/fonts/MaShanZheng.woff2')
+          CANDIDATES = [
+              {
+                  'commit': '72c50ec001cea63d223d35562eeb2ba42f0fe67a',
+                  'gitBlob': '11bbfb9867d70612158229d037e7a5f622bd0e38',
+                  'path': Path('/tmp/mashanzheng/current.ttf'),
+              },
+              {
+                  'commit': '6bfdbe288f5935c6e9072cdd6ab1aa102a006aab',
+                  'gitBlob': 'a6ab20d1bd5f27fcfc4ed52515627d1bffb3b6d0',
+                  'path': Path('/tmp/mashanzheng/pre-bugfix.ttf'),
+              },
+          ]
 
-          const evidence = {
-            schemaVersion: 1,
-            asset: path,
-            sha256,
-            gitBlob,
-            inspectedWith: 'fontconfig fc-scan on ubuntu-24.04',
-            metadata: { family, style, copyright, fontversion },
-            license: {
-              type: 'SIL Open Font License 1.1',
-              local: 'licenses/fonts/MaShanZheng/OFL.txt',
-              upstreamRepository: 'https://github.com/googlefonts/mashanzheng',
-              upstreamLicense: 'https://github.com/googlefonts/mashanzheng/blob/master/OFL.txt'
-            }
-          };
-          writeFileSync('content/evidence/fonts/MaShanZheng.json', `${JSON.stringify(evidence, null, 2)}\n`);
-          console.log(JSON.stringify(evidence, null, 2));
-          NODE
+          def sha256(path):
+              return hashlib.sha256(path.read_bytes()).hexdigest()
+
+          def family_names(font):
+              out = set()
+              for record in font['name'].names:
+                  if record.nameID not in (1, 4, 6):
+                      continue
+                  try:
+                      value = record.toUnicode().strip()
+                  except Exception:
+                      continue
+                  if value:
+                      out.add(value)
+              return sorted(out)
+
+          def outline(font, glyph_name):
+              glyph_set = font.getGlyphSet()
+              pen = DecomposingRecordingPen(glyph_set)
+              glyph_set[glyph_name].draw(pen)
+              return pen.value
+
+          local = TTFont(str(LOCAL), recalcBBoxes=False, recalcTimestamp=False)
+          local_cmap = local.getBestCmap() or {}
+          if not local_cmap:
+              raise SystemExit('local WOFF2 has no Unicode cmap')
+          names = family_names(local)
+          if not any('Ma Shan Zheng' in value or 'MaShanZheng' in value for value in names):
+              raise SystemExit(f'unexpected local font names: {names}')
+
+          comparisons = []
+          match = None
+          for candidate in CANDIDATES:
+              upstream = TTFont(str(candidate['path']), recalcBBoxes=False, recalcTimestamp=False)
+              upstream_cmap = upstream.getBestCmap() or {}
+              missing = []
+              outline_mismatches = []
+              metric_mismatches = []
+
+              if local['head'].unitsPerEm != upstream['head'].unitsPerEm:
+                  comparisons.append({
+                      'commit': candidate['commit'],
+                      'gitBlob': candidate['gitBlob'],
+                      'upstreamSha256': sha256(candidate['path']),
+                      'matched': False,
+                      'reason': 'unitsPerEm mismatch',
+                  })
+                  continue
+
+              for codepoint, local_glyph in sorted(local_cmap.items()):
+                  upstream_glyph = upstream_cmap.get(codepoint)
+                  if upstream_glyph is None:
+                      missing.append(f'U+{codepoint:04X}')
+                      continue
+                  if local['hmtx'].metrics[local_glyph] != upstream['hmtx'].metrics[upstream_glyph]:
+                      metric_mismatches.append(f'U+{codepoint:04X}')
+                  if outline(local, local_glyph) != outline(upstream, upstream_glyph):
+                      outline_mismatches.append(f'U+{codepoint:04X}')
+
+              result = {
+                  'commit': candidate['commit'],
+                  'gitBlob': candidate['gitBlob'],
+                  'upstreamSha256': sha256(candidate['path']),
+                  'localCodepoints': len(local_cmap),
+                  'missingCodepoints': missing,
+                  'outlineMismatches': outline_mismatches,
+                  'metricMismatches': metric_mismatches,
+                  'matched': not missing and not outline_mismatches and not metric_mismatches,
+              }
+              comparisons.append(result)
+              if result['matched'] and match is None:
+                  match = result
+
+          if match is None:
+              print(json.dumps({'localNames': names, 'comparisons': comparisons}, indent=2, ensure_ascii=False))
+              raise SystemExit('local WOFF2 did not match any pinned official Ma Shan Zheng TTF candidate')
+
+          evidence = {
+              'schemaVersion': 1,
+              'asset': str(LOCAL),
+              'sha256': sha256(LOCAL),
+              'gitBlob': subprocess.check_output(['git', 'hash-object', '--', str(LOCAL)], text=True).strip(),
+              'identity': {
+                  'method': 'fonttools-cmap-outline-hmtx-subset-equivalence',
+                  'tool': 'fonttools 4.63.0',
+                  'localNames': names,
+                  'localCodepoints': len(local_cmap),
+                  'matchedUpstreamCommit': match['commit'],
+                  'matchedUpstreamGitBlob': match['gitBlob'],
+                  'matchedUpstreamSha256': match['upstreamSha256'],
+                  'allLocalCodepointsMatched': True,
+              },
+              'comparisons': comparisons,
+              'license': {
+                  'type': 'SIL Open Font License 1.1',
+                  'local': 'licenses/fonts/MaShanZheng/OFL.txt',
+                  'upstreamRepository': 'https://github.com/googlefonts/mashanzheng',
+                  'upstreamLicense': 'https://github.com/googlefonts/mashanzheng/blob/master/OFL.txt',
+              },
+          }
+          Path('content/evidence/fonts/MaShanZheng.json').write_text(
+              json.dumps(evidence, indent=2, ensure_ascii=False) + '\n', encoding='utf-8'
+          )
+          print(json.dumps(evidence, indent=2, ensure_ascii=False))
+          PY
       - name: Verify project gates
         run: npm run check
       - name: Verify dependency audit
