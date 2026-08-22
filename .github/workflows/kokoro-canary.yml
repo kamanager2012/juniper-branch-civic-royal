@@ -46,14 +46,14 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: "22"
           cache: npm
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.12"
 
@@ -70,7 +70,7 @@ jobs:
 
       - name: Restore locked narration uv package cache
         id: narration-uv-cache
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
         with:
           path: ~/.cache/uv
           key: kokoro-uv-packages-v1-${{ runner.os }}-${{ runner.arch }}-py312-uv0.10.0-${{ hashFiles('scripts/narration-runtime/pyproject.toml', 'scripts/narration-runtime/uv.lock') }}
@@ -117,7 +117,7 @@ jobs:
 
       - name: Restore exact pinned model asset cache
         id: kokoro-assets-cache
-        uses: actions/cache@v5
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
         with:
           path: .runtime-assets
           key: kokoro-local-assets-v1-${{ hashFiles('content/evidence/narration/providers/kokoro-v1.1-zh-zf001.json') }}
@@ -221,7 +221,7 @@ jobs:
           done
           find canary-artifact -maxdepth 3 -type f -print
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         if: always()
         with:
           name: kokoro-shou-zhu-canary
