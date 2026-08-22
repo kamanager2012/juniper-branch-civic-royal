@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 import { buildNarrationStateFromReceipt } from "./import-narration-receipt.mjs";
+import { computeNarrationInputDigest } from "./narration-generation-set.mjs";
 import { readNarrationReceipt, sha256Buffer, validateNarrationReceipt } from "./narration-receipt.mjs";
 import { evaluateNarrationStatus } from "./narration-plan.mjs";
 import { buildNarrationProvenanceEntries } from "./narration-rights.mjs";
@@ -14,11 +15,21 @@ const AUDIO_PATH = "public/audio/demo/p0.mp3";
 const RIGHTS_PATH = "content/evidence/narration/rights/test-provider.txt";
 
 function fixtureReceipt(audioSha256) {
+  const items = [
+    {
+      key: "demo/p0",
+      file: AUDIO_PATH,
+      textSha256: TEXT_SHA,
+      audioSha256,
+    },
+  ];
   return {
     schemaVersion: 1,
     batchId: "test-batch-001",
     canonicalSource: "content/published-stories.json",
     createdAt: "2026-08-22T06:00:00.000Z",
+    inputItemCount: items.length,
+    inputDigestSha256: computeNarrationInputDigest(items),
     provider: {
       name: "test-provider",
       voice: "voice-a",
@@ -29,14 +40,7 @@ function fixtureReceipt(audioSha256) {
       claim: "permission",
       evidence: [RIGHTS_PATH],
     },
-    items: [
-      {
-        key: "demo/p0",
-        file: AUDIO_PATH,
-        textSha256: TEXT_SHA,
-        audioSha256,
-      },
-    ],
+    items,
   };
 }
 
@@ -71,10 +75,30 @@ test("receipt schema rejects ambiguous paths and duplicate narration entries", (
 
   const invalid = structuredClone(valid);
   invalid.items.push({ ...invalid.items[0], file: "../escape.mp3" });
+  invalid.inputItemCount = invalid.items.length;
+  invalid.inputDigestSha256 = computeNarrationInputDigest(invalid.items);
   const result = validateNarrationReceipt(invalid);
   assert.equal(result.valid, false);
   assert.ok(result.problems.some((problem) => problem.includes("duplicates")));
   assert.ok(result.problems.some((problem) => problem.includes("canonical public/audio")));
+});
+
+test("receipt input digest is derived from the exact generation input set", () => {
+  const valid = fixtureReceipt("b".repeat(64));
+  assert.equal(valid.inputItemCount, 1);
+  assert.equal(valid.inputDigestSha256, computeNarrationInputDigest(valid.items));
+
+  const changedText = structuredClone(valid);
+  changedText.items[0].textSha256 = "c".repeat(64);
+  const changedResult = validateNarrationReceipt(changedText);
+  assert.equal(changedResult.valid, false);
+  assert.ok(changedResult.problems.includes("inputDigestSha256 does not match the receipt narration input set"));
+
+  const wrongCount = structuredClone(valid);
+  wrongCount.inputItemCount = 2;
+  const countResult = validateNarrationReceipt(wrongCount);
+  assert.equal(countResult.valid, false);
+  assert.ok(countResult.problems.includes("inputItemCount must exactly match items.length"));
 });
 
 test("receipt contract binds exact canonical text/audio pair and durable rights evidence", () => {
@@ -103,6 +127,8 @@ test("receipt contract binds exact canonical text/audio pair and durable rights 
     const entry = result.state.entries["demo/p0"];
     assert.equal(entry.textSha256, TEXT_SHA);
     assert.equal(entry.audioSha256, fixture.audioSha256);
+    assert.equal(entry.inputItemCount, durable.receipt.inputItemCount);
+    assert.equal(entry.inputDigestSha256, durable.receipt.inputDigestSha256);
     assert.equal(entry.receiptSha256, durable.receiptSha256);
     assert.equal(entry.rightsClaim, "permission");
     assert.deepEqual(entry.rightsEvidence, [RIGHTS_PATH]);
@@ -117,6 +143,7 @@ test("text or audio mismatch prevents narration state update", () => {
     const durable = readNarrationReceipt(RECEIPT_PATH, { root: fixture.root });
     const badReceipt = structuredClone(durable.receipt);
     badReceipt.items[0].textSha256 = "c".repeat(64);
+    badReceipt.inputDigestSha256 = computeNarrationInputDigest(badReceipt.items);
     const result = buildNarrationStateFromReceipt({
       receipt: badReceipt,
       receiptPath: durable.receiptPath,
@@ -176,6 +203,30 @@ test("durable receipt drift revokes generated narration provenance", () => {
     const drifted = buildNarrationProvenanceEntries(assets, plan, { readReceipt });
     assert.deepEqual(drifted.entries, {});
     assert.ok(drifted.issues.some((issue) => issue.includes("receipt SHA-256")));
+  } finally {
+    rmSync(fixture.root, { recursive: true, force: true });
+  }
+});
+
+test("narration state input digest drift revokes generated provenance", () => {
+  const fixture = makeFixture();
+  try {
+    const durable = readNarrationReceipt(RECEIPT_PATH, { root: fixture.root });
+    const imported = buildNarrationStateFromReceipt({
+      receipt: durable.receipt,
+      receiptPath: durable.receiptPath,
+      receiptSha256: durable.receiptSha256,
+      plan: { items: [{ key: "demo/p0", output: AUDIO_PATH, textSha256: TEXT_SHA, audioSha256: fixture.audioSha256 }] },
+      state: { schemaVersion: 1, entries: {} },
+      root: fixture.root,
+    });
+    const state = { ...imported.state.entries["demo/p0"], inputDigestSha256: "d".repeat(64) };
+    const plan = { items: [{ key: "demo/p0", output: AUDIO_PATH, textSha256: TEXT_SHA, audioSha256: fixture.audioSha256, status: "current", provenance: state }] };
+    const assets = [{ id: `audio:${AUDIO_PATH}`, category: "narration", path: AUDIO_PATH, fingerprintSha256: fixture.audioSha256 }];
+    const readReceipt = (path) => readNarrationReceipt(path, { root: fixture.root });
+    const result = buildNarrationProvenanceEntries(assets, plan, { readReceipt });
+    assert.deepEqual(result.entries, {});
+    assert.ok(result.issues.some((issue) => issue.includes("input digest")));
   } finally {
     rmSync(fixture.root, { recursive: true, force: true });
   }
