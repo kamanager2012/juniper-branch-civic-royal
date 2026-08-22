@@ -148,7 +148,7 @@ async function cliMain() {
 
   const result = reviewNarrationPilot({ decision, reviewerRole, decisionNote, write });
   console.log(JSON.stringify(result, null, 2));
-  if (!write) console.error("Dry-run only. Re-run with --write after confirming the human quality-gate decision.");
+  if (!write) console.error("Dry-run only. Re-run with --write after confirming the human quality-gate decision (approve, reject, or waive).");
 }
 
 if (process.argv[1]?.endsWith("narration-pilot-review.mjs")) {
