@@ -9,6 +9,7 @@ import { loadStoryModel, repoRoot } from "./story-model.mjs";
 const model = loadStoryModel();
 const draftCatalog = loadDraftStoryCatalog();
 const report = buildReleaseReadiness();
+const NON_NARRATION_VERIFIED_BASELINE = 297;
 
 test("release inventory has 100 verified texts and 192 verified story images", () => {
   assert.equal(report.categories["story-text"]?.total, model.stories.length + draftCatalog.stories.length);
@@ -36,15 +37,18 @@ test("release inventory has 100 verified texts and 192 verified story images", (
   for (const asset of report.assets) assert.match(asset.fingerprintSha256, /^[a-f0-9]{64}$/);
 });
 
-test("provenance accounting is complete and remains blocked only by narration", () => {
+test("provenance accounting stays exact as narration is verified incrementally", () => {
   const p = report.provenance;
+  const narration = report.categories.narration;
+  assert.ok(narration, "narration category must exist");
   assert.equal(p.verified + p.unverified + p.stale + p.invalid, p.total);
   assert.equal(p.total, report.assets.length);
   assert.equal(p.total, 513);
-  assert.equal(p.verified, 297);
-  assert.equal(p.unverified, 216);
-  assert.equal(p.stale, 0);
-  assert.equal(p.invalid, 0);
+  assert.equal(p.verified, NON_NARRATION_VERIFIED_BASELINE + narration.verified);
+  assert.equal(p.unverified, narration.unverified);
+  assert.equal(p.stale, narration.stale ?? 0);
+  assert.equal(p.invalid, narration.invalid ?? 0);
+  assert.equal(NON_NARRATION_VERIFIED_BASELINE + narration.total, p.total);
   assert.ok(p.coverage >= 0 && p.coverage <= 1);
   assert.deepEqual(report.issues, [], `release registry issues: ${report.issues.join("; ")}`);
 
@@ -54,15 +58,25 @@ test("provenance accounting is complete and remains blocked only by narration", 
     p.invalid === 0 &&
     report.narration.current === report.narration.total;
   assert.equal(report.releaseReady, expectedReady);
-  assert.equal(report.releaseReady, false, "verified text/images must not bypass unresolved narration rights and synchronization");
+  if (report.narration.current < report.narration.total) {
+    assert.equal(report.releaseReady, false, "partial narration verification must not mark the full release ready");
+  }
 });
 
-test("narration synchronization remains the unresolved release condition", () => {
+test("narration synchronization accounting supports partial verified batches", () => {
   const n = report.narration;
+  const category = report.categories.narration;
+  assert.ok(category, "narration category must exist");
   assert.equal(n.current + n.stale + n.unverified + n.missing, n.total);
   assert.equal(n.total, model.pages.length);
-  assert.equal(n.current, 0);
-  assert.equal(n.unverified, 216);
+  assert.equal(n.total, 216);
+  assert.equal(n.stale, 0);
+  assert.equal(n.missing, 0);
+  assert.equal(n.unverified, n.total - n.current);
+  assert.equal(category.verified, n.current);
+  assert.equal(category.unverified, n.unverified);
+  assert.equal(category.stale ?? 0, 0);
+  assert.equal(category.invalid ?? 0, 0);
 });
 
 test("provenance evidence references must be durable and resolvable", () => {
