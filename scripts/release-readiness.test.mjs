@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import test from "node:test";
-import { buildReleaseReadiness } from "./release-readiness.mjs";
-import { loadStoryModel } from "./story-model.mjs";
+import { buildReleaseReadiness, validateEvidenceReference } from "./release-readiness.mjs";
+import { loadStoryModel, repoRoot } from "./story-model.mjs";
 
 const model = loadStoryModel();
 const report = buildReleaseReadiness();
@@ -37,4 +39,38 @@ test("narration synchronization remains a separate release condition", () => {
   const n = report.narration;
   assert.equal(n.current + n.stale + n.unverified + n.missing, n.total);
   assert.equal(n.total, model.pages.length);
+});
+
+test("provenance evidence references must be durable and resolvable", () => {
+  assert.deepEqual(validateEvidenceReference("licenses/fonts/MaShanZheng/OFL.txt"), {
+    valid: true,
+    kind: "local",
+    problem: null,
+  });
+  assert.deepEqual(validateEvidenceReference("https://github.com/googlefonts/mashanzheng/blob/master/OFL.txt"), {
+    valid: true,
+    kind: "https",
+    problem: null,
+  });
+  assert.equal(validateEvidenceReference("http://example.com/license").valid, false);
+  assert.equal(validateEvidenceReference("../outside-repo.txt").valid, false);
+  assert.equal(validateEvidenceReference("content/evidence/does-not-exist.json").valid, false);
+});
+
+test("Ma Shan Zheng is the first fingerprint-backed licensed release asset", () => {
+  const asset = report.assets.find((item) => item.id === "font:public/fonts/MaShanZheng.woff2");
+  assert.ok(asset, "Ma Shan Zheng release asset missing");
+  assert.equal(asset.fingerprintSha256, "11e2c8cbcd09ac08fa38066a2e9699e57fda40a8e2880fbf7cbf101f5926a595");
+  assert.equal(asset.provenanceStatus, "verified");
+  assert.equal(asset.claim, "licensed");
+
+  const evidence = JSON.parse(readFileSync(join(repoRoot, "content/evidence/fonts/MaShanZheng.json"), "utf8"));
+  assert.equal(evidence.sha256, asset.fingerprintSha256);
+  assert.equal(evidence.identity.tool, "fonttools 4.63.0");
+  assert.equal(evidence.identity.localCodepoints, 802);
+  assert.equal(evidence.identity.allLocalCodepointsMatched, true);
+  assert.equal(evidence.identity.matchedUpstreamCommit, "72c50ec001cea63d223d35562eeb2ba42f0fe67a");
+  assert.equal(evidence.identity.matchedUpstreamGitBlob, "11bbfb9867d70612158229d037e7a5f622bd0e38");
+  assert.ok(evidence.comparisons.every((comparison) => comparison.matched === true));
+  assert.equal(evidence.license.type, "SIL Open Font License 1.1");
 });
