@@ -1,6 +1,8 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { join, relative } from "node:path";
+import { join, relative, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
+import { buildNarrationPlan } from "./narration-plan.mjs";
 import { loadStoryModel, repoRoot } from "./story-model.mjs";
 
 function walk(dir) {
@@ -124,6 +126,14 @@ export function buildContentReport() {
   for (const path of orphanImages) issues.push(`orphan story asset: ${path}`);
   for (const path of orphanAudio) issues.push(`orphan narration asset: ${path}`);
 
+  const narrationPlan = buildNarrationPlan();
+  const narration = Object.fromEntries(
+    ["current", "stale", "unverified", "missing"].map((status) => [
+      status,
+      narrationPlan.items.filter((item) => item.status === status).length,
+    ]),
+  );
+
   return {
     schemaVersion: 1,
     canonicalSource: "src/data/stories.ts",
@@ -134,19 +144,20 @@ export function buildContentReport() {
       imageBytes: stories.reduce((sum, story) => sum + story.imageBytes, 0),
       audioBytes: stories.reduce((sum, story) => sum + story.audioBytes, 0),
     },
+    narration,
     issues: [...new Set(issues)].sort(),
     warnings: [...new Set(warnings)].sort(),
     stories,
   };
 }
 
-const isCli = process.argv[1] && new URL(`file://${process.argv[1]}`).href === import.meta.url;
+const isCli = Boolean(process.argv[1]) && pathToFileURL(resolve(process.argv[1])).href === import.meta.url;
 if (isCli) {
   const report = buildContentReport();
   const check = process.argv.includes("--check");
   const summaryOnly = process.argv.includes("--summary");
   if (summaryOnly) {
-    console.log(JSON.stringify({ schemaVersion: report.schemaVersion, totals: report.totals, issues: report.issues, warnings: report.warnings }, null, 2));
+    console.log(JSON.stringify({ schemaVersion: report.schemaVersion, totals: report.totals, narration: report.narration, issues: report.issues, warnings: report.warnings }, null, 2));
   } else {
     console.log(JSON.stringify(report, null, 2));
   }
