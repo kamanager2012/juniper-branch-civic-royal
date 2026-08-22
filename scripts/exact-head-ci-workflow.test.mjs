@@ -32,14 +32,16 @@ test("all third-party actions are immutable approved commits", () => {
   }
 });
 
-test("machine-readable success is impossible unless every required job succeeds", () => {
+test("machine-readable success is impossible unless every required job succeeds and links to its run", () => {
   assert.match(workflow, /needs:\s*\[check, dependency-audit, e2e\]/);
   assert.match(workflow, /if:\s*\$\{\{ always\(\) \}\}/);
   assert.match(workflow, /CHECK_RESULT:\s*\$\{\{ needs\.check\.result \}\}/);
   assert.match(workflow, /AUDIT_RESULT:\s*\$\{\{ needs\.dependency-audit\.result \}\}/);
   assert.match(workflow, /E2E_RESULT:\s*\$\{\{ needs\.e2e\.result \}\}/);
+  assert.match(workflow, /RUN_URL:\s*\$\{\{ github\.server_url \}\}\/\$\{\{ github\.repository \}\}\/actions\/runs\/\$\{\{ github\.run_id \}\}/);
   assert.match(workflow, /if \[ "\$CHECK_RESULT" = success \] && \[ "\$AUDIT_RESULT" = success \] && \[ "\$E2E_RESULT" = success \]/);
   assert.match(workflow, /context="exact-head-ci"/);
   assert.match(workflow, /statuses\/\$\{GITHUB_SHA\}/);
+  assert.match(workflow, /target_url="\$RUN_URL"/);
   assert.match(workflow, /test "\$state" = success/);
 });
