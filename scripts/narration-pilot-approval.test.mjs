@@ -77,7 +77,7 @@ test("expansion approval requires complete listening review metadata and intact 
   }
 });
 
-test("official generation entrypoint is guarded and raw generator is restricted to the read-only pilot canary", () => {
+test("official generation entrypoint is guarded and raw workflow execution is restricted to the read-only pilot canary", () => {
   const pkg = JSON.parse(readFileSync(join(repoRoot, "package.json"), "utf8"));
   assert.equal(pkg.scripts["narration:generate"], "node scripts/generate-narration-guarded.mjs");
 
@@ -85,11 +85,14 @@ test("official generation entrypoint is guarded and raw generator is restricted 
   assert.match(wrapper, /assertNarrationExpansionAllowed/);
   assert.match(wrapper, /scripts\/generate-narration\.mjs/);
 
+  const generator = readFileSync(join(repoRoot, "scripts/generate-narration.mjs"), "utf8");
+  assert.match(generator, /assertNarrationExpansionAllowed/);
+
   const workflowsDir = join(repoRoot, ".github/workflows");
-  const rawReferences = readdirSync(workflowsDir)
+  const rawExecutions = readdirSync(workflowsDir)
     .filter((name) => name.endsWith(".yml") || name.endsWith(".yaml"))
-    .filter((name) => readFileSync(join(workflowsDir, name), "utf8").includes("scripts/generate-narration.mjs"));
-  assert.deepEqual(rawReferences, ["kokoro-canary.yml"]);
+    .filter((name) => /\bnode\s+scripts\/generate-narration\.mjs\b/.test(readFileSync(join(workflowsDir, name), "utf8")));
+  assert.deepEqual(rawExecutions, ["kokoro-canary.yml"]);
 
   const canary = readFileSync(join(workflowsDir, "kokoro-canary.yml"), "utf8");
   assert.match(canary, /permissions:\s*\n\s*contents:\s*read/);
