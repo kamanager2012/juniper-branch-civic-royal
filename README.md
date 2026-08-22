@@ -16,11 +16,16 @@
 - 移动端安全区和触控体验
 - 标准静态 Web App Manifest
 - 产品自有离线 app shell；已访问故事图片可在断网后继续显示
+- canonical 内容模型、资产完整性报告和旁白 provenance 状态
 
 ## 架构
 
 ```text
 src/data/stories.ts
+        ↓
+scripts/story-model.mjs
+   ↙         ↓          ↘
+content gate  report   narration plan/generator
         ↓
 public/stories + public/audio
         ↓
@@ -42,6 +47,7 @@ npm ci
 npm run deps:inventory
 npm run typecheck
 npm test
+npm run content:check
 npm run build
 npm run dev
 ```
@@ -74,29 +80,66 @@ PWA 元数据位于 `public/manifest.webmanifest`，离线 shell 位于 `public/
 
 音频体积较大，而且浏览器可能使用分段 Range 请求。未来如果要提供“整本下载后离线听”，应单独设计下载、容量、更新和清理机制，而不是偷偷把所有 MP3 塞进 service-worker cache。
 
-## 内容结构
+## 内容模型与生产链
 
-故事元数据位于：
+唯一 canonical 内容源是：
 
 ```text
 src/data/stories.ts
 ```
 
-每一页由 story id、page id、page kind、正文、图片和旁白音频组成。静态内容位于：
+所有内容工具统一通过：
+
+```text
+scripts/story-model.mjs
+```
+
+解析同一份 story/page/text 事实，不再允许生成器、迁移脚本或测试自己复制故事正文。
+
+静态内容位于：
 
 ```text
 public/stories/<story-id>/...
 public/audio/<story-id>/...
 ```
 
-CI 使用 TypeScript AST 读取真实 `page()` 调用，并检查每页图片/音频存在且非空，同时检查 story/page ID 与 cover/moral 结构，避免出现“代码能构建，但线上缺页/缺音频”的假通过。
+常用内容命令：
+
+```bash
+# 严格检查 manifest、图片/MP3 签名、缺失资产和 orphan 资产
+npm run content:check
+
+# 输出确定性的机器可读报告：故事/页数、字节数、SHA-256、问题与警告
+npm run content:report
+
+# 查看每个旁白相对当前正文的 current/stale/unverified/missing 状态
+npm run narration:plan
+```
+
+`content/narration-state.json` 只记录通过当前 pipeline 生成或验证过的旁白。历史 MP3 如果没有匹配的 text/audio SHA-256 记录，只能标记为 `unverified`，不能因为文件存在就宣称“与当前正文一致”。
+
+### 旁白生成
+
+旁白生成器不会内置另一份故事正文，也不会默认批量调用付费接口：
+
+```bash
+# 只看计划，不产生请求
+npm run narration:generate -- --story shou-zhu --voice <VOICE_ID> --dry-run
+
+# 明确指定单个故事与 voice 后生成
+XAI_API_KEY=... npm run narration:generate -- --story shou-zhu --voice <VOICE_ID>
+```
+
+批量全量生成必须显式使用 `--all`。Voice 必须通过 `--voice` 或 `XAI_TTS_VOICE_ID` 指定，生成器会先从 xAI voice API 校验该 voice 是否当前可用。API key 只从环境变量读取。
+
+旧的 `expand-stories.py`、`generate-narration.py`、`generate-narration-2.py` 已退出 active tree；它们的历史仍保存在 Git 中，但不再构成内容真源。
 
 ## 工程边界
 
 - 不让 Better Auth / PostgreSQL / PGlite / TanStack Start / Nitro 等未使用基础设施进入默认主链；
 - 不提交 Vercel 构建输出、临时 artifacts、截图目录或本地 Builder 状态；
 - 保留真正服务于绘本体验的图片、音频和字体；
-- import inventory、typecheck、tests、build、dependency audit 都属于交付 gate；
+- import inventory、typecheck、tests、content gate、build、dependency audit 都属于交付 gate；
 - 路由/阅读器/媒体/响应式/PWA/部署改动还必须通过产品级浏览器 E2E；
 - service-worker cache 只能清理本项目自己的 `chengyu-storybook-*` key；
 - 大体积历史生成物若要清理，单独做经过审计的 Git history rewrite，不和产品开发混在一起。
